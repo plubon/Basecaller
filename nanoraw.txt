@@ -1,0 +1,12 @@
+nanoraw genome_resquiggle /home/lubonp/Dane/squiggled /home/lubonp/Dane/genome-diploid/NA12878_diploid_2017_jan7/chrM_NA12878_maternal.fa --graphmap-executable /home/lubonp/Apps/graphmap/bin/Linux-x64/graphmap --normalization-type median --failed-reads-filename testing.signif_group1.failed_read.txt --processes 4 --overwrite
+
+--timeout 60 --cpts-limit 100
+
+
+
+cp `ls | head -5000` /home/lubonp/Dane/squiggled
+
+nanoraw genome_resquiggle ~/Dane/chrM/rel3-fast5-chrM.part01/rel3/\$\{chr\}/\$\{fn\}/ ~/Dane/genome-diploid/NA12878_diploid_2017_jan7/chrM_NA12878_maternal.fa --graphmap-executable /home/lubonp/Apps/graphmap/bin/Linux-x64/graphmap --timeout 60 --cpts-limit 100 --normalization-type median --failed-reads-filename testing.signif_group1.failed_read.txt --processes 4 --overwrite
+
+/home/lubonp/Apps/bwa-0.7.17/bwa
+nanoraw genome_resquiggle /home/lubonp/Dane/squiggled /home/lubonp/Dane/genome-diploid/NA12878_diploid_2017_jan7/chrM_NA12878_maternal.fa --bwa-executable ~/Apps/bwa-0.7.17/bwa --normalization-type median --failed-reads-filename testing.signif_group1.failed_read.txt --processes 4 --overwrite

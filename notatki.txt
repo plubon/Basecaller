@@ -1,0 +1,24 @@
+Notatki
+
+Pobranie danych:
+	surowy sygnał plus eventy i wstępny basecalling: https://github.com/nanopore-wgs-consortium/NA12878/blob/master/nanopore-human-genome/rel_3_4.md
+
+	chromosom diploidalny: http://sv.gersteinlab.org/NA12878_diploid/NA12878_diploid_2017_jan7/
+
+	dna pochodzi z genomu NA12878
+
+Dopasowanie sekcji surowego sygnału do baz w genomie referencyjnym:
+	użycie nanoraw i BWA
+
+	zbudowanie indexu bwa: ./bwa index ~/Dane/genome-diploid/NA12878_diploid_2017_jan7/chrM_NA12878_maternal.fa
+
+	dopasowanie przy użyciu nanoraw: nanoraw genome_resquiggle /home/lubonp/Dane/squiggled /home/lubonp/Dane/genome-diploid/NA12878_diploid_2017_jan7/chrM_NA12878_maternal.fa --bwa-executable ~/Apps/
+	bwa-0.7.17/bwa --normalization-type median --failed-reads-filename testing.signif_group1.failed_read.txt --processes 4 --overwrite
+	
+	normalizacja poprzez odjęcie mediany i podzielenie przez Median absolute deviation, dodatkowo winsoryzacja na zakresie (-5,5)
+	
+	sprawdzenie czy wyniki zgadzają się z danymi początkowymi - dokonanie powyższych przekształceń na surowym sygnale i sprawdzenie czy w segmentach sygnału wyznaczonych przez nanoraw zgadza się 
+	znormalizowana średnia i odchylenie standardowe wartości sygnału - skrpyt NanorawValidation
+
+
+
