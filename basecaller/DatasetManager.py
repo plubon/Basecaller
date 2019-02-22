@@ -2,6 +2,15 @@ import os
 import random
 import h5py
 import numpy as np
+import keras
+
+class SignalSequence(keras.utils.Sequence):
+
+	def __init__(self, path, read_number=4000, read_lens=[200,400,100]):
+		self.path = path
+		self.read_number = read_number
+		self.read_lens = read_lens
+		self.used_files_paths = []
 
 class DatasetManager:
 

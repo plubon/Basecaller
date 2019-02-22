@@ -1,0 +1,47 @@
+300 signals -> 10-20 base pairs
+
+Layery:
+	5 x residual block:
+		1x1 conv 256 no bias - czy to ma sens?
+		1x3 conv 256 no bias
+		1x1 conv 256 no bias - max pooling z porzedniego layera
+		1x1 conv 256 residual that is added of output of 3 above layers
+		global batch normalization after every convolution
+		stride=1
+		relu activation
+		suma branchy + relu na koniec
+		inne kernele i inna liczba filtrow juz sprawdzone
+	3 x rnn:
+		lst - można sprobowac GRu zamiast
+		200 hidden units
+		separate batch normalization on the inside cell state and input term
+		return concatenated last forward layer and last backward layer
+	1 x fc:
+		softmax
+	1 x CTC decoder lub greedy
+
+Dane:
+	normalizacja per read
+	4000 readów
+	ready o zmiennej długosc - 200, 400, 1000
+	batche readow o powyzszych dlugosciach na zmiane
+
+Sliding window:
+	przesunięcie o 10% długości okna
+	batch size(100) - kazda obserwacja w batchu to kolejne przesuniecie
+	assemlby z tych wyników
+
+Nanopore:
+	250-450 bp/s przepływ
+	4000 signal samples/s
+
+
+To do:
+	-szybki i ogarniety sposob tworzenia batchy, zeby nie bylo trzeba czekac po kazdym batchu na dane
+	-sieć, jeśli się da to keras
+
+
+Future work:
+linear quantization
+weight pruning
+czy nie da sie tego zmniejszyc? wiekszy stride? poolingi?
