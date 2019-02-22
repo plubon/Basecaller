@@ -3,14 +3,42 @@ import random
 import h5py
 import numpy as np
 import keras
+from sklearn.model_selection import train_test_split
 
 class SignalSequence(keras.utils.Sequence):
 
-	def __init__(self, path, read_number=4000, read_lens=[200,400,100]):
-		self.path = path
-		self.read_number = read_number
+	def __init__(self, file_paths, batch_size=100, number_of_reads=4000, read_lens=[200,400,1000]):
+		self.file_paths = file_paths
 		self.read_lens = read_lens
+		self.number_of_reads = number_of_reads
 		self.used_files_paths = []
+		self.batch_size = batch_size
+
+	def __len__(self):
+		return int(np.floor(self.number_of_reads/self.batch_size))
+
+	def __getitem__(self, index):
+		type_dirs = random.choices(self.file_paths.keys(), k=batch_size)
+		read_len = random.choice(self.read_lens)
+
+class DatasetReader:
+
+	def __init__(self, path):
+		self.base_path = path
+		self.type_dirs = os.listdir(self.path)
+		self.files = dict()
+		for type_dir in self.type_dirs:
+			dir_path = os.path.join(self.base_path, type_dir)
+			self.files[type_dir] = [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file))]
+
+	def get_train_test_files(self):
+		train = dict()
+		test = dict()
+		for type_dir in self.type_dirs:
+			train, test = train_test_split(self.files[type_dir], test_size=0.2)
+			train[type_dir] = [os.path.join(self.base_path, type_dir, x) for x in train]
+			test[type_dir] = [os.path.join(self.base_path, type_dir, x) for x in test]
+		return train, test
 
 class DatasetManager:
 
