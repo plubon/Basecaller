@@ -3,13 +3,12 @@ import random
 import h5py
 import numpy as np
 import keras
-import datetime
 from math import ceil, floor
 from sklearn.model_selection import train_test_split
 
 class SignalSequence(keras.utils.Sequence):
 
-	alphabet = 'ACGT '
+	alphabet = b'ACGT '
 
 	def __init__(self, file_paths, batch_size=100, number_of_reads=4000, read_lens=[200,400,1000], dir_probs=None):
 		self.file_paths = file_paths
@@ -75,7 +74,8 @@ class DataDirectoryReader:
 		self.files = dict()
 		for type_dir in self.type_dirs:
 			dir_path = os.path.join(self.base_path, type_dir)
-			self.files[type_dir] = [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file))]
+			self.files[type_dir] = [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file)) and self.file_is_valid(type_dir, file)]
+			print(len(self.files[type_dir]))
 
 	def get_train_test_files(self):
 		train_dict = dict()
@@ -85,6 +85,14 @@ class DataDirectoryReader:
 			train_dict[type_dir] = [os.path.join(self.base_path, type_dir, x) for x in train]
 			test_dict[type_dir] = [os.path.join(self.base_path, type_dir, x) for x in test]
 		return train_dict, test_dict
+
+	def file_is_valid(self, dir_name, file):
+		with h5py.File(os.path.join(self.base_path, dir_name, file),'r') as contents:
+			has_analysis = 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' in contents
+			if has_analysis:
+				return contents['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events'][-1][2] > 1000
+			else:
+				return False
 
 class Fast5Reader:
 
@@ -101,16 +109,18 @@ class Fast5Reader:
 			return self._get_sample_from_h5(contents)
 
 	def _get_sample_from_h5(self, h5_file):
-		corrected_events = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events'][()]
+		corrected_events = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
+		corrected_events_array = corrected_events[()]
 		raw_signal = h5_file['Raw/Reads']
 		signal_path = raw_signal.visit(self.find_signal)
 		dataset = raw_signal[signal_path]
-		offset = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events'].attrs.get('read_start_rel_to_raw')
-		print(corrected_events)
-		analyzed_length = corrected_events[-1,2]
+		offset = corrected_events.attrs.get('read_start_rel_to_raw')
+		event_position = np.array([x[2] for x in corrected_events_array])
+		sequence = np.array([x[4] for x in corrected_events_array])
+		analyzed_length = event_position[-1]
 		index = random.randrange(analyzed_length - self.window_size)
 		signal = dataset[(offset+index):(offset+index+self.window_size)]
-		first_event_idx = np.argmax(corrected_events[:,2] >= index)
-		last_event_idx = np.argmax(corrected_events[:,2] >= index + self.window_size)
-		seq = corrected_events[first_event_idx:last_event_idx,4]
+		seq_start = np.argmax(event_position > index)
+		seq_end = np.argmax(event_position > index + self.window_size)
+		seq = sequence[seq_start:seq_end]
 		return signal, seq
