@@ -45,3 +45,4 @@ Future work:
 linear quantization
 weight pruning
 czy nie da sie tego zmniejszyc? wiekszy stride? poolingi?
+There are also improvements in accuracy to be gained from bet-ter alignment of overlapping reads and consensus calling. In-creasing the size of the sliding window will also improve accu-racy but at the cost of increased memory and running time.
