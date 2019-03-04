@@ -18,7 +18,6 @@ class SignalSequence(keras.utils.Sequence):
 		self.batch_read_lens = random.choices(read_lens, k=len(self))
 		if dir_probs is None:
 			self.dir_probs = [1/len(self.file_paths.keys())]*len(self.file_paths.keys())
-			print(self.dir_probs)
 		else:
 			self.dir_probs = dir_probs
 		self.dir_counts = {list(file_paths.keys())[idx]:floor(batch_size*value) for idx, value in enumerate(self.dir_probs)}
@@ -54,14 +53,17 @@ class SignalSequence(keras.utils.Sequence):
 		Y = [s[1] for s in samples]
 		Y = [self.seq_to_label(y) for y in Y]
 		max_len = max([len(y) for y in Y])
-		Y_array = np.full((len(Y), max_len), -1)
+		Y_array = np.zeros((len(Y), 300))
 		for idx, word in enumerate(Y):
-			Y_array[idx, 0:len(word)] = word 
+			Y_array[idx, 0:len(word)] = word
+		input_arr = np.expand_dims(np.stack(X).astype(np.float32), -1)
+		for i in range(input_arr.shape[0]):
+			input_arr[i,:] = (input_arr[i,:] - np.mean(input_arr[i,:]))/np.std(input_arr[i,:])
 		inputs = {
-			'the_input': np.stack(X),
+			'the_input': input_arr,
 			'the_labels': Y_array,
-			'input_length': read_len,
-			'label_length': max_len
+			'input_length': np.full([input_arr.shape[0], 1], read_len),
+			'label_length': np.reshape(np.array([len(y) for y in Y]), [input_arr.shape[0], 1])
 		}
 		outputs = {'ctc': np.zeros([self.batch_size])}
 		return (inputs, outputs)
@@ -75,7 +77,11 @@ class DataDirectoryReader:
 		for type_dir in self.type_dirs:
 			dir_path = os.path.join(self.base_path, type_dir)
 			self.files[type_dir] = [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file)) and self.file_is_valid(type_dir, file)]
-			print(len(self.files[type_dir]))
+
+	def get_stuck_files(self):
+		for type_dir in self.type_dirs:
+			dir_path = os.path.join(self.base_path, type_dir)
+			self.files[type_dir] = [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file)) and self.file_is_stuck(type_dir, file)]
 
 	def get_train_test_files(self):
 		train_dict = dict()
@@ -85,6 +91,16 @@ class DataDirectoryReader:
 			train_dict[type_dir] = [os.path.join(self.base_path, type_dir, x) for x in train]
 			test_dict[type_dir] = [os.path.join(self.base_path, type_dir, x) for x in test]
 		return train_dict, test_dict
+	
+	def file_is_stuck(self, dir_name, file):
+		with h5py.File(os.path.join(self.base_path, dir_name, file),'r') as contents:
+			has_analysis = 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' in contents
+			if has_analysis:
+				rows = contents['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
+				lens = [x[2] for x in rows]				
+				return max(lens) > 50
+			else:
+				return False
 
 	def file_is_valid(self, dir_name, file):
 		with h5py.File(os.path.join(self.base_path, dir_name, file),'r') as contents:
@@ -123,4 +139,10 @@ class Fast5Reader:
 		seq_start = np.argmax(event_position > index)
 		seq_end = np.argmax(event_position > index + self.window_size)
 		seq = sequence[seq_start:seq_end]
+		if len(seq) == 0:
+			print(self.path)
+			print(analyzed_length)
+			print(index)
+			print(self.window_size)
+			raise NameError('Sequence of length 0 created')
 		return signal, seq
