@@ -8,7 +8,17 @@ from sklearn.model_selection import train_test_split
 
 class SignalSequence(keras.utils.Sequence):
 
-	alphabet = b'ACGT '
+	alphabet_dict = {
+	b'A':0,
+	b'a':0,
+	b'C':1,
+	b'c':1,
+	b'G':2,
+	b'g':2,
+	b'T':3,
+	b't':3,
+
+	}
 
 	def __init__(self, file_paths, batch_size=100, number_of_reads=4000, read_lens=[200,400,1000], dir_probs=None):
 		self.file_paths = file_paths
@@ -41,7 +51,8 @@ class SignalSequence(keras.utils.Sequence):
 			self.batches.append(batch)
 
 	def seq_to_label(self, seq):
-		return [self.alphabet.find(x) for x in seq]
+		labels = [self.alphabet_dict[x] for x in seq]
+		return labels
 
 	def __len__(self):
 		return int(ceil(self.number_of_reads/self.batch_size))
@@ -52,7 +63,6 @@ class SignalSequence(keras.utils.Sequence):
 		X = [s[0] for s in samples]
 		Y = [s[1] for s in samples]
 		Y = [self.seq_to_label(y) for y in Y]
-		max_len = max([len(y) for y in Y])
 		Y_array = np.zeros((len(Y), 300))
 		for idx, word in enumerate(Y):
 			Y_array[idx, 0:len(word)] = word
@@ -70,18 +80,38 @@ class SignalSequence(keras.utils.Sequence):
 
 class DataDirectoryReader:
 
+	index_filename = 'index'
+
 	def __init__(self, path):
 		self.base_path = path
 		self.type_dirs = os.listdir(self.base_path)
 		self.files = dict()
+		self.stuck_files = []
+		self.uncertain_files = []
 		for type_dir in self.type_dirs:
 			dir_path = os.path.join(self.base_path, type_dir)
-			self.files[type_dir] = [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file)) and self.file_is_valid(type_dir, file)]
+			if os.path.isfile(os.path.join(dir_path, self.index_filename)):
+				with open(os.path.join(dir_path, self.index_filename)) as file:
+					valid_files_names = file.readlines()
+					self.files[type_dir] = [x.strip() for x in valid_files_names]
+			else:
+				self.files[type_dir] = [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file)) and self.file_is_valid(type_dir, file)]
+				with open(os.path.join(dir_path, self.index_filename), 'w') as file:
+					for filename in self.files[type_dir]:
+						file.write("%s\n" % filename)
+
 
 	def get_stuck_files(self):
 		for type_dir in self.type_dirs:
 			dir_path = os.path.join(self.base_path, type_dir)
-			self.files[type_dir] = [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file)) and self.file_is_stuck(type_dir, file)]
+			self.stuck_files += [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file)) and self.file_is_stuck(type_dir, file)]
+		return self.stuck_files
+
+	def get_uncertain_files(self):
+		for type_dir in self.type_dirs:
+			dir_path = os.path.join(self.base_path, type_dir)
+			self.uncertain_files += [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path,file)) and self.file_is_uncertain(type_dir, file)]
+		return self.uncertain_files		
 
 	def get_train_test_files(self):
 		train_dict = dict()
@@ -97,8 +127,26 @@ class DataDirectoryReader:
 			has_analysis = 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' in contents
 			if has_analysis:
 				rows = contents['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
-				lens = [x[2] for x in rows]				
-				return max(lens) > 50
+				lens = [x[3] for x in rows]				
+				return max(lens) > 200
+			else:
+				return False
+
+	def file_is_uncertain(self, dir_name, file):
+		with h5py.File(os.path.join(self.base_path, dir_name, file),'r') as contents:
+			has_analysis = 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' in contents
+			if has_analysis:
+				rows = contents['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
+				chars = [x[4] for x in rows]				
+				return any([x not in b'AaCcGgTt' for x in chars])
+			else:
+				return False
+
+	def file_has_correct_length(self, dir_name, file):
+		with h5py.File(os.path.join(self.base_path, dir_name, file),'r') as contents:
+			has_analysis = 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' in contents
+			if has_analysis:
+				return contents['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events'][-1][2] > 1000
 			else:
 				return False
 
@@ -106,9 +154,12 @@ class DataDirectoryReader:
 		with h5py.File(os.path.join(self.base_path, dir_name, file),'r') as contents:
 			has_analysis = 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' in contents
 			if has_analysis:
-				return contents['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events'][-1][2] > 1000
+				data = contents['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
+				lens = [x[3] for x in data]
+				chars = [x[4] for x in data]
+				return all([x in b'AaCcGgTt' for x in chars]) and max(lens) < 200 and data[-1][2] > 1000
 			else:
-				return False
+				return False		
 
 class Fast5Reader:
 
@@ -137,12 +188,6 @@ class Fast5Reader:
 		index = random.randrange(analyzed_length - self.window_size)
 		signal = dataset[(offset+index):(offset+index+self.window_size)]
 		seq_start = np.argmax(event_position > index)
-		seq_end = np.argmax(event_position > index + self.window_size)
+		seq_end = max(np.argmax(event_position > index + self.window_size), seq_start+1)
 		seq = sequence[seq_start:seq_end]
-		if len(seq) == 0:
-			print(self.path)
-			print(analyzed_length)
-			print(index)
-			print(self.window_size)
-			raise NameError('Sequence of length 0 created')
 		return signal, seq
