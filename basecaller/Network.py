@@ -48,7 +48,6 @@ def get_model():
 		model = get_residual_block(model)
 	model = get_RNN_part(model)
 	model = layers.Dense(5)(model)
-	model = layers.Activation('softmax')(model)
 	loss_out = layers.Lambda(
 		ctc_lambda_func, output_shape=(1,),
 		name='ctc')([model, labels, input_length, label_length])
