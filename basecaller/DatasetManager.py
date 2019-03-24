@@ -20,7 +20,7 @@ class SignalSequence(keras.utils.Sequence):
 
 	}
 
-	def __init__(self, file_paths, batch_size=100, number_of_reads=4000, read_lens=[200,400,1000], dir_probs=None):
+	def __init__(self, file_paths, batch_size=100, number_of_reads=20000, read_lens=[200,400,1000], dir_probs=None):
 		self.file_paths = file_paths
 		self.read_lens = read_lens
 		self.number_of_reads = number_of_reads
@@ -99,7 +99,13 @@ class DataDirectoryReader:
 				with open(os.path.join(dir_path, self.index_filename), 'w') as file:
 					for filename in self.files[type_dir]:
 						file.write("%s\n" % filename)
-
+		to_remove = []
+		for type_dir in self.type_dirs:
+			if len(self.files[type_dir]) == 0:
+				to_remove.append(type_dir)
+		for val in to_remove:
+			self.type_dirs.remove(val)
+			self.files.pop(val)
 
 	def get_stuck_files(self):
 		for type_dir in self.type_dirs:
