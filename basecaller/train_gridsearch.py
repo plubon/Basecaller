@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from Network import get_model
+from Network import get_default_model
 from keras import optimizers
 from keras.utils import multi_gpu_model
 from keras.callbacks import CSVLogger
@@ -19,7 +19,7 @@ def main():
 		signal_seq = SignalSequence(train, batch_size=150)
 		test_len = sum([len(test[x]) for x in test.keys()])
 		test_seq = SignalSequence(test, number_of_reads=test_len)
-		model = get_model()
+		model = get_default_model()
 		model = multi_gpu_model(model, gpus=2)
 		adam = optimizers.Adam(lr=param[0], beta_1=param[1], beta_2=param[2], epsilon=param[3])
 		model.compile(loss={'ctc': lambda y_true, y_pred: y_pred},optimizer=adam)

@@ -19,7 +19,7 @@ def get_residual_block(input_layer):
 	sum_layer = layers.ReLU()(sum_layer)
 	return sum_layer
 
-def get_RNN_part(input):
+def get_GRU_part(input):
 	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(input)
 	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(input)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
@@ -34,24 +34,59 @@ def get_RNN_part(input):
 	merged = layers.BatchNormalization()(merged)
 	return merged
 
+def get_LSTM_part(input):
+	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(input)
+	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(input)
+	merged = layers.Concatenate()([layer_fw, layer_bw])
+	merged = layers.BatchNormalization()(merged)
+	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(merged)
+	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
+	merged = layers.Concatenate()([layer_fw, layer_bw])
+	merged = layers.BatchNormalization()(merged)
+	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(merged)
+	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
+	merged = layers.Concatenate()([layer_fw, layer_bw])
+	merged = layers.BatchNormalization()(merged)
+	return merged
+
 def ctc_lambda_func(args):
 	y_pred, labels, input_length, label_length = args
 	return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
-def get_model():
+def get_default_model():
 	input_var = layers.Input(shape=(None, 1), name='the_input')
 	input_length = layers.Input(name='input_length', shape=[1], dtype='int64')
 	label_length = layers.Input(name='label_length', shape=[1], dtype='int64')
 	labels = layers.Input(name='the_labels', shape=[300], dtype='float32')
 	model = get_residual_block(input_var)
-	for i in range(4):
+	for _ in range(4):
 		model = get_residual_block(model)
-	model = get_RNN_part(model)
+	model = get_GRU_part(model)
 	model = layers.Dense(5)(model)
 	loss_out = layers.Lambda(
 		ctc_lambda_func, output_shape=(1,),
 		name='ctc')([model, labels, input_length, label_length])
 	return models.Model(inputs=[input_var, labels, input_length, label_length], outputs=loss_out)
+
+def get_model_with_boundaries():
+	input_var = layers.Input(shape=(None, 1), name='the_input')
+	input_length = layers.Input(name='input_length', shape=[1], dtype='int64')
+	label_length = layers.Input(name='label_length', shape=[1], dtype='int64')
+	labels = layers.Input(name='the_labels', shape=[300], dtype='float32')
+	boundaries = layers.Input(shape=(None, 1), name='the_boundaries')
+	model = get_residual_block(input_var)
+	for _ in range(4):
+		model = get_residual_block(model)
+	model = get_LSTM_part(model)
+	model = layers.Concatenate()(model, boundaries)
+	model = layers.Dense(5)(model)
+	loss_out = layers.Lambda(
+		ctc_lambda_func, output_shape=(1,),
+		name='ctc')([model, labels, input_length, label_length])
+	return models.Model(inputs=[input_var, boundaries, labels, input_length, label_length], outputs=loss_out)
+	
+
+
 	
 
 
