@@ -11,6 +11,7 @@ import os
 import json
 import numpy as np
 from Levenshtein import distance, editops
+import sys
 
 
 def write_file_dict_to_file(path, file_dict):
@@ -28,7 +29,7 @@ def write_dict_to_file(path, params):
     with open(path, 'w') as file:
         json.dump(params, file)
 
-def main():
+def main(epochs):
     run_start_time = str(datetime.datetime.now())
     os.mkdir('runs/'+run_start_time)
     log_dir = os.path.join('runs', run_start_time)
@@ -47,7 +48,7 @@ def main():
     write_dict_to_file(param_file_path, param)
     adam = optimizers.Adam(**param)
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred},optimizer=adam)
-    model.fit_generator(signal_seq, validation_data=test_seq, epochs=1, callbacks=[csv_logger])
+    model.fit_generator(signal_seq, validation_data=test_seq, epochs=epochs, callbacks=[csv_logger])
     model.save(os.path.join(log_dir, 'model.h5'))
     val_seq = SignalSequence(test, number_of_reads=test_len)
     sub_model = model.get_layer('model_1')
@@ -91,4 +92,4 @@ def main():
     write_dict_to_file(metrics_file_path, metrics)
 
 if __name__ == "__main__":
-	main()
+	main(int(sys.argv[1]))
