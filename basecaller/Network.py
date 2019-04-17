@@ -63,6 +63,7 @@ def get_default_model():
 		model = get_residual_block(model)
 	model = get_GRU_part(model)
 	model = layers.Dense(5)(model)
+	model = layers.Activation('softmax')(model)
 	loss_out = layers.Lambda(
 		ctc_lambda_func, output_shape=(1,),
 		name='ctc')([model, labels, input_length, label_length])
@@ -74,12 +75,14 @@ def get_model_with_boundaries():
 	label_length = layers.Input(name='label_length', shape=[1], dtype='int64')
 	labels = layers.Input(name='the_labels', shape=[300], dtype='float32')
 	boundaries = layers.Input(shape=(None, 1), name='the_boundaries')
-	model = get_residual_block(input_var)
+	model = layers.Concatenate()([input_var, boundaries])
+	model = get_residual_block(model)
 	for _ in range(4):
 		model = get_residual_block(model)
 	model = get_LSTM_part(model)
-	model = layers.Concatenate()(model, boundaries)
 	model = layers.Dense(5)(model)
+	model = layers.Concatenate()([model, boundaries])
+	model = layers.Activation('softmax')(model)
 	loss_out = layers.Lambda(
 		ctc_lambda_func, output_shape=(1,),
 		name='ctc')([model, labels, input_length, label_length])

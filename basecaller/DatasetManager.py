@@ -7,8 +7,24 @@ from math import ceil, floor
 from sklearn.model_selection import train_test_split
 
 class BaseSequence(keras.utils.Sequence):
+	
 
-	def __init__(self, file_paths, batch_size=100, number_of_reads=20000, read_lens=[200,400,1000], dir_probs=None):
+	alphabet_dict = {
+	b'A':0,
+	b'a':0,
+	b'C':1,
+	b'c':1,
+	b'G':2,
+	b'g':2,
+	b'T':3,
+	b't':3
+	}
+
+	def seq_to_label(self, seq):
+		labels = [self.alphabet_dict[x] for x in seq]
+		return labels
+
+	def __init__(self, file_paths, batch_size=100, number_of_reads=4000, read_lens=[200,400,1000], dir_probs=None):
 		self.file_paths = file_paths
 		self.read_lens = read_lens
 		self.number_of_reads = number_of_reads
@@ -46,25 +62,29 @@ class BoundarySequence(BaseSequence):
 	def __getitem__(self, index):
 		read_len =  self.read_lens[index % len(self.read_lens)]
 		samples = [Fast5Reader(file_path, read_len).get_squiggle_boundary_sample() for file_path in self.batches[index]]
-		return samples
+		X = [s[0] for s in samples]
+		Y = [s[1] for s in samples]
+		Y = [self.seq_to_label(y) for y in Y]
+		B = [s[2] for s in samples]
+		Y_array = np.zeros((len(Y), 300))
+		for idx, word in enumerate(Y):
+			Y_array[idx, 0:len(word)] = word
+		input_arr = np.expand_dims(np.stack(X).astype(np.float32), -1)
+		for i in range(input_arr.shape[0]):
+			input_arr[i,:] = (input_arr[i,:] - np.mean(input_arr[i,:]))/np.std(input_arr[i,:])
+		boundary_arr =  np.expand_dims(np.stack(B).astype(np.float32), -1)
+		inputs = {
+			'the_input': input_arr,
+			'the_labels': Y_array,
+			'the_boundaries': boundary_arr,
+			'input_length': np.full([input_arr.shape[0], 1], read_len),
+			'label_length': np.reshape(np.array([len(y) for y in Y]), [input_arr.shape[0], 1])
+		}
+		outputs = {'ctc': np.zeros([self.batch_size])}
+		return (inputs, outputs)
 
 
 class SignalSequence(BaseSequence):
-
-	alphabet_dict = {
-	b'A':0,
-	b'a':0,
-	b'C':1,
-	b'c':1,
-	b'G':2,
-	b'g':2,
-	b'T':3,
-	b't':3
-	}
-
-	def seq_to_label(self, seq):
-		labels = [self.alphabet_dict[x] for x in seq]
-		return labels
 
 	def __getitem__(self, index):
 		read_len =  self.read_lens[index % len(self.read_lens)]
@@ -91,7 +111,7 @@ class DataDirectoryReader:
 
 	index_filename = 'index'
 
-	def __init__(self, path):
+	def __init__(self, path, include_dirs = None):
 		self.base_path = path
 		self.type_dirs = os.listdir(self.base_path)
 		self.files = dict()

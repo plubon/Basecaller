@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-from Network import get_default_model
+from Network import get_default_model, get_model_with_boundaries
 from keras import optimizers
 from keras.utils import multi_gpu_model
 from keras.callbacks import CSVLogger
-from DatasetManager import SignalSequence, DataDirectoryReader
+from DatasetManager import BoundarySequence, DataDirectoryReader
 import datetime
 import os
 import json
@@ -34,17 +34,17 @@ def main():
     write_file_dict_to_file(os.path.join(log_dir,'test.txt'), test)
     write_file_dict_to_file(os.path.join(log_dir,'train.txt'), train)
     csv_logger = CSVLogger(os.path.join(log_dir, 'Log.csv'))
-    signal_seq = SignalSequence(train, batch_size=150)
+    signal_seq = BoundarySequence(train, batch_size=150)
     test_len = sum([len(test[x]) for x in test.keys()])
-    test_seq = SignalSequence(test, number_of_reads=test_len)
-    model = get_default_model()
+    test_seq = BoundarySequence(test, number_of_reads=test_len)
+    model = get_model_with_boundaries()
     model = multi_gpu_model(model, gpus=2)
     param = {'lr':0.001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'decay':0.001}
     param_file_path = os.path.join(log_dir, 'params.json')
     write_params_to_file(param_file_path, param)
     adam = optimizers.Adam(**param)
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred},optimizer=adam)
-    model.fit_generator(signal_seq, validation_data=test_seq, epochs=10, callbacks=[csv_logger])
+    model.fit_generator(signal_seq, validation_data=test_seq, epochs=50, callbacks=[csv_logger])
     model.save(os.path.join(log_dir, 'model.h5'))
 
 if __name__ == "__main__":
