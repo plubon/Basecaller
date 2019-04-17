@@ -92,4 +92,4 @@ def main(data_path, epochs):
     write_dict_to_file(metrics_file_path, metrics)
 
 if __name__ == "__main__":
-	main(argv[1, int(argv[2])])
+	main(sys.argv[1], int(sys.argv[2]))
