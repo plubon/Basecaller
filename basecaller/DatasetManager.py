@@ -96,8 +96,6 @@ class SignalSequence(BaseSequence):
 		for idx, word in enumerate(Y):
 			Y_array[idx, 0:len(word)] = word
 		input_arr = np.expand_dims(np.stack(X).astype(np.float32), -1)
-		for i in range(input_arr.shape[0]):
-			input_arr[i,:] = (input_arr[i,:] - np.mean(input_arr[i,:]))/np.std(input_arr[i,:])
 		inputs = {
 			'the_input': input_arr,
 			'the_labels': Y_array,
@@ -112,7 +110,7 @@ class DataDirectoryReader:
 	index_filename = 'index'
 
 	def __init__(self, path, include_dirs = None):
-		self.base_path = path
+		self.base_path = os.path.abspath(path)
 		self.type_dirs = os.listdir(self.base_path)
 		self.files = dict()
 		self.stuck_files = []
@@ -266,6 +264,7 @@ class Fast5Reader:
 		analyzed_length = event_position[-1]
 		index = random.randrange(analyzed_length - self.window_size)
 		signal = dataset[(offset+index):(offset+index+self.window_size)]
+		signal = (signal - np.mean(dataset))/np.std(dataset)
 		seq_start = np.argmax(event_position > index)
 		seq_end = max(np.argmax(event_position > index + self.window_size), seq_start+1)
 		seq = sequence[seq_start:seq_end]

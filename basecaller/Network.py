@@ -4,17 +4,12 @@ from keras import backend as K
 
 def get_residual_block(input_layer):
 	layer = layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
-	layer = layers.BatchNormalization()(layer)
 	layer = layers.ReLU()(layer)
 	layer = layers.Conv1D(filters=256, kernel_size=3, strides=1, use_bias=False, padding='same')(layer)
-	layer = layers.BatchNormalization()(layer)
 	layer = layers.ReLU()(layer)
 	layer = layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
-	layer = layers.BatchNormalization()(layer)
-	layer = layers.ReLU()(layer)
 	jump = layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
 	jump = layers.BatchNormalization()(jump)
-	jump = layers.ReLU()(jump)
 	sum_layer =  layers.Add()([layer, jump])
 	sum_layer = layers.ReLU()(sum_layer)
 	return sum_layer
@@ -23,31 +18,19 @@ def get_GRU_part(input):
 	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(input)
 	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(input)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
 	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(merged)
 	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
 	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(merged)
 	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
 	return merged
 
 def get_LSTM_part(input):
-	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(input)
-	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(input)
-	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
-	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(merged)
-	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
-	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
-	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(merged)
-	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
-	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
-	return merged
+	model = layers.Bidirectional(layers.LSTM(units=200, activation='relu',return_sequences=True), merge_mode='concat')(input)
+	model = layers.Bidirectional(layers.LSTM(units=200, activation='relu',return_sequences=True), merge_mode='concat')(model)
+	model = layers.Bidirectional(layers.LSTM(units=200, activation='relu',return_sequences=True), merge_mode='concat')(model)
+	return model
 
 def ctc_lambda_func(args):
 	y_pred, labels, input_length, label_length = args
@@ -61,8 +44,8 @@ def get_default_model():
 	model = get_residual_block(input_var)
 	for _ in range(4):
 		model = get_residual_block(model)
-	model = get_GRU_part(model)
-	model = layers.Dense(5)(model)
+	model = get_LSTM_part(model)
+	model = layers.TimeDistributed(layers.Dense(5))(model)
 	model = layers.Activation('softmax')(model)
 	loss_out = layers.Lambda(
 		ctc_lambda_func, output_shape=(1,),
