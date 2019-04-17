@@ -29,11 +29,11 @@ def write_dict_to_file(path, params):
     with open(path, 'w') as file:
         json.dump(params, file)
 
-def main(epochs):
+def main(data_path, epochs):
     run_start_time = str(datetime.datetime.now())
     os.mkdir('runs/'+run_start_time)
     log_dir = os.path.join('runs', run_start_time)
-    dir_reader = DataDirectoryReader('../../Dane/squiggled/')
+    dir_reader = DataDirectoryReader(data_path)
     train, test = dir_reader.get_train_test_files()
     write_file_dict_to_file(os.path.join(log_dir,'test.txt'), test)
     write_file_dict_to_file(os.path.join(log_dir,'train.txt'), train)
@@ -92,4 +92,4 @@ def main(epochs):
     write_dict_to_file(metrics_file_path, metrics)
 
 if __name__ == "__main__":
-	main(int(sys.argv[1]))
+	main(argv[1, int(argv[2])])
