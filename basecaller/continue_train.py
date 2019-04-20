@@ -36,7 +36,7 @@ def main(data_path, epochs):
         test = [x.strip() for x in test_file.readlines()]
     csv_logger = CSVLogger(os.path.join(data_path, 'Log1.csv'))
     signal_seq = SignalSequence({'chrM':train}, batch_size=150)
-    test_len = sum([len(test[x]) for x in test.keys()])
+    test_len = len(test)
     test_seq = SignalSequence({'chrM':test}, number_of_reads=test_len)
     model = model.load_model(os.path.join(data_path, 'model.h5'))
     model = multi_gpu_model(model, gpus=2)
@@ -44,8 +44,7 @@ def main(data_path, epochs):
     adam = optimizers.Adam(**param)
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred},optimizer=adam)
     model.fit_generator(signal_seq, validation_data=test_seq, epochs=epochs, callbacks=[csv_logger])
-    model.save(os.path.join(log_dir, 'model.h5'))
-    val_seq = SignalSequence(test, number_of_reads=test_len)
+    model.save(os.path.join(log_dir, 'model1.h5'))
     sub_model = model.get_layer('model_1')
     im_model = Model(inputs=sub_model.get_input_at(0), outputs =sub_model.get_layer('activation_1').output)
     dists = []
@@ -54,7 +53,7 @@ def main(data_path, epochs):
     pred_lens = []
     real = []
     predicted = []
-    for j in range(len(val_seq)):
+    for j in range(len(test_seq)):
         batch = test_seq[j][0]
         preds = im_model.predict_on_batch(batch)
         val = K.ctc_decode(preds, np.full(100, batch['input_length'][0,0]), greedy=False)
