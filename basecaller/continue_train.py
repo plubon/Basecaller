@@ -38,7 +38,7 @@ def main(data_path, epochs):
     signal_seq = SignalSequence({'chrM':train}, batch_size=150)
     test_len = len(test)
     test_seq = SignalSequence({'chrM':test}, number_of_reads=test_len)
-    model = load_model(os.path.join(data_path, 'model.h5'))
+    model = load_model(os.path.join(data_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
     model = multi_gpu_model(model, gpus=2)
     param = {'lr':0.001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'decay':0.001}
     adam = optimizers.Adam(**param)
