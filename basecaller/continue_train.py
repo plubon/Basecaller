@@ -35,9 +35,9 @@ def main(data_path, epochs):
     with open(os.path.join(data_path, 'test.txt')) as test_file:
         test = [x.strip() for x in test_file.readlines()]
     csv_logger = CSVLogger(os.path.join(data_path, 'Log1.csv'))
-    signal_seq = SignalSequence(train, batch_size=150)
+    signal_seq = SignalSequence({'chrM':train}, batch_size=150)
     test_len = sum([len(test[x]) for x in test.keys()])
-    test_seq = SignalSequence(test, number_of_reads=test_len)
+    test_seq = SignalSequence({'chrM':test}, number_of_reads=test_len)
     model = model.load_model(os.path.join(data_path, 'model.h5'))
     model = multi_gpu_model(model, gpus=2)
     param = {'lr':0.001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'decay':0.001}
