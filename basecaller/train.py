@@ -5,13 +5,13 @@ from keras.utils import multi_gpu_model
 from keras.callbacks import CSVLogger
 from keras.models import Model
 import keras.backend as K
-from DatasetManager import SignalSequence, DataDirectoryReader
 import datetime
 import os
 import json
 import numpy as np
 from Levenshtein import distance, editops
 import sys
+from Data import Dataset, ExampleSequence
 
 
 def write_file_dict_to_file(path, file_dict):
@@ -31,16 +31,15 @@ def write_dict_to_file(path, params):
 
 def main(data_path, epochs):
     run_start_time = str(datetime.datetime.now())
+    dataset = Dataset(data_path)
+    train, test = dataset.train_test_split()
+    signal_seq = ExampleSequence(dataset, train)
+    test_seq = ExampleSequence(dataset, test)
     os.mkdir('runs/'+run_start_time)
     log_dir = os.path.join('runs', run_start_time)
-    dir_reader = DataDirectoryReader(data_path)
-    train, test = dir_reader.get_train_test_files()
     write_file_dict_to_file(os.path.join(log_dir,'test.txt'), test)
     write_file_dict_to_file(os.path.join(log_dir,'train.txt'), train)
     csv_logger = CSVLogger(os.path.join(log_dir, 'Log.csv'))
-    signal_seq = SignalSequence(train, batch_size=150)
-    test_len = sum([len(test[x]) for x in test.keys()])
-    test_seq = SignalSequence(test, number_of_reads=test_len)
     model = get_default_model()
     model = multi_gpu_model(model, gpus=2)
     param = {'lr':0.001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'decay':0.001}
@@ -50,7 +49,6 @@ def main(data_path, epochs):
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred},optimizer=adam)
     model.fit_generator(signal_seq, validation_data=test_seq, epochs=epochs, callbacks=[csv_logger])
     model.save(os.path.join(log_dir, 'model.h5'))
-    val_seq = SignalSequence(test, number_of_reads=test_len)
     sub_model = model.get_layer('model_1')
     im_model = Model(inputs=sub_model.get_input_at(0), outputs =sub_model.get_layer('activation_1').output)
     dists = []
@@ -59,7 +57,7 @@ def main(data_path, epochs):
     pred_lens = []
     real = []
     predicted = []
-    for j in range(len(val_seq)):
+    for j in range(len(test_seq)):
         batch = test_seq[j][0]
         preds = im_model.predict_on_batch(batch)
         val = K.ctc_decode(preds, np.full(100, batch['input_length'][0,0]), greedy=False)
