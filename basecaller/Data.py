@@ -1,6 +1,5 @@
 import os
 import h5py
-import tables
 import numpy as np
 import shelve
 import sys
@@ -32,6 +31,9 @@ class ExampleSequence(keras.utils.Sequence):
     def seq_to_label(self, seq):
         labels = [self.alphabet_dict[x] for x in seq]
         return labels
+
+    def __len__(self):
+        return int(ceil(len(self.ids)/self.batch_size))
 
     def __getitem__(self, index):
         examples = self.dataset.get(self.ids[self.batch_size*index:self.batch_size*(index+1)])
