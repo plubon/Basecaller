@@ -111,10 +111,11 @@ class DatasetCreator:
         sample_count = 0
         with shelve.open(self.output_path) as db:
             for input_file in self.files:
-                samples = self.get_samples_from_file(os.path.join(self.input_path, input_file))
-                sample_count += len(samples)
-                for sample in samples:
-                    db[sample.id] = sample
+                if input_file.endswith('fast5'):
+                    samples = self.get_samples_from_file(os.path.join(self.input_path, input_file))
+                    sample_count += len(samples)
+                    for sample in samples:
+                        db[sample.id] = sample
             db['size'] = sample_count
         print('Created '+str(sample_count)+' samples.')
     
