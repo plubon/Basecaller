@@ -41,8 +41,7 @@ class ExampleSequence(keras.utils.Sequence):
         Y = [self.seq_to_label(x.sequence) for x in examples]
         input_lengths = [len(x) for x in X]
         label_lengths = [len(x) for x in Y]
-        max_label_length = max(label_lengths)
-        Y_array = np.zeros((len(Y), max_label_length))
+        Y_array = np.zeros((len(Y), 300))
         for idx, word in enumerate(Y):
             Y_array[idx, 0:len(word)] = word
         input_arr = np.expand_dims(np.stack(X).astype(np.float32), -1)
