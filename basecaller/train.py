@@ -11,7 +11,7 @@ import json
 import numpy as np
 from Levenshtein import distance, editops
 import sys
-from Data import Dataset, ExampleSequence
+from Data import Dataset, ExampleSequence, TrainingExample
 
 
 def write_file_dict_to_file(path, file_dict):
