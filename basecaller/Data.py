@@ -101,7 +101,7 @@ class DatasetCreator:
 	b't':3
 	}
 
-    def __init__(self, input_path, output_path, seg_length=1000, skip=10):
+    def __init__(self, input_path, output_path, seg_length=300, skip=10):
         self.input_path = input_path
         self.output_path = output_path
         self.files = os.listdir(self.input_path)
