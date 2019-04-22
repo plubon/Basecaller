@@ -22,7 +22,8 @@ class ExampleSequence(keras.utils.Sequence):
 	b't':3
 	}
 
-    def __init__(self, dataset, ids, batch_size=150):
+    def __init__(self, dataset, ids, name='', batch_size=150):
+        self.name = name
         self.dataset = dataset
         self.ids = ids
         self.batch_size = batch_size
@@ -33,7 +34,7 @@ class ExampleSequence(keras.utils.Sequence):
         return labels
 
     def __len__(self):
-        return int(ceil(len(self.ids)/self.batch_size))
+        return int(floor(len(self.ids)/self.batch_size))
 
     def __getitem__(self, index):
         examples = self.dataset.get(self.ids[self.batch_size*index:self.batch_size*(index+1)])
@@ -51,7 +52,7 @@ class ExampleSequence(keras.utils.Sequence):
 			'input_length': np.reshape(np.array(input_lengths), [input_arr.shape[0], 1]),
 			'label_length': np.reshape(np.array(label_lengths), [input_arr.shape[0], 1])
 		}
-        outputs = {'ctc': np.zeros([self.batch_size])}
+        outputs = {'ctc': np.zeros([len(examples)])}
         return (inputs, outputs)
 
     def on_epoch_end(self):
