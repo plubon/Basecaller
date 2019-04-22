@@ -62,7 +62,7 @@ class Dataset:
     
     def __init__(self, path):
         self.path = path
-        with shelve.open(self.path) as db:
+        with shelve.open(self.path, 'r') as db:
             self.size = db['size']
 
     def train_test_split(self, test_size=0.2):
