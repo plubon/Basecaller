@@ -42,7 +42,7 @@ def main(data_path, epochs):
     csv_logger = CSVLogger(os.path.join(log_dir, 'Log.csv'))
     model = get_default_model()
     model = multi_gpu_model(model, gpus=2)
-    param = {'lr':0.0001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'decay':0.001}
+    param = {'lr':0.001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'decay':0.001}
     param_file_path = os.path.join(log_dir, 'params.json')
     write_dict_to_file(param_file_path, param)
     adam = optimizers.Adam(**param)
