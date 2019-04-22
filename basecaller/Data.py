@@ -156,9 +156,9 @@ class DatasetCreator:
                         current_len += event_length[i]
                         i += 1 
                     else:
-                        if i - current_start > 2:
+                        if i - current_start >4 :
                             signal = dataset[event_position[current_start]: event_position[current_start]+self.segment_length]
-                            normalized_signal = (signal - np.mean(dataset))/np.std(dataset)
+                            normalized_signal = (signal - np.mean(np.unique(dataset)))/np.std(np.unique(dataset))
                             breaks = event_position[current_start+1:i-1] - event_position[current_start]
                             current_seq = sequence[current_start:i-1]
                             example = TrainingExample(self.get_id(), path, current_start, normalized_signal, signal, current_seq, breaks)
