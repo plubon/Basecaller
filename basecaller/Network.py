@@ -10,7 +10,7 @@ def get_residual_block(input_layer):
 	layer = layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
 	jump = layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
 	sum_layer =  layers.Add()([layer, jump])
-	sum_layer = layers.BatchNormalization(sum_layer)
+	sum_layer = layers.BatchNormalization()(sum_layer)
 	sum_layer = layers.ReLU()(sum_layer)
 	return sum_layer
 
