@@ -50,7 +50,7 @@ def main(data_path, epochs):
     model.fit_generator(signal_seq, validation_data=test_seq, epochs=epochs, callbacks=[csv_logger])
     model.save(os.path.join(log_dir, 'model.h5'))
     sub_model = model.get_layer('model_1')
-    im_model = Model(inputs=sub_model.get_input_at(0), outputs =sub_model.get_layer('activation_1').output)
+    im_model = Model(inputs=sub_model.get_input_at(0), outputs =sub_model.get_layer('softmax').output)
     dists = []
     ops = []
     lens = []
