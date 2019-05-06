@@ -269,3 +269,7 @@ if __name__ == "__main__":
     creator.create()
     now = datetime.datetime.now()
     print(now.strftime("%Y-%m-%d %H:%M:%S"))
+    f = open("end.txt","w+")
+    f.write(now.strftime("%Y-%m-%d %H:%M:%S"))
+    f.close()
+
