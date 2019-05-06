@@ -88,6 +88,99 @@ class TrainingExample:
         self.breaks = breaks
         self.raw_signal = raw_signal
 
+class ChironDatasetCreator:
+
+    alphabet_dict = {
+	b'A':0,
+	b'a':0,
+	b'C':1,
+	b'c':1,
+	b'G':2,
+	b'g':2,
+	b'T':3,
+	b't':3,
+    'A':0,
+	'a':0,
+	'C':1,
+	'c':1,
+	'G':2,
+	'g':2,
+	'T':3,
+	't':3
+	}
+
+    def __init__(self, input_path, output_path, seg_length=300, skip=10):
+        self.input_path = input_path
+        self.output_path = output_path
+        self.files = os.listdir(self.input_path)
+        self.files = [x.split('.')[0] for x in self.files]
+        self.files = list(set(self.files))
+        print(len(self.files))
+        self.skip = skip
+        self.segment_length = seg_length
+        self.id_counter = 1
+        
+    def create(self):
+        sample_count = 0
+        with shelve.open(self.output_path) as db:
+            for idx, input_file in enumerate(self.files):
+                if idx % 100 == 0:
+                    print(idx)
+                samples = self.get_samples_from_file(os.path.join(self.input_path, input_file))
+                sample_count += len(samples)
+                for sample in samples:
+                    db[sample.id] = sample
+            db['size'] = sample_count
+        print('Created '+str(sample_count)+' samples.')
+    
+    def get_id(self):
+        id = self.id_counter
+        self.id_counter += 1
+        return str(id)
+
+    def find_signal(self, name):
+	    if 'Signal' in name:
+	        return name
+
+    def get_samples_from_file(self, path):
+        with open(path+'.label', 'r') as label_file:
+            with open(path+'.signal', 'r') as signal_file:
+                dataset = signal_file.readlines()
+                dataset = dataset[0].strip()
+                dataset = dataset.split(' ')
+                dataset = [int(x) for x in dataset]
+                corrected_events_array = label_file.readlines()
+                corrected_events_array = [x.strip() for x in corrected_events_array]
+                corrected_events_array = [x.split(' ') for x in corrected_events_array]
+                event_position = np.array([int(x[0]) for x in corrected_events_array])
+                event_length = np.array([int(x[1]) - int(x[0]) for x in corrected_events_array])
+                sequence = np.array([x[2] for x in corrected_events_array])
+                i = self.skip
+                current_start = i
+                current_len = 0
+                examples = []
+                while i < len(event_position) - self.skip:
+                    if sequence[i] not in self.alphabet_dict.keys():
+                        current_len = 0
+                        current_start = i + 1
+                        i += 1
+                    else:
+                        if current_len + event_length[i] < self.segment_length:
+                            current_len += event_length[i]
+                            i += 1 
+                        else:
+                            if i - current_start >4 :
+                                signal = dataset[event_position[current_start]: event_position[current_start]+self.segment_length]
+                                normalized_signal = (signal - np.mean(np.unique(dataset)))/np.std(np.unique(dataset))
+                                breaks = event_position[current_start+1:i-1] - event_position[current_start]
+                                current_seq = sequence[current_start:i-1]
+                                example = TrainingExample(self.get_id(), path, current_start, normalized_signal, signal, current_seq, breaks)
+                                examples.append(example)
+                            current_len = 0
+                            current_start = i + 1
+                            i += 1
+                return examples
+
 class DatasetCreator:
 
     alphabet_dict = {
@@ -172,7 +265,7 @@ class DatasetCreator:
 if __name__ == "__main__":
     now = datetime.datetime.now()
     print(now.strftime("%Y-%m-%d %H:%M:%S"))
-    creator = DatasetCreator(sys.argv[1], sys.argv[2])
+    creator = ChironDatasetCreator(sys.argv[1], sys.argv[2])
     creator.create()
     now = datetime.datetime.now()
     print(now.strftime("%Y-%m-%d %H:%M:%S"))
