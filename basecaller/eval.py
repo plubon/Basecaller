@@ -49,7 +49,7 @@ def main(dataset_path, model_path):
     for j in range(len(test_seq)):
         batch = test_seq[j][0]
         preds = im_model.predict_on_batch(batch)
-        val = K.ctc_decode(preds, np.full(100, batch['input_length'][0,0]), greedy=False)
+        val = K.ctc_decode(preds, np.full(150, batch['input_length'][0,0]), greedy=False)
         decoded = K.eval(val[0][0])
         for i in range(decoded.shape[0]):
             real_label = batch['the_labels'][i, :batch['label_length'][i,0]]
