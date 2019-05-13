@@ -11,27 +11,21 @@ def get_residual_block(input_layer):
 	layer = layers.ReLU()(layer)
 	layer = layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
 	layer = layers.BatchNormalization()(layer)
-	layer = layers.ReLU()(layer)
 	jump = layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
-	jump = layers.BatchNormalization()(jump)
-	jump = layers.ReLU()(jump)
 	sum_layer =  layers.Add()([layer, jump])
 	sum_layer = layers.ReLU()(sum_layer)
 	return sum_layer
 
 def get_RNN_part(input):
-	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(input)
-	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(input)
+	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(input)
+	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(input)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
-	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(merged)
-	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
+	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(merged)
+	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
-	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(merged)
-	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
+	layer_fw = layers.LSTM(units=200, activation='relu',return_sequences=True)(merged)
+	layer_bw = layers.LSTM(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
-	merged = layers.BatchNormalization()(merged)
 	return merged
 
 def ctc_lambda_func(args):
