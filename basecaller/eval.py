@@ -37,7 +37,8 @@ def main(dataset_path, model_path):
     test_seq = ExampleSequence(dataset, test, name='test')
     model = load_model(os.path.join(model_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
     model = multi_gpu_model(model, gpus=2)
-    sub_model = model.get_layer('model_1')
+    sub_model = model.get_layer('model_2')
+    sub_model = sub_model.get_layer('model_1')
     im_model = Model(inputs=sub_model.get_input_at(0), outputs =sub_model.get_layer('activation_1').output)
     dists = []
     ops = []
