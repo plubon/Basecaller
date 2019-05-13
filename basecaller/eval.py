@@ -11,6 +11,7 @@ import os
 import json
 import numpy as np
 from Levenshtein import distance, editops
+from Data import Dataset, ExampleSequence, TrainingExample
 import sys
 
 
@@ -29,22 +30,13 @@ def write_dict_to_file(path, params):
     with open(path, 'w') as file:
         json.dump(params, file)
 
-def main(data_path, epochs):
-    with open(os.path.join(data_path, 'train.txt')) as train_file:
-        train = [x.strip() for x in train_file.readlines()]
-    with open(os.path.join(data_path, 'test.txt')) as test_file:
+def main(dataset_path, model_path):
+    dataset = Dataset(dataset_path)
+    with open(os.path.join(model_path, 'test.txt')) as test_file:
         test = [x.strip() for x in test_file.readlines()]
-    csv_logger = CSVLogger(os.path.join(data_path, 'Log1.csv'))
-    signal_seq = SignalSequence({'chrM':train}, batch_size=150)
-    test_len = len(test)
-    test_seq = SignalSequence({'chrM':test}, number_of_reads=test_len)
-    model = load_model(os.path.join(data_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
+    test_seq = ExampleSequence(dataset, test, name='test')
+    model = load_model(os.path.join(model_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
     model = multi_gpu_model(model, gpus=2)
-    param = {'lr':0.001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'decay':0.001}
-    adam = optimizers.Adam(**param)
-    model.compile(loss={'ctc': lambda y_true, y_pred: y_pred},optimizer=adam)
-    model.fit_generator(signal_seq, validation_data=test_seq, epochs=epochs, callbacks=[csv_logger])
-    model.save(os.path.join(data_path, 'model1.h5'))
     sub_model = model.get_layer('model_1')
     im_model = Model(inputs=sub_model.get_input_at(0), outputs =sub_model.get_layer('activation_1').output)
     dists = []
@@ -82,8 +74,8 @@ def main(data_path, epochs):
         'predicted_mean_length': np.mean(pred_lens)
     }
     metrics.update(op_counts)
-    metrics_file_path = os.path.join(log_dir, 'metrics1.json')
+    metrics_file_path = os.path.join(model_path, 'metrics1.json')
     write_dict_to_file(metrics_file_path, metrics)
 
 if __name__ == "__main__":
-	main(sys.argv[1], int(sys.argv[2]))
+	main(sys.argv[1], sys.argv[2])
