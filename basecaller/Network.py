@@ -31,14 +31,14 @@ def get_RNN_part(input):
 	return merged
 
 def get_GRU_part(input):
-	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(input)
-	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(input)
+	layer_fw = layers.GRU(units=100, activation='relu',return_sequences=True)(input)
+	layer_bw = layers.GRU(units=100, activation='relu', go_backwards=True,return_sequences=True)(input)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
-	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(merged)
-	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
+	layer_fw = layers.GRU(units=100, activation='relu',return_sequences=True)(merged)
+	layer_bw = layers.GRU(units=100, activation='relu', go_backwards=True,return_sequences=True)(merged)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
-	layer_fw = layers.GRU(units=200, activation='relu',return_sequences=True)(merged)
-	layer_bw = layers.GRU(units=200, activation='relu', go_backwards=True,return_sequences=True)(merged)
+	layer_fw = layers.GRU(units=100, activation='relu',return_sequences=True)(merged)
+	layer_bw = layers.GRU(units=100, activation='relu', go_backwards=True,return_sequences=True)(merged)
 	merged = layers.Concatenate()([layer_fw, layer_bw])
 	return merged
 
@@ -54,7 +54,7 @@ def get_default_model():
 	model = get_residual_block(input_var)
 	for i in range(3):
 		model = get_residual_block(model, bn=(i==0))
-	model = get_RNN_part(model)
+	model = get_GRU_part(model)
 	model = layers.Dense(5)(model)
 	model = layers.Activation('softmax')(model)
 	loss_out = layers.Lambda(
