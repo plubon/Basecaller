@@ -66,6 +66,56 @@ class ExampleSequence(keras.utils.Sequence):
     def on_epoch_end(self):
         random.shuffle(self.ids)
 
+class EvalDataset:
+
+    alphabet_dict = {
+	b'A':0,
+	b'a':0,
+	b'C':1,
+	b'c':1,
+	b'G':2,
+	b'g':2,
+	b'T':3,
+	b't':3,
+    'A':0,
+	'a':0,
+	'C':1,
+	'c':1,
+	'G':2,
+	'g':2,
+	'T':3,
+	't':3
+	}
+
+    def __init__(self, path, seq_len=300, skip=10):
+        self.skip = skip
+        self.path = path
+        self.seq_len = seq_len
+        self.files = os.listdir(self.path)
+        self.files = [x.split('.')[0] for x in self.files]
+        self.files = list(set(self.files))
+
+    def __len__(self):
+        return len(self.files)
+
+    def __getitem__(self, index):
+        with open(self.path+self.files[index]+'.label', 'r') as label_file:
+            with open(self.path+self.files[index]+'.signal', 'r') as signal_file:
+                dataset = signal_file.readlines()
+                dataset = dataset[0].strip()
+                dataset = dataset.split(' ')
+                dataset = [int(x) for x in dataset]
+                corrected_events_array = label_file.readlines()
+                corrected_events_array = [x.strip() for x in corrected_events_array]
+                corrected_events_array = [x.split(' ') for x in corrected_events_array]
+                event_start = [int(x[0]) for x in corrected_events_array]
+                event_end = [int(x[1])  for x in corrected_events_array]
+                sequence = np.array([x[2] for x in corrected_events_array])
+                signal = dataset[event_start[self.skip]:event_end[-self.skip]]
+                signal = (signal - np.mean(dataset))/np.std(dataset)
+                bases = sequence[self.skip:-self.skip]
+                return signal, bases
+
 class Dataset:
     
     def __init__(self, path):
