@@ -92,7 +92,7 @@ class EvalDataset:
         self.path = path
         self.seq_len = seq_len
         self.files = os.listdir(self.path)
-        self.files = [x.split('.')[0] for x in self.files]
+        self.files = [x.split('.')[0] for x in self.files if x != '']
         self.files = list(set(self.files))
 
     def __len__(self):

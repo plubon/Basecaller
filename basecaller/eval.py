@@ -16,6 +16,32 @@ import sys
 import difflib
 
 
+alphabet_dict = {
+	b'A':0,
+	b'a':0,
+	b'C':1,
+	b'c':1,
+	b'G':2,
+	b'g':2,
+	b'T':3,
+	b't':3,
+    'A':0,
+	'a':0,
+	'C':1,
+	'c':1,
+	'G':2,
+	'g':2,
+	'T':3,
+	't':3
+	}
+
+batch_size = 150
+segment_length = 300
+window_offset = segment_length // 10
+def idx_to_label(index_list):
+    bases = ['A', 'C', 'G', 'T']
+    return [bases[x] for x in index_list]
+
 def simple_assembly(bpreads):
     concensus = np.zeros([4,1000])
     pos = 0
@@ -62,46 +88,48 @@ def write_dict_to_file(path, params):
 def main(dataset_path, model_path):
     dataset = EvalDataset(dataset_path)
     model = load_model(os.path.join(model_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
+    model = multi_gpu_model(model, gpus=2)
     sub_model = model.get_layer('model_2')
     sub_model = sub_model.get_layer('model_1')
     im_model = Model(inputs=sub_model.get_input_at(0), outputs =sub_model.get_layer('activation_1').output)
     dists = []
-    ops = []
     lens = []
     pred_lens = []
     real = []
     predicted = []
-    for j in range(len(dataset)):
-        signal, bases = dataset[i]
-        for idx in range(0,len(signal)-300, 30*75):
-            batch_signal = [signal[idx:idx+300] for 
-            batch = {'the_input':batch_signal, 'input_length':}
-            preds = im_model.predict_on_batch()
-            val = K.ctc_decode(preds, np.full(150, batch['input_length'][0,0]), greedy=False)
+    for f in range(len(dataset)):
+        signal, real_label = dataset[f]
+        reads = []
+        for idx in range(0, len(signal)-(len(signal)%(batch_size*window_offset))-segment_length, batch_size*window_offset):
+            batch_signal = [signal[idx+i:idx+i+batch_size] for i in range(0, batch_size*window_offset, window_offset)]
+            for idx, s in enumerate(batch_signal):
+                batch_signal[idx] = np.pad(s, (0, segment_length-len(s)), mode='edge')
+            batch_signal_arr = np.expand_dims(np.stack(batch_signal).astype(np.float32), -1)
+            batch = {
+                'the_input':batch_signal_arr,
+                'input_length':np.full((batch_size,1), segment_length),
+                'label_length':np.full((batch_size,1), segment_length),
+                'the_labels':np.zeros((150, 300))
+            }
+            preds = im_model.predict_on_batch(batch)
+            val = K.ctc_decode(preds, np.full(150, segment_length), greedy=False)
             decoded = K.eval(val[0][0])
-        real_label = batch['the_labels'][i, :batch['label_length'][i,0]]
-        real_label = ''.join([str(int(x)) for x in real_label.tolist()])
-        pred_label = list(filter(lambda x: x!= -1, decoded[i,:].tolist()))
-        pred_label = [str(x) for x in pred_label]
-        pred_label = ''.join(pred_label)
-        dists.append(distance(pred_label, real_label))
-        ops.append(editops(pred_label, real_label))
-        lens.append(len(real_label))
-        pred_lens.append(len(pred_label))
+            bases = [''.join(idx_to_label(d)) for d in decoded]
+            reads += bases
+        assembly = simple_assembly(reads)
+        c_bpread = idx_to_label(np.argmax(assembly,axis = 0))
+        pred_label = ''.join(real_label) 
+        real_label = ''.join(c_bpread)
         real.append(real_label)
         predicted.append(pred_label)
-    op_counts = {'insert':0, 'replace':0, 'delete':0}
-    for op in ops:
-        for x in op:
-            op_counts[x[0]] += 1
-    for key in op_counts.keys():
-        op_counts[key] = op_counts[key] / sum(lens)
+        dists.append(distance(pred_label, real_label))
+        lens.append(len(real_label))
+        pred_lens.append(len(pred_label))
     metrics = {
         'LER': sum(dists)/sum(lens),
         'real_mean_length': np.mean(lens),
         'predicted_mean_length': np.mean(pred_lens)
     }
-    metrics.update(op_counts)
     metrics_file_path = os.path.join(model_path, 'metrics1.json')
     write_dict_to_file(metrics_file_path, metrics)
 
