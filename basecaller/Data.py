@@ -99,8 +99,8 @@ class EvalDataset:
         return len(self.files)
 
     def __getitem__(self, index):
-        with open(self.path+self.files[index]+'.label', 'r') as label_file:
-            with open(self.path+self.files[index]+'.signal', 'r') as signal_file:
+        with open(os.path.join(self.path, self.files[index])+'.label', 'r') as label_file:
+            with open(os.path.join(self.path,self.files[index])+'.signal', 'r') as signal_file:
                 dataset = signal_file.readlines()
                 dataset = dataset[0].strip()
                 dataset = dataset.split(' ')

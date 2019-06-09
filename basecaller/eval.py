@@ -118,8 +118,8 @@ def main(dataset_path, model_path):
             reads += bases
         assembly = simple_assembly(reads)
         c_bpread = idx_to_label(np.argmax(assembly,axis = 0))
-        pred_label = ''.join(real_label) 
-        real_label = ''.join(c_bpread)
+        real_label = ''.join(real_label) 
+        pred_label = ''.join(c_bpread)
         real.append(real_label)
         predicted.append(pred_label)
         dists.append(distance(pred_label, real_label))
