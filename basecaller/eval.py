@@ -34,7 +34,7 @@ def main(dataset_path, model_path):
     dataset = Dataset(dataset_path)
     with open(os.path.join(model_path, 'test.txt')) as test_file:
         test = [x.strip() for x in test_file.readlines()]
-    test_seq = ExampleSequence(dataset, test, name='test')
+    test_seq = ExampleSequence(dataset, test, name='test', batch_size=16)
     model = load_model(os.path.join(model_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
     model = multi_gpu_model(model, gpus=2)
     sub_model = model.get_layer('model_2')
@@ -49,7 +49,7 @@ def main(dataset_path, model_path):
     for j in range(len(test_seq)):
         batch = test_seq[j][0]
         preds = im_model.predict_on_batch(batch)
-        val = K.ctc_decode(preds, np.full(150, batch['input_length'][0,0]), greedy=False)
+        val = K.ctc_decode(preds, np.full(16, batch['input_length'][0,0]), greedy=False)
         decoded = K.eval(val[0][0])
         for i in range(decoded.shape[0]):
             real_label = batch['the_labels'][i, :batch['label_length'][i,0]]
