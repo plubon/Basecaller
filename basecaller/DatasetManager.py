@@ -110,7 +110,7 @@ class DataDirectoryReader:
 	index_filename = 'index'
 
 	def __init__(self, path, include_dirs = None):
-		self.base_path = os.path.abspath(path)
+		self.base_path = path
 		self.type_dirs = os.listdir(self.base_path)
 		self.files = dict()
 		self.stuck_files = []

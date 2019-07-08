@@ -12,6 +12,7 @@ import numpy as np
 from Levenshtein import distance, editops
 import sys
 from Data import Dataset, ExampleSequence, TrainingExample
+from keras.utils import plot_model
 
 
 def write_file_dict_to_file(path, file_dict):
@@ -30,7 +31,7 @@ def write_dict_to_file(path, params):
         json.dump(params, file)
 
 def main(data_path, epochs):
-    run_start_time = str(datetime.datetime.now())
+    run_start_time = str(datetime.datetime.now().isoformat())
     dataset = Dataset(data_path)
     train, test = dataset.train_test_split()
     signal_seq = ExampleSequence(dataset, train, name='train')
@@ -44,8 +45,9 @@ def main(data_path, epochs):
     model = multi_gpu_model(model, gpus=2)
     param = {'lr':0.001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'decay':0.001}
     param_file_path = os.path.join(log_dir, 'params.json')
-    write_dict_to_file(param_file_path, param)
     adam = optimizers.Adam(**param)
+    param.update({'data_path':data_path, 'epochs':epochs})
+    write_dict_to_file(param_file_path, param)
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred},optimizer=adam)
     model.fit_generator(signal_seq, validation_data=test_seq, epochs=epochs, callbacks=[csv_logger])
     model.save(os.path.join(log_dir, 'model.h5'))
@@ -88,6 +90,7 @@ def main(data_path, epochs):
     metrics.update(op_counts)
     metrics_file_path = os.path.join(log_dir, 'metrics.json')
     write_dict_to_file(metrics_file_path, metrics)
+    plot_model(im_model, to_file=os.path.join(log_dir, 'model.png'))
 
 if __name__ == "__main__":
 	main(sys.argv[1], int(sys.argv[2]))
