@@ -32,21 +32,21 @@ def write_dict_to_file(path, params):
         json.dump(params, file)
 
 def main(data_path, model_path, epochs):
-    with open(os.path.join(data_path, 'train.txt')) as train_file:
+    with open(os.path.join(model_path, 'train.txt')) as train_file:
         train = [x.strip() for x in train_file.readlines()]
-    with open(os.path.join(data_path, 'test.txt')) as test_file:
+    with open(os.path.join(model_path, 'test.txt')) as test_file:
         test = [x.strip() for x in test_file.readlines()]
-    csv_logger = CSVLogger(os.path.join(data_path, 'Log1.csv'))
+    csv_logger = CSVLogger(os.path.join(model_path, 'Log1.csv'))
     dataset = Dataset(data_path)
     signal_seq = ExampleSequence(dataset, train, name='train', batch_size=batch_size)
     test_seq = ExampleSequence(dataset, test, name='test', batch_size=batch_size)
-    model = load_model(os.path.join(data_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
+    model = load_model(os.path.join(model_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
     model = multi_gpu_model(model, gpus=2)
     param = {'lr':0.001, 'beta_1':0.9, 'beta_2':0.999, 'epsilon':None, 'clipvalue':2}
     adam = optimizers.Adam(**param)
     model.compile(loss={'ctc': lambda y_true, y_pred: y_pred},optimizer=adam)
     model.fit_generator(signal_seq, validation_data=test_seq, epochs=epochs, callbacks=[csv_logger])
-    model.save(os.path.join(data_path, 'model_1.h5'))
+    model.save(os.path.join(model_path, 'model_1.h5'))
     sub_model = model.get_layer('model_2')
     sub_model = sub_model.get_layer('model_1')
     im_model = Model(inputs=sub_model.get_input_at(0), outputs =sub_model.get_layer('activation_1').output)
