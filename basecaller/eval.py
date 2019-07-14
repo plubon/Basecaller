@@ -35,7 +35,7 @@ def main(dataset_path, model_path):
     with open(os.path.join(model_path, 'test.txt')) as test_file:
         test = [x.strip() for x in test_file.readlines()]
     test_seq = ExampleSequence(dataset, test, name='test', batch_size=16)
-    model = load_model(os.path.join(model_path, 'model.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
+    model = load_model(os.path.join(model_path, 'model1.h5'), custom_objects={'<lambda>': lambda y_true, y_pred: y_pred})
     model = multi_gpu_model(model, gpus=2)
     sub_model = model.get_layer('model_2')
     sub_model = sub_model.get_layer('model_1')
@@ -75,7 +75,7 @@ def main(dataset_path, model_path):
         'predicted_mean_length': np.mean(pred_lens)
     }
     metrics.update(op_counts)
-    metrics_file_path = os.path.join(model_path, 'metrics1.json')
+    metrics_file_path = os.path.join(model_path, 'metrics_eval.json')
     write_dict_to_file(metrics_file_path, metrics)
 
 if __name__ == "__main__":
