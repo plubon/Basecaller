@@ -58,23 +58,16 @@ def main(dataset_path, model_path):
             pred_label = [str(x) for x in pred_label]
             pred_label = ''.join(pred_label)
             dists.append(distance(pred_label, real_label))
-            ops.append(editops(pred_label, real_label))
             lens.append(len(real_label))
             pred_lens.append(len(pred_label))
             real.append(real_label)
             predicted.append(pred_label)
-    op_counts = {'insert':0, 'replace':0, 'delete':0}
-    for op in ops:
-        for x in op:
-            op_counts[x[0]] += 1
-    for key in op_counts.keys():
-        op_counts[key] = op_counts[key] / sum(lens)
+    print(str(sum(dists)/sum(lens))
     metrics = {
         'LER': sum(dists)/sum(lens),
         'real_mean_length': np.mean(lens),
         'predicted_mean_length': np.mean(pred_lens)
     }
-    metrics.update(op_counts)
     metrics_file_path = os.path.join(model_path, 'metrics_eval.json')
     write_dict_to_file(metrics_file_path, metrics)
 
