@@ -14,6 +14,7 @@ import sys
 from Data import Dataset, ExampleSequence, TrainingExample
 from keras.utils import plot_model
 
+batch_size = 16
 
 def write_file_dict_to_file(path, file_dict):
     lines = []

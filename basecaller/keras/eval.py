@@ -62,7 +62,7 @@ def main(dataset_path, model_path):
             pred_lens.append(len(pred_label))
             real.append(real_label)
             predicted.append(pred_label)
-    print(str(sum(dists)/sum(lens))
+    print(str(sum(dists)/sum(lens)))
     metrics = {
         'LER': sum(dists)/sum(lens),
         'real_mean_length': np.mean(lens),
