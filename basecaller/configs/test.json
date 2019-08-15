@@ -1,0 +1,5 @@
+{
+  "model_name": "cnn_lstm",
+  "batch_size": 1,
+  "epochs": 1
+}

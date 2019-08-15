@@ -1,3 +1,6 @@
+import json
+
+
 alphabet_dict = {
 	b'A':0,
 	b'a':0,
@@ -16,3 +19,16 @@ alphabet_dict = {
 	'T':3,
 	't':3
 	}
+
+def string_label_to_int(label):
+	return [alphabet_dict[x] for x in label]
+
+def write_lines_to_file(path, lines):
+    with open(path, 'w') as file:
+        for line in lines:
+            file.write("%s\n" % line)
+
+def write_dict_to_file(path, params):
+	with open(path, "w") as json_file:
+		json.dump(params, json_file)
+		json_file.write("\n")
