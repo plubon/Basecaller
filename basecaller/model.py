@@ -7,7 +7,7 @@ class ModelFactory:
     def get(name, signal, params=None):
         if params is None:
             params = {}
-        if name == 'cnn_lstm':
+        if name.lower() == 'cnn_lstm':
             return CnnLstmModel(signal, params)
 
 

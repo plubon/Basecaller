@@ -5,6 +5,7 @@ import numpy as np
 import os
 import tensorflow as tf
 import sys
+import json
 
 
 class TrainingExample:
@@ -196,7 +197,7 @@ class SignalFileParser:
 
 class DatasetExtractor:
     train_features = {
-        'signal': tf.FixedLenFeature([], tf.float32),
+        'signal': tf.FixedLenFeature([300], tf.float32),
         'label': tf.VarLenFeature(tf.int64),
         'signal_len': tf.FixedLenFeature([], tf.int64),
         'label_len': tf.FixedLenFeature([], tf.int64)
@@ -209,19 +210,29 @@ class DatasetExtractor:
     def extract_train(self):
         return self._extract('train')
 
+    def extract_test(self):
+        return self._extract('test')
+
+    def extract_val(self):
+        return self._extract('val')
+
     def _extract_fn(self, tfrecord):
         sample = tf.parse_single_example(tfrecord, self.train_features)
 
-        return [sample['signal'], sample['label'], sample['signal_len'], sample['label_len']]
+        return [tf.expand_dims(sample['signal'], -1), sample['label'], sample['signal_len'], sample['label_len']]
 
     def _extract(self, split_name):
-        dataset = tf.data.TFRecordDataset([os.path.join(self.path, f"{split_name}.tfrecords")])
-        dataset = dataset.map(self._extract_fn)
-        dataset = dataset.batch(self.config.batch_size)
-        dataset = dataset.repeat(self.config.epochs)
-        dataset = dataset.shuffle(self.config.batch_size * 5)
-        dataset = dataset.prefetch(self.config.batch_size * 5)
-        return dataset
+        with tf.device('/cpu:0'):
+            dataset = tf.data.TFRecordDataset([os.path.join(self.path, f"{split_name}.tfrecords")])
+            dataset = dataset.shuffle(self.config.batch_size * 5)
+            dataset = dataset.repeat(self.config.epochs)
+            dataset = dataset.map(self._extract_fn)
+            dataset = dataset.batch(self.config.batch_size)
+            dataset = dataset.prefetch(self.config.batch_size * 5)
+        with open(os.path.join(self.path, split_name), 'r') as info_file:
+            info = json.load(info_file)
+            size = int(info['count'])
+        return dataset, size
 
 
 if __name__ == "__main__":
