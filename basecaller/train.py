@@ -7,6 +7,7 @@ from decoder import DecoderFactory
 import numpy as np
 import os
 from shutil import copyfile
+import sys
 
 
 def log_to_file(path, line):
@@ -100,6 +101,6 @@ def train(config_path, dataset_path, output_path):
 
 
 if __name__ == "__main__":
-    train("/home/piotr/Uczelnia/PracaMagisterska/Basecaller/basecaller/configs/test.json",
-          '/home/piotr/Uczelnia/PracaMagisterska/Dane/dataset_chiron',
-          '/home/piotr/Uczelnia/PracaMagisterska/Output/chiron_test')
+    train(sys.argv[1],
+          sys.argv[2],
+          sys.argv[3])
