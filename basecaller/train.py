@@ -6,14 +6,17 @@ from optimizer import OptimizerFactory
 from decoder import DecoderFactory
 import numpy as np
 import os
+from shutil import copyfile
 
 
 def log_to_file(path, line):
     with open(path, 'a+') as log_file:
         log_file.write(line)
+        log_file.write('\n')
 
 
 def train(config_path, dataset_path, output_path):
+    copyfile(config_path, os.path.join(output_path, 'config.json'))
     log_path = os.path.join(output_path, 'log')
     config = ConfigReader(config_path).read()
     dataset_extractor = DatasetExtractor(dataset_path, config)
@@ -25,13 +28,13 @@ def train(config_path, dataset_path, output_path):
     test_iterator = dataset_test.make_one_shot_iterator()
     dataset_handle = tf.placeholder(tf.string, shape=[])
     feedable_iterator = tf.data.Iterator.from_string_handle(dataset_handle, dataset_train.output_types,
-                                                            dataset_train.output_shapes)
+                                                            dataset_train.output_shapes, dataset_train.output_classes)
     signal, label, signal_len, _ = feedable_iterator.get_next()
     label = tf.cast(label, dtype=tf.int32)
     model = ModelFactory.get(config.model_name, signal)
     optimizer = OptimizerFactory.get(config.optimizer, model.logits, label, signal_len)
-    decoder = DecoderFactory.get(config.predictor, model.logits, signal_len)
-    distance = tf.reduce_mean(tf.edit_distance(tf.cast(decoder.decoded, dtype=tf.int32), label))
+    decoder = DecoderFactory.get(config.decoder, model.logits, signal_len)
+    distance_op = tf.reduce_mean(tf.edit_distance(tf.cast(decoder.decoded, dtype=tf.int32), label))
     saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
@@ -54,13 +57,13 @@ def train(config_path, dataset_path, output_path):
                 previous_print_length = len(message)
                 print(message, end='')
                 if steps >= train_size:
-                    saver.save(sess, os.path.join(output_path, f"model_{epoch}.ckpt"))
+                    saver.save(sess, os.path.join(output_path, f"model.ckpt"))
                     distances = []
                     val_losses = []
                     sess.run(val_iterator.initializer)
                     while True:
                         try:
-                            distance, val_loss = sess.run([distance, optimizer.loss],
+                            distance, val_loss = sess.run([distance_op, optimizer.loss],
                                                           feed_dict={dataset_handle: validation_handle})
                             distances.append(distance)
                             val_losses.append(val_loss)
@@ -77,12 +80,12 @@ def train(config_path, dataset_path, output_path):
                     previous_print_length = 0
             except tf.errors.OutOfRangeError:
                 break  # End of dataset
-        saver.save(sess, os.path.join(output_path, "model_end.ckpt"))
+        saver.save(sess, os.path.join(output_path, "model.ckpt"))
         test_distances = []
         test_losses = []
         while True:
             try:
-                test_distance, test_loss = sess.run([distance, optimizer.loss],
+                test_distance, test_loss = sess.run([distance_op, optimizer.loss],
                                               feed_dict={dataset_handle: test_handle})
                 test_distances.append(test_distance)
                 test_losses.append(test_loss)
@@ -95,6 +98,8 @@ def train(config_path, dataset_path, output_path):
         print(log_message)
         log_to_file(log_path, log_message)
 
+
 if __name__ == "__main__":
     train("/home/piotr/Uczelnia/PracaMagisterska/Basecaller/basecaller/configs/test.json",
-          '/home/piotr/Uczelnia/PracaMagisterska/Dane/dataset_chiron', None)
+          '/home/piotr/Uczelnia/PracaMagisterska/Dane/dataset_chiron',
+          '/home/piotr/Uczelnia/PracaMagisterska/Output/chiron_test')
