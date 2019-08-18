@@ -1,0 +1,7 @@
+{
+  "model_name": "cnn_lstm",
+  "batch_size": 64,
+  "epochs": 10,
+  "optimizer": "adam",
+  "decoder": "beam_search"
+}
