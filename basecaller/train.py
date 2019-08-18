@@ -5,9 +5,16 @@ from model import ModelFactory
 from optimizer import OptimizerFactory
 from decoder import DecoderFactory
 import numpy as np
+import os
+
+
+def log_to_file(path, line):
+    with open(path, 'a+') as log_file:
+        log_file.write(line)
 
 
 def train(config_path, dataset_path, output_path):
+    log_path = os.path.join(output_path, 'log')
     config = ConfigReader(config_path).read()
     dataset_extractor = DatasetExtractor(dataset_path, config)
     dataset_train, train_size = dataset_extractor.extract_train()
@@ -25,6 +32,7 @@ def train(config_path, dataset_path, output_path):
     optimizer = OptimizerFactory.get(config.optimizer, model.logits, label, signal_len)
     decoder = DecoderFactory.get(config.predictor, model.logits, signal_len)
     distance = tf.reduce_mean(tf.edit_distance(tf.cast(decoder.decoded, dtype=tf.int32), label))
+    saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         training_handle = sess.run(train_iterator.string_handle())
@@ -46,8 +54,10 @@ def train(config_path, dataset_path, output_path):
                 previous_print_length = len(message)
                 print(message, end='')
                 if steps >= train_size:
+                    saver.save(sess, os.path.join(output_path, f"model_{epoch}.ckpt"))
                     distances = []
                     val_losses = []
+                    sess.run(val_iterator.initializer)
                     while True:
                         try:
                             distance, val_loss = sess.run([distance, optimizer.loss],
@@ -59,12 +69,15 @@ def train(config_path, dataset_path, output_path):
                     mean_distance = np.mean(distances)
                     mean_val_loss = np.mean(val_losses)
                     print()
-                    print(f"Epoch: {epoch} Validation Loss: {mean_val_loss} Edit Distance: {mean_distance}")
+                    log_message = f"Epoch: {epoch} Validation Loss: {mean_val_loss} Edit Distance: {mean_distance}"
+                    print(log_message)
+                    log_to_file(log_path, log_message)
                     epoch += 1
                     steps = 0
                     previous_print_length = 0
             except tf.errors.OutOfRangeError:
                 break  # End of dataset
+        saver.save(sess, os.path.join(output_path, "model_end.ckpt"))
         test_distances = []
         test_losses = []
         while True:
@@ -78,7 +91,9 @@ def train(config_path, dataset_path, output_path):
         mean_test_distance = np.mean(test_distances)
         mean_test_loss = np.mean(test_losses)
         print()
-        print(f"Test Loss: {mean_test_loss} Edit Distance: {mean_test_distance}")
+        log_message = f"Test Loss: {mean_test_loss} Edit Distance: {mean_test_distance}"
+        print(log_message)
+        log_to_file(log_path, log_message)
 
 if __name__ == "__main__":
     train("/home/piotr/Uczelnia/PracaMagisterska/Basecaller/basecaller/configs/test.json",
