@@ -17,7 +17,7 @@ class CnnLstmModel:
         self.input = signal
         self.params = params
         model = self.get_residual_block(self.input)
-        for i in range(3):
+        for i in range(2):
             model = self.get_residual_block(model, bn=(i == 0))
         model = self.get_gru_part(model)
         model = tf.keras.layers.Dense(5)(model)
@@ -32,7 +32,7 @@ class CnnLstmModel:
         layer = tf.keras.layers.ReLU()(layer)
         layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
         layer = tf.keras.layers.BatchNormalization()(layer)
-        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same')(input_layer)
+        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(input_layer)
         if bn:
             jump = tf.keras.layers.BatchNormalization()(jump)
         sum_layer = tf.keras.layers.Add()([layer, jump])

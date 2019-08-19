@@ -236,5 +236,5 @@ class DatasetExtractor:
 
 
 if __name__ == "__main__":
-    parser = SignalFileParser(sys.argv[1], sys.argv[2], format='chiron')
+    parser = SignalFileParser(sys.argv[1], sys.argv[2], format=sys.argv[3])
     parser.create()

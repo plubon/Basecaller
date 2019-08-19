@@ -17,6 +17,6 @@ class AdamOptimizer:
         self.logits = logits
         self.labels = labels
         self.seq_len = seq_length
-        self.loss = tf.reduce_sum(tf.nn.ctc_loss(self.labels, self.logits, tf.cast(self.seq_len,
+        self.loss = tf.reduce_mean(tf.nn.ctc_loss(self.labels, self.logits, tf.cast(self.seq_len,
                                                                                    dtype=tf.int32), time_major=False))
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.001, epsilon=1e-07).minimize(self.loss)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(self.loss)
