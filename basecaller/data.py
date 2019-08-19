@@ -26,7 +26,7 @@ class H5FileReader:
         self.parser = parser
 
     def filter_files(self, files):
-        return [x for x in files if x.endswith('h5')]
+        return [x for x in files if x.endswith('fast5')]
 
     def find_signal(self, name):
         if 'Signal' in name:
