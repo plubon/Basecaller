@@ -3,5 +3,6 @@
   "batch_size": 2,
   "epochs": 1,
   "optimizer": "adam",
-  "decoder": "beam_search"
+  "decoder": "beam_search",
+  "debug": true
 }

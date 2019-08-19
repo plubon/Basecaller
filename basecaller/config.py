@@ -9,6 +9,7 @@ class Config:
         self.batch_size = batch_size
         self.optimizer = optimizer
         self.decoder = decoder
+        self.debug = debug
 
 
 class ConfigReader:
