@@ -11,6 +11,37 @@ class ModelFactory:
             return CnnLstmModel(signal, params)
         if name.lower() == 'fcnn_lstm':
             return FcnnLstmModel(signal, params)
+        if name.lower() == 'residual':
+            return ResidualModel(signal, params)
+
+
+class ResidualModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+
+        model = self.get_residual_block(signal, bn=True)
+        for i in range(7):
+            model = self.get_residual_block(model)
+
+        self.logits = tf.keras.layers.Dense(5)(model)
+
+    def get_residual_block(self, input_layer, bn=False):
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
+        layer = tf.keras.layers.BatchNormalization()(layer)
+        layer = tf.keras.layers.ReLU()(layer)
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=3, strides=1, use_bias=False, padding='same')(layer)
+        layer = tf.keras.layers.BatchNormalization()(layer)
+        layer = tf.keras.layers.ReLU()(layer)
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
+        layer = tf.keras.layers.BatchNormalization()(layer)
+        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(input_layer)
+        if bn:
+            jump = tf.keras.layers.BatchNormalization()(jump)
+        sum_layer = tf.keras.layers.Add()([layer, jump])
+        sum_layer = tf.keras.layers.ReLU()(sum_layer)
+        return sum_layer
 
 
 class FcnnLstmModel:
