@@ -18,7 +18,6 @@ class FcnnLstmModel:
     def __init__(self, signal, params):
         self.input = signal
         self.params = params
-        left = tf.keras.layers.LSTM(100, activation='relu', return_sequences=True)(signal)
 
         right = tf.keras.layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(self.input)
         right = tf.keras.layers.BatchNormalization()(right)
@@ -32,8 +31,7 @@ class FcnnLstmModel:
         right = tf.keras.layers.BatchNormalization()(right)
         right = tf.keras.layers.Activation('relu')(right)
 
-        added = tf.keras.layers.Concatenate()([left, right])
-        self.logits = tf.keras.layers.Dense(5)(added)
+        self.logits = tf.keras.layers.Dense(5)(right)
 
 
 class CnnLstmModel:
