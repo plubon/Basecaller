@@ -9,6 +9,34 @@ class ModelFactory:
             params = {}
         if name.lower() == 'cnn_lstm':
             return CnnLstmModel(signal, params)
+        if name.lower() == 'fcnn_lstm':
+            return FcnnLstmModel(signal, params)
+
+
+class FcnnLstmModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        left = tf.transpose(self.input, [0, 2, 1])
+        left = tf.keras.layers.LSTM(100)(left)
+
+        right = tf.keras.layers.Conv1D(128, 8, padding='same', kernel_initializer='he_uniform')(self.input)
+        right = tf.keras.layers.BatchNormalization()(right)
+        right = tf.keras.layers.Activation('relu')(right)
+
+        right = tf.keras.layers.Conv1D(256, 5, padding='same', kernel_initializer='he_uniform')(right)
+        right = tf.keras.layers.BatchNormalization()(right)
+        right = tf.keras.layers.Activation('relu')(right)
+
+        right = tf.keras.layers.Conv1D(128, 3, padding='same', kernel_initializer='he_uniform')(right)
+        right = tf.keras.layers.BatchNormalization()(right)
+        right = tf.keras.layers.Activation('relu')(right)
+
+        right = tf.keras.layers.GlobalAveragePooling1D()(right)
+
+        added = tf.keras.layers.Concatenate()([left, right])
+        self.logits = tf.keras.layers.Dense(5)(added)
 
 
 class CnnLstmModel:
