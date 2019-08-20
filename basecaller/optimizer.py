@@ -19,4 +19,7 @@ class AdamOptimizer:
         self.seq_len = seq_length
         self.loss = tf.reduce_mean(tf.nn.ctc_loss(self.labels, self.logits, tf.cast(self.seq_len,
                                                                                    dtype=tf.int32), time_major=False))
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.0005).minimize(self.loss)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.0005)
+        gds, vars = zip(*self.optimizer.compute_gradients(self.loss))
+        clipped_gds, _ = tf.clip_by_global_norm(gds, 5)
+        self.optimizer = self.optimizer.apply_gradients(zip(clipped_gds, vars))
