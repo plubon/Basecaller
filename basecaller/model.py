@@ -44,12 +44,12 @@ class WavenetModel:
                                       2,
                                       dilation_rate=dilation,
                                       padding='causal',
-                                      activation='tanh')
+                                      activation='tanh')(input)
         sigma = tf.keras.layers.Conv1D(256,
                                        2,
                                        dilation_rate=dilation,
                                        padding='causal',
-                                       activation='sigmoid')
+                                       activation='sigmoid')(input)
         model = tf.keras.layers.Multiply()([tanh, sigma])
         res = tf.keras.layers.Conv1D(256, 1, padding='same')(model)
         skip = tf.keras.layers.Conv1D(256, 1, padding='same')(model)
