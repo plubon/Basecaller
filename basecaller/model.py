@@ -67,7 +67,7 @@ class CnnTcnModel:
             jump, model = self.get_block(model, i)
             skip_connections.append(jump)
             i = i * 2
-        model = tf.keras.layers.Add(skip_connections)
+        model = tf.keras.layers.Add()(skip_connections)
         self.logits = tf.keras.layers.Dense(5)(model)
 
     def get_residual_block(self, input_layer, bn=False):
