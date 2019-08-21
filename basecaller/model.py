@@ -33,8 +33,9 @@ class WavenetModel:
         i = 1
         model = tf.keras.layers.Conv1D(256, 1, padding='same')(signal)
         while i <= max_dilation:
-            model, skip = self.get_wavenet_block(model, params)
+            model, skip = self.get_wavenet_block(model, i, params)
             skip_connections.append(skip)
+            i = i * 2
         skip_sum = tf.keras.layers.Add()(skip_connections)
         self.logits = tf.keras.layers.Dense(5)(skip_sum)
 
