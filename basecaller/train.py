@@ -18,6 +18,8 @@ def log_to_file(path, line):
 
 
 def train(config_path, dataset_path, output_path):
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     copyfile(config_path, os.path.join(output_path, 'config.json'))
     log_path = os.path.join(output_path, 'log')
     config = ConfigReader(config_path).read()
@@ -63,26 +65,27 @@ def train(config_path, dataset_path, output_path):
             print(message, end='', flush=True)
             if steps >= train_size:
                 saver.save(sess, os.path.join(output_path, f"model.ckpt"))
-                distances = []
-                val_losses = []
-                sess.run(val_iterator.initializer)
-                while True:
-                    try:
-                        distance, val_loss = sess.run([distance_op, optimizer.loss],
-                                                      feed_dict={dataset_handle: validation_handle})
-                        distances.append(distance)
-                        val_losses.append(val_loss)
-                    except tf.errors.InvalidArgumentError as e:
-                        log_to_file(log_path, e.message)
-                        raise e
-                    except tf.errors.OutOfRangeError:
-                        break
-                mean_distance = np.mean(distances)
-                mean_val_loss = np.mean(val_losses)
-                print(flush=True)
-                log_message = f"Epoch: {epoch} Validation Loss: {mean_val_loss} Edit Distance: {mean_distance}"
-                print(log_message, flush=True)
-                log_to_file(log_path, log_message)
+                if config.validate:
+                    distances = []
+                    val_losses = []
+                    sess.run(val_iterator.initializer)
+                    while True:
+                        try:
+                            distance, val_loss = sess.run([distance_op, optimizer.loss],
+                                                          feed_dict={dataset_handle: validation_handle})
+                            distances.append(distance)
+                            val_losses.append(val_loss)
+                        except tf.errors.InvalidArgumentError as e:
+                            log_to_file(log_path, e.message)
+                            raise e
+                        except tf.errors.OutOfRangeError:
+                            break
+                    mean_distance = np.mean(distances)
+                    mean_val_loss = np.mean(val_losses)
+                    print(flush=True)
+                    log_message = f"Epoch: {epoch} Validation Loss: {mean_val_loss} Edit Distance: {mean_distance}"
+                    print(log_message, flush=True)
+                    log_to_file(log_path, log_message)
                 epoch += 1
                 steps = 0
                 previous_print_length = 0

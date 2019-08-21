@@ -3,13 +3,14 @@ import json
 
 class Config:
 
-    def __init__(self, model_name, epochs, batch_size, optimizer, decoder, debug):
+    def __init__(self, model_name, epochs, batch_size, optimizer, decoder, debug, validate):
         self.model_name = model_name
         self.epochs = epochs
         self.batch_size = batch_size
         self.optimizer = optimizer
         self.decoder = decoder
         self.debug = debug
+        self.validate = validate
 
 
 class ConfigReader:

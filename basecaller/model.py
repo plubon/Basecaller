@@ -17,8 +17,43 @@ class ModelFactory:
             return TcnModel(signal, params)
         if name.lower() == 'cnn_tcn':
             return CnnTcnModel(signal, params)
+        if name.lower() == 'wavenet':
+            return WavenetModel(signal, params)
         else:
             raise ValueError(f'No model with name: {name}')
+
+
+class WavenetModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        max_dilation = 128
+        skip_connections = []
+        i = 1
+        model = tf.keras.layers.Conv1D(256, 1, padding='same')(signal)
+        while i <= max_dilation:
+            model, skip = self.get_wavenet_block(model, params)
+            skip_connections.append(skip)
+        skip_sum = tf.keras.layers.Add()(skip_connections)
+        self.logits = tf.keras.layers.Dense(5)(skip_sum)
+
+    def get_wavenet_block(self, input, dilation, params):
+        tanh = tf.keras.layers.Conv1D(256,
+                                      2,
+                                      dilation_rate=dilation,
+                                      padding='causal',
+                                      activation='tanh')
+        sigma = tf.keras.layers.Conv1D(256,
+                                       2,
+                                       dilation_rate=dilation,
+                                       padding='causal',
+                                       activation='sigmoid')
+        model = tf.keras.layers.Multiply()([tanh, sigma])
+        res = tf.keras.layers.Conv1D(256, 1, padding='same')(model)
+        skip = tf.keras.layers.Conv1D(256, 1, padding='same')(model)
+        res = tf.keras.layers.Add()[(input, res)]
+        return res, skip
 
 
 class TcnModel:
@@ -26,9 +61,13 @@ class TcnModel:
     def __init__(self, signal, params):
         self.input = signal
         self.params = params
-        max_dilation = 64
+
+        model = self.get_residual_block(signal, bn=True)
+        for i in range(4):
+            model = self.get_residual_block(model)
+
+        max_dilation = 32
         i = 1
-        model = self.input
         while i <= max_dilation:
             model = self.get_block(model, i)
             i = i * 2
@@ -71,7 +110,8 @@ class CnnTcnModel:
         self.logits = tf.keras.layers.Dense(5)(model)
 
     def get_residual_block(self, input_layer, bn=False):
-        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(
+            input_layer)
         layer = tf.keras.layers.BatchNormalization()(layer)
         layer = tf.keras.layers.ReLU()(layer)
         layer = tf.keras.layers.Conv1D(filters=256, kernel_size=3, strides=1, use_bias=False, padding='same')(layer)
@@ -79,7 +119,8 @@ class CnnTcnModel:
         layer = tf.keras.layers.ReLU()(layer)
         layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
         layer = tf.keras.layers.BatchNormalization()(layer)
-        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(input_layer)
+        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(
+            input_layer)
         if bn:
             jump = tf.keras.layers.BatchNormalization()(jump)
         sum_layer = tf.keras.layers.Add()([layer, jump])
@@ -116,7 +157,8 @@ class ResidualModel:
         self.logits = tf.keras.layers.Dense(5)(model)
 
     def get_residual_block(self, input_layer, bn=False):
-        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(
+            input_layer)
         layer = tf.keras.layers.BatchNormalization()(layer)
         layer = tf.keras.layers.ReLU()(layer)
         layer = tf.keras.layers.Conv1D(filters=256, kernel_size=3, strides=1, use_bias=False, padding='same')(layer)
@@ -124,7 +166,8 @@ class ResidualModel:
         layer = tf.keras.layers.ReLU()(layer)
         layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
         layer = tf.keras.layers.BatchNormalization()(layer)
-        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(input_layer)
+        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(
+            input_layer)
         if bn:
             jump = tf.keras.layers.BatchNormalization()(jump)
         sum_layer = tf.keras.layers.Add()([layer, jump])
@@ -166,7 +209,8 @@ class CnnLstmModel:
         self.logits = model
 
     def get_residual_block(self, input_layer, bn=False):
-        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(
+            input_layer)
         layer = tf.keras.layers.BatchNormalization()(layer)
         layer = tf.keras.layers.ReLU()(layer)
         layer = tf.keras.layers.Conv1D(filters=256, kernel_size=3, strides=1, use_bias=False, padding='same')(layer)
@@ -174,7 +218,8 @@ class CnnLstmModel:
         layer = tf.keras.layers.ReLU()(layer)
         layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
         layer = tf.keras.layers.BatchNormalization()(layer)
-        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(input_layer)
+        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(
+            input_layer)
         if bn:
             jump = tf.keras.layers.BatchNormalization()(jump)
         sum_layer = tf.keras.layers.Add()([layer, jump])
