@@ -15,6 +15,8 @@ class ModelFactory:
             return ResidualModel(signal, params)
         if name.lower() == 'tcn':
             return TcnModel(signal, params)
+        if name.lower() == 'cnn_tcn':
+            return CnnTcnModel(signal, params)
         else:
             raise ValueError(f'No model with name: {name}')
 
@@ -24,13 +26,62 @@ class TcnModel:
     def __init__(self, signal, params):
         self.input = signal
         self.params = params
-        max_dilation = 32
+        max_dilation = 64
         i = 1
         model = self.input
         while i <= max_dilation:
             model = self.get_block(model, i)
             i = i * 2
         self.logits = tf.keras.layers.Dense(5)(model)
+
+    def get_block(self, input, dilation):
+        model = input
+        for _ in range(2):
+            model = tf.keras.layers.Conv1D(filters=256,
+                                           kernel_size=3,
+                                           dilation_rate=dilation,
+                                           padding='causal')(model)
+            model = tf.keras.layers.BatchNormalization()(model)
+            model = tf.keras.layers.ReLU()(model)
+        jump = tf.keras.layers.Conv1D(filters=256,
+                                      kernel_size=1,
+                                      padding='same')(input)
+        model = tf.keras.layers.Add()([jump, model])
+        return tf.keras.layers.ReLU()(model)
+
+
+class CnnTcnModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+
+        model = self.get_residual_block(signal, bn=True)
+        for i in range(4):
+            model = self.get_residual_block(model)
+
+        max_dilation = 32
+        i = 1
+        while i <= max_dilation:
+            model = self.get_block(model, i)
+            i = i * 2
+        self.logits = tf.keras.layers.Dense(5)(model)
+
+    def get_residual_block(self, input_layer, bn=False):
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(input_layer)
+        layer = tf.keras.layers.BatchNormalization()(layer)
+        layer = tf.keras.layers.ReLU()(layer)
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=3, strides=1, use_bias=False, padding='same')(layer)
+        layer = tf.keras.layers.BatchNormalization()(layer)
+        layer = tf.keras.layers.ReLU()(layer)
+        layer = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(layer)
+        layer = tf.keras.layers.BatchNormalization()(layer)
+        jump = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, padding='same', use_bias=False)(input_layer)
+        if bn:
+            jump = tf.keras.layers.BatchNormalization()(jump)
+        sum_layer = tf.keras.layers.Add()([layer, jump])
+        sum_layer = tf.keras.layers.ReLU()(sum_layer)
+        return sum_layer
 
     def get_block(self, input, dilation):
         model = input
