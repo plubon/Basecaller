@@ -53,7 +53,7 @@ class WavenetModel:
         model = tf.keras.layers.Multiply()([tanh, sigma])
         res = tf.keras.layers.Conv1D(256, 1, padding='same')(model)
         skip = tf.keras.layers.Conv1D(256, 1, padding='same')(model)
-        res = tf.keras.layers.Add()[(input, res)]
+        res = tf.keras.layers.Add()([input, res])
         return res, skip
 
 
