@@ -15,6 +15,8 @@ class ModelFactory:
             return ResidualModel(signal, params)
         if name.lower() == 'tcn':
             return TcnModel(signal, params)
+        else:
+            raise ValueError(f'No model with name: {name}')
 
 
 class TcnModel:
@@ -36,7 +38,7 @@ class TcnModel:
             model = tf.keras.layers.Conv1D(filters=256,
                                            kernel_size=3,
                                            dilation_rate=dilation,
-                                           padding='casual')(model)
+                                           padding='causal')(model)
             model = tf.keras.layers.BatchNormalization()(model)
             model = tf.keras.layers.ReLU()(model)
         jump = tf.keras.layers.Conv1D(filters=256,
