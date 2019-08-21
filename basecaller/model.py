@@ -60,11 +60,14 @@ class CnnTcnModel:
         for i in range(4):
             model = self.get_residual_block(model)
 
+        skip_connections = []
         max_dilation = 32
         i = 1
         while i <= max_dilation:
-            model = self.get_block(model, i)
+            jump, model = self.get_block(model, i)
+            skip_connections.append(jump)
             i = i * 2
+        model = tf.keras.layers.Add(skip_connections)
         self.logits = tf.keras.layers.Dense(5)(model)
 
     def get_residual_block(self, input_layer, bn=False):
@@ -95,8 +98,9 @@ class CnnTcnModel:
         jump = tf.keras.layers.Conv1D(filters=256,
                                       kernel_size=1,
                                       padding='same')(input)
-        model = tf.keras.layers.Add()([jump, model])
-        return tf.keras.layers.ReLU()(model)
+        jump = tf.keras.layers.Add()([model, jump])
+        jump = tf.keras.layers.ReLU(jump)
+        return jump, model
 
 
 class ResidualModel:
