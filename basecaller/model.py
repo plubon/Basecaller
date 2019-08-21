@@ -99,7 +99,7 @@ class CnnTcnModel:
                                       kernel_size=1,
                                       padding='same')(input)
         jump = tf.keras.layers.Add()([model, jump])
-        jump = tf.keras.layers.ReLU(jump)
+        jump = tf.keras.layers.ReLU()(jump)
         return jump, model
 
 
