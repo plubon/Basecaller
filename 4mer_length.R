@@ -1,0 +1,17 @@
+library('dplyr')
+library('stringr')
+library('ggplot2')
+rsum.cumsum <- function(x, n = 3L) tail(cumsum(x) - cumsum(c(rep(0, n), head(x, -n))), -n + 1)
+files <- list.files('/home/piotr/Uczelnia/PracaMagisterska/Dane/train')
+setwd('/home/piotr/Uczelnia/PracaMagisterska/Dane/train')
+files <- data.frame(filename=files, stringsAsFactors = FALSE)
+label_files <- files %>% filter(str_detect(filename, 'label'))
+df_list <- list()
+data_list <- lapply(label_files$filename,function(x)
+{
+  read.csv(x, header = FALSE, sep=' ')
+})
+mer_lenghts <- lapply(data_list, function(x)
+{
+  return(rsum.cumsum(x$V2-x$V1, 4))
+})

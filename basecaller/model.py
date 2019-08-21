@@ -13,6 +13,37 @@ class ModelFactory:
             return FcnnLstmModel(signal, params)
         if name.lower() == 'residual':
             return ResidualModel(signal, params)
+        if name.lower() == 'tcn':
+            return TcnModel(signal, params)
+
+
+class TcnModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        max_dilation = 32
+        i = 1
+        model = self.input
+        while i <= max_dilation:
+            model = self.get_block(model, i)
+            i = i * 2
+        self.logits = tf.keras.layers.Dense(5)(model)
+
+    def get_block(self, input, dilation):
+        model = input
+        for _ in range(2):
+            model = tf.keras.layers.Conv1D(filters=256,
+                                           kernel_size=3,
+                                           dilation_rate=dilation,
+                                           padding='casual')(model)
+            model = tf.keras.layers.BatchNormalization()(model)
+            model = tf.keras.layers.ReLU()(model)
+        jump = tf.keras.layers.Conv1D(filters=256,
+                                      kernel_size=1,
+                                      padding='same')(input)
+        model = tf.keras.layers.Add()([jump, model])
+        return tf.keras.layers.ReLU()(model)
 
 
 class ResidualModel:
