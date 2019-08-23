@@ -60,7 +60,7 @@ def tcn_block_both_direction(original, reversed, dilation):
     return relu(original), relu(reversed)
 
 
-def wavenet_block_both_direction(original, reversed, dilation):
+def wavenet_bidirectional_block(original, reversed, dilation):
     prev_original = original
     prev_reversed = reversed
     tanh = tf.keras.layers.Conv1D(256,
