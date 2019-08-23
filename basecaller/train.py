@@ -35,7 +35,7 @@ def train(config_path, dataset_path, output_path):
                                                             dataset_train.output_shapes, dataset_train.output_classes)
     signal, label, signal_len, _ = feedable_iterator.get_next()
     label = tf.cast(label, dtype=tf.int32)
-    model = ModelFactory.get(config.model_name, signal)
+    model = ModelFactory.get(config.model_name, signal, config)
     optimizer = OptimizerFactory.get(config.optimizer, model.logits, label, signal_len)
     decoder = DecoderFactory.get(config.decoder, model.logits, signal_len)
     distance_op = tf.reduce_mean(tf.edit_distance(tf.cast(decoder.decoded, dtype=tf.int32), label))

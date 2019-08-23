@@ -2,6 +2,7 @@ import tensorflow as tf
 import blocks
 import numpy as np
 
+
 class ModelFactory:
 
     @staticmethod
@@ -39,6 +40,24 @@ class WavenetModel:
         self.logits = tf.keras.layers.Dense(5)(skip_sum)
 
 
+class WavenetBothDirectionsModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        max_dilation = 128
+        skip_connections = []
+        i = 1
+        original = tf.keras.layers.Conv1D(256, 1, padding='same')(signal)
+        reversed = tf.reverse(original, [1])
+        while i <= max_dilation:
+            original, original_skip, reversed, reversed_skip = blocks.wavenet_block(original, reversed, i)
+            skip_connections.append(tf.concat([original_skip, tf.reverse(reversed_skip, [1])], 2))
+            i = i * 2
+        skip_sum = tf.keras.layers.Add()(skip_connections)
+        self.logits = tf.keras.layers.Dense(5)(skip_sum)
+
+
 class TcnModel:
 
     def __init__(self, signal, params):
@@ -58,6 +77,27 @@ class TcnModel:
 
 
 class CnnTcnModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+
+        model = blocks.residual_block(signal, bn=True)
+        for i in range(4):
+            model = blocks.residual_block(model)
+
+        skip_connections = []
+        max_dilation = 64
+        i = 1
+        while i <= max_dilation:
+            jump, model = blocks.tcn_block(model, i)
+            skip_connections.append(jump)
+            i = i * 2
+        model = tf.keras.layers.Add()(skip_connections)
+        self.logits = tf.keras.layers.Dense(5)(model)
+
+
+class CnnTcnModelBothDirections:
 
     def __init__(self, signal, params):
         self.input = signal
