@@ -53,7 +53,7 @@ class WavenetBidirectionalModel:
         original = tf.keras.layers.Conv1D(256, 1, padding='same')(signal)
         reversed = tf.reverse(original, [1])
         while i <= max_dilation:
-            original, original_skip, reversed, reversed_skip = blocks.wavenet_block(original, reversed, i)
+            original, original_skip, reversed, reversed_skip = blocks.wavenet_bidirectional_block(original, reversed, i)
             skip_connections.append(tf.concat([original_skip, tf.reverse(reversed_skip, [1])], 2))
             i = i * 2
         skip_sum = tf.keras.layers.Add()(skip_connections)
