@@ -19,6 +19,8 @@ class ModelFactory:
             return CnnTcnModel(signal, config)
         if name.lower() == 'wavenet':
             return WavenetModel(signal, config)
+        if name.lower() == 'wavenet_bidirectional':
+            return WavenetBidirectionalModel(signal, config)
         else:
             raise ValueError(f'No model with name: {name}')
 
@@ -40,7 +42,7 @@ class WavenetModel:
         self.logits = tf.keras.layers.Dense(5)(skip_sum)
 
 
-class WavenetBothDirectionsModel:
+class WavenetBidirectionalModel:
 
     def __init__(self, signal, params):
         self.input = signal
