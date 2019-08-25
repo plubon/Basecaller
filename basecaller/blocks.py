@@ -1,20 +1,35 @@
 import tensorflow as tf
 
 
-def wavenet_block(input, dilation, params):
-    tanh = tf.keras.layers.Conv1D(256,
+def wavenet_gate(input, dilation, filters):
+    tanh = tf.keras.layers.Conv1D(filters,
                                   2,
                                   dilation_rate=dilation,
                                   padding='causal',
                                   activation='tanh')(input)
-    sigma = tf.keras.layers.Conv1D(256,
+    sigma = tf.keras.layers.Conv1D(filters,
                                    2,
                                    dilation_rate=dilation,
                                    padding='causal',
                                    activation='sigmoid')(input)
-    model = tf.keras.layers.Multiply()([tanh, sigma])
+    return tf.keras.layers.Multiply()([tanh, sigma])
+
+
+def wavenet_block(input, dilation, params=None):
+    model = wavenet_gate(input, dilation, 256)
     res = tf.keras.layers.Conv1D(256, 1, padding='same')(model)
     skip = tf.keras.layers.Conv1D(256, 1, padding='same')(model)
+    res = tf.keras.layers.Add()([input, res])
+    return res, skip
+
+
+def wavenet_bidirectional_block(input, dilation):
+    reversed = tf.reverse(input, [1])
+    original_branch = wavenet_gate(input, dilation, 128)
+    reversed_branch = wavenet_gate(reversed, dilation, 128)
+    merged = tf.concat(original_branch, tf.reverse(reversed_branch, [1]), axis=-1)
+    res = tf.keras.layers.Conv1D(256, 1, padding='same')(merged)
+    skip = tf.keras.layers.Conv1D(256, 1, padding='same')(merged)
     res = tf.keras.layers.Add()([input, res])
     return res, skip
 
@@ -58,31 +73,6 @@ def tcn_block_both_direction(original, reversed, dilation):
     reversed = tf.keras.layers.Add()([jump_reversed, reversed])
     relu = tf.keras.layers.ReLU()
     return relu(original), relu(reversed)
-
-
-def wavenet_bidirectional_block(original, reversed, dilation):
-    prev_original = original
-    prev_reversed = reversed
-    tanh = tf.keras.layers.Conv1D(256,
-                                  2,
-                                  dilation_rate=dilation,
-                                  padding='causal',
-                                  activation='tanh')
-    sigma = tf.keras.layers.Conv1D(256,
-                                   2,
-                                   dilation_rate=dilation,
-                                   padding='causal',
-                                   activation='sigmoid')
-    multiply = tf.keras.layers.Multiply()
-    original = multiply([tanh(original), sigma(original)])
-    reversed = multiply([tanh(reversed), sigma(reversed)])
-    res = tf.keras.layers.Conv1D(256, 1, padding='same')
-    skip = tf.keras.layers.Conv1D(256, 1, padding='same')
-    original_res = tf.keras.layers.Add()([prev_original, res(original)])
-    reversed_res = tf.keras.layers.Add()([prev_reversed, res(reversed)])
-    original_skip = skip(original)
-    reversed_skip = skip(reversed)
-    return original_res, original_skip, reversed_res, reversed_skip
 
 
 def residual_block(input_layer, bn=False):

@@ -48,13 +48,14 @@ class WavenetBidirectionalModel:
         self.input = signal
         self.params = params
         max_dilation = 128
-        skip_connections = []
+        model = self.input
+        for i in range(3):
+            model = blocks.residual_block(model, i == 0)
         i = 1
-        original = tf.keras.layers.Conv1D(256, 1, padding='same')(signal)
-        reversed = tf.reverse(original, [1])
+        skip_connections = []
         while i <= max_dilation:
-            original, original_skip, reversed, reversed_skip = blocks.wavenet_bidirectional_block(original, reversed, i)
-            skip_connections.append(tf.concat([original_skip, tf.reverse(reversed_skip, [1])], 2))
+            model, skip = blocks.wavenet_bidirectional_block(model, i)
+            skip_connections.append(skip)
             i = i * 2
         skip_sum = tf.keras.layers.Add()(skip_connections)
         self.logits = tf.keras.layers.Dense(5)(skip_sum)
@@ -145,8 +146,7 @@ class CnnLstmModel:
         model = blocks.lstm_block(model)
         weight_bi = tf.Variable(tf.truncated_normal([2, hidden_num], stddev=np.sqrt(2.0 / (2*hidden_num))))
         bias_bi = tf.Variable(tf.zeros([hidden_num]))
-        model = tf.reshape(model, [self.config.batch_size, 300, 2, hidden_num])
+        model = tf.reshape(model, [tf.shape(model)[0], 300, 2, hidden_num])
         model = tf.nn.bias_add(tf.reduce_sum(tf.multiply(model, weight_bi), axis=2), bias_bi)
         model = tf.keras.layers.Dense(5)(model)
         self.logits = model
-
