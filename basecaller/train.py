@@ -59,7 +59,7 @@ def train(config_path, dataset_path, output_path):
             steps += config.batch_size
             if previous_print_length > 0:
                 print('\b' * previous_print_length, end='', flush=True)
-            message = f"Epoch: {epoch} Step: {steps} Loss: {np.mean(losses)}"
+            message = f"Epoch: {epoch} Step: {steps} Step Loss:{loss_value} Epoch Loss: {np.mean(losses)}"
             log_to_file(log_path, message)
             previous_print_length = len(message)
             print(message, end='', flush=True)
