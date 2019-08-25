@@ -27,7 +27,7 @@ def wavenet_bidirectional_block(input, dilation):
     reversed = tf.reverse(input, [1])
     original_branch = wavenet_gate(input, dilation, 128)
     reversed_branch = wavenet_gate(reversed, dilation, 128)
-    merged = tf.concat(original_branch, tf.reverse(reversed_branch, [1]), axis=-1)
+    merged = tf.concat([original_branch, tf.reverse(reversed_branch, [1])], axis=-1)
     res = tf.keras.layers.Conv1D(256, 1, padding='same')(merged)
     skip = tf.keras.layers.Conv1D(256, 1, padding='same')(merged)
     res = tf.keras.layers.Add()([input, res])
