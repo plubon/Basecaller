@@ -47,7 +47,7 @@ class AdamOptimizerWithDecay:
         self.labels = labels
         self.seq_len = seq_length
         self.global_step = tf.Variable(0, trainable=False)
-        self.learning_rate = tf.compat.v1.train.exponential_decay(0.001,
+        self.learning_rate = tf.train.exponential_decay(0.001,
                                                             self.global_step,
                                                             1000, 0.96, staircase=True)
 
