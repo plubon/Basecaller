@@ -50,8 +50,8 @@ def train(config_path, dataset_path, output_path):
     epoch = 0
     steps = 0
     previous_print_length = 0
+    losses = []
     while True:
-        losses = []
         try:
             loss_value, _ = sess.run([optimizer.loss, optimizer.optimizer],
                                      feed_dict={dataset_handle: training_handle})
@@ -89,6 +89,7 @@ def train(config_path, dataset_path, output_path):
                 epoch += 1
                 steps = 0
                 previous_print_length = 0
+                losses = []
         except tf.errors.OutOfRangeError:
             break  # End of dataset
     saver.save(sess, os.path.join(output_path, "model.ckpt"))
