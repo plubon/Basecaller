@@ -11,6 +11,8 @@ class OptimizerFactory:
             return ClippedAdamOptimizer(logits, labels, seq_length, params)
         if name.lower() == 'adam':
             return AdamOptimizer(logits, labels, seq_length, params)
+        if name.lower() == 'adam_decay':
+            return AdamOptimizerWithDecay(logits, labels, seq_length, params)
 
 
 class ClippedAdamOptimizer:
@@ -36,3 +38,20 @@ class AdamOptimizer:
         self.loss = tf.reduce_mean(tf.nn.ctc_loss(self.labels, self.logits, tf.cast(self.seq_len,
                                                                                    dtype=tf.int32), time_major=False))
         self.optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(self.loss)
+
+
+class AdamOptimizerWithDecay:
+
+    def __init__(self, logits, labels, seq_length, params):
+        self.logits = logits
+        self.labels = labels
+        self.seq_len = seq_length
+        self.global_step = tf.Variable(0, trainable=False)
+        self.learning_rate = tf.compat.v1.train.exponential_decay(0.001,
+                                                            self.global_step,
+                                                            1000, 0.96, staircase=True)
+
+        self.loss = tf.reduce_mean(tf.nn.ctc_loss(self.labels, self.logits, tf.cast(self.seq_len,
+                                                                                   dtype=tf.int32), time_major=False))
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)\
+            .minimize(self.loss, global_step=self.global_step)
