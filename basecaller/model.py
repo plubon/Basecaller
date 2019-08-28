@@ -30,10 +30,12 @@ class WavenetModel:
     def __init__(self, signal, params):
         self.input = signal
         self.params = params
+        model = self.input
+        for i in range(3):
+            model = blocks.residual_block(model, i == 0)
         max_dilation = 128
         skip_connections = []
         i = 1
-        model = tf.keras.layers.Conv1D(256, 1, padding='same')(signal)
         while i <= max_dilation:
             model, skip = blocks.wavenet_block(model, i, params)
             skip_connections.append(skip)
