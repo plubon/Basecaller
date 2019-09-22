@@ -229,10 +229,29 @@ class DatasetExtractor:
             dataset = dataset.map(self._extract_fn)
             dataset = dataset.batch(self.config.batch_size)
             dataset = dataset.prefetch(self.config.batch_size * 5)
-        with open(os.path.join(self.path, split_name), 'r') as info_file:
-            info = json.load(info_file)
-            size = int(info['count'])
+            with open(os.path.join(self.path, split_name), 'r') as info_file:
+                info = json.load(info_file)
+                size = int(info['count'])
         return dataset, size
+
+
+class EvalDataExtractor:
+
+    def __init__(self, data_dir, file_list):
+        self.files = os.listdir(data_dir)
+        self.files = [x for x in self.files if x.endswith('.fast5') or x.endswith('.signal')]
+        if file_list is not None:
+            self.files = [x for x in self.files if x.split('.')[0] in file_list]
+
+    def get_dataset(self, batch_size=100):
+        dataset = tf.data.Dataset.from_generator(self.generator, (tf.float32, tf.string, tf.int64),
+                                                 (tf.TensorShape([300]), tf.TensorShape([]), tf.TensorShape([])))
+        dataset = dataset.prefetch(batch_size * 5)
+        dataset = dataset.batch(batch_size)
+        return dataset
+
+    def generator(self):
+
 
 
 if __name__ == "__main__":
