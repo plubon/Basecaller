@@ -242,16 +242,22 @@ class EvalDataExtractor:
         self.files = [x for x in self.files if x.endswith('.fast5') or x.endswith('.signal')]
         if file_list is not None:
             self.files = [x for x in self.files if x.split('.')[0] in file_list]
+        self.output_types = (tf.float32, tf.string, tf.int64)
+        self.output_shapes = (tf.TensorShape([300]), tf.TensorShape([]), tf.TensorShape([]))
+        self.current_file = 0
 
-    def get_dataset(self, batch_size=100):
-        dataset = tf.data.Dataset.from_generator(self.generator, (tf.float32, tf.string, tf.int64),
-                                                 (tf.TensorShape([300]), tf.TensorShape([]), tf.TensorShape([])))
+    def has_next_file(self):
+        return self.current_file < len(self.files)
+
+    def get_next_file_dataset(self, batch_size=100):
+        dataset = tf.data.Dataset.from_generator(self.generator, self.output_types, self.output_shapes)
         dataset = dataset.prefetch(batch_size * 5)
         dataset = dataset.batch(batch_size)
+        self.current_file = self.current_file + 1
         return dataset
 
     def generator(self):
-
+        pass
 
 
 if __name__ == "__main__":
