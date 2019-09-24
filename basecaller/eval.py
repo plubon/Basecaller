@@ -17,6 +17,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
     saver = tf.train.Saver()
     with tf.Session() as sess:
         saver.restore(sess, os.path.join(model_dir, "model.ckpt"))
+        print('Model restored')
         while data_extractor.has_next_file():
             logits_list = []
             filenames_list = []

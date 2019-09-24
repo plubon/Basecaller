@@ -22,8 +22,22 @@ class TrainingExample:
 
 class H5FileReader:
 
-    def __init__(self, parser):
+    def __init__(self, parser=None):
         self.parser = parser
+
+    def read_for_eval(self, path):
+        with h5py.File(path + '.fast5', 'r') as h5_file:
+            raw_signal = h5_file['Raw/Reads']
+            signal_path = raw_signal.visit(self.find_signal)
+            dataset = raw_signal[signal_path][()]
+            i = 0
+            signal = []
+            indices = []
+            while i + 300 < len(dataset):
+                signal.append(dataset[i:i + 300])
+                indices.append(i)
+                i = i + 30
+            return signal, indices
 
     def filter_files(self, files):
         return [x for x in files if x.endswith('fast5')]
@@ -76,8 +90,23 @@ class H5FileReader:
 
 class ChironFileReader:
 
-    def __init__(self, parser):
+    def __init__(self, parser=None):
         self.parser = parser
+
+    def read_for_eval(self, path):
+        with open(path, 'r') as signal_file:
+            dataset = signal_file.readlines()
+            dataset = dataset[0].strip()
+            dataset = dataset.split(' ')
+            dataset = [int(x) for x in dataset]
+            i = 0
+            signal = []
+            indices = []
+            while i + 300 < len(dataset):
+                signal.append(dataset[i:i+300])
+                indices.append(i)
+                i = i + 30
+            return signal, indices
 
     def filter_files(self, files):
         return [x for x in files if x.endswith('signal') or x.endswith('label')]
@@ -238,6 +267,7 @@ class DatasetExtractor:
 class EvalDataExtractor:
 
     def __init__(self, data_dir, file_list):
+        self.data_dir = data_dir
         self.files = os.listdir(data_dir)
         self.files = [x for x in self.files if x.endswith('.fast5') or x.endswith('.signal')]
         if file_list is not None:
@@ -250,14 +280,29 @@ class EvalDataExtractor:
         return self.current_file < len(self.files)
 
     def get_next_file_dataset(self, batch_size=100):
-        dataset = tf.data.Dataset.from_generator(self.generator, self.output_types, self.output_shapes)
+        dataset = self.extract_next_file()
         dataset = dataset.prefetch(batch_size * 5)
         dataset = dataset.batch(batch_size)
         self.current_file = self.current_file + 1
         return dataset
 
-    def generator(self):
-        pass
+    def extract_next_file(self):
+        filename = self.files[self.current_file]
+        if filename.endswith('h5'):
+            reader = H5FileReader()
+        elif filename.endswith('signal'):
+            reader = ChironFileReader()
+        else:
+            raise ValueError(f"Format was {filename.split('.')[1]}, but it must be one of {', '.join(['.h5', '.signal'])}.")
+        signal, index = reader.read_for_eval(os.path.join(self.data_dir, filename))
+        signal = np.concatenate(signal)
+        index = np.concatenate(index)
+        filenames = np.repeat(filename, index.shape[0])
+        return tf.data.Dataset.from_tensor_slices({
+            'signal': signal,
+            'index': index,
+            'filenames': filenames
+        })
 
 
 if __name__ == "__main__":
