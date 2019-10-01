@@ -33,8 +33,12 @@ class H5FileReader:
             i = 0
             signal = []
             indices = []
+            mean = np.mean(np.unique(dataset))
+            std = np.std(np.unique(dataset))
             while i + 300 < len(dataset):
-                signal.append(dataset[i:i + 300])
+                raw = dataset[i:i + 300]
+                normalized = (raw - mean) / std
+                signal.append(normalized)
                 indices.append(i)
                 i = i + 30
             return signal, indices
@@ -102,8 +106,12 @@ class ChironFileReader:
             i = 0
             signal = []
             indices = []
+            mean = np.mean(np.unique(dataset))
+            std = np.std(np.unique(dataset))
             while i + 300 < len(dataset):
-                signal.append(dataset[i:i+300])
+                raw = dataset[i:i + 300]
+                normalized = (raw - mean) / std
+                signal.append(normalized)
                 indices.append(i)
                 i = i + 30
             return signal, indices
