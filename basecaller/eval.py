@@ -23,7 +23,8 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
             logits_list = []
             filenames_list = []
             indices_list = []
-            eval_iterator = data_extractor.get_next_file_dataset()
+            eval_dataset = data_extractor.get_next_file_dataset()
+            eval_iterator = eval_dataset.make_one_shot_iterator()
             eval_handle = sess.run(eval_iterator.string_handle())
             while True:
                 try:
