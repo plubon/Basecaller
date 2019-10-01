@@ -4,6 +4,7 @@ from data import EvalDataExtractor
 import tensorflow as tf
 from model import ModelFactory
 import numpy as np
+import sys
 
 
 def evaluate(model_dir, data_dir, out_dir, file_list=None):
@@ -57,3 +58,7 @@ def save_file_results(out_dir, logits, filenames, indices):
         record = tf.train.Features(feature=feature_dict)
         record = tf.train.Example(features=record)
         writer.write(record.SerializeToString())
+
+if __name__ == "__main__":
+    evaluate(sys.argv[1], sys.argv[2], sys.argv[3],
+             ['DEAMERNANOPORE_20161117_FNFAB43577_MN16450_sequencing_run_MA_821_R9_4_NA12878_11_17_16_88738_ch101_read1454_strand'])
