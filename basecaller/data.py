@@ -288,12 +288,12 @@ class EvalDataExtractor:
 
     def extract_next_file(self):
         filename = self.files[self.current_file]
-        if filename.endswith('h5'):
+        if filename.endswith('fast5'):
             reader = H5FileReader()
         elif filename.endswith('signal'):
             reader = ChironFileReader()
         else:
-            raise ValueError(f"Format was {filename.split('.')[1]}, but it must be one of {', '.join(['.h5', '.signal'])}.")
+            raise ValueError(f"Format was {filename.split('.')[1]}, but it must be one of {', '.join(['.fast5', '.signal'])}.")
         signal, index = reader.read_for_eval(os.path.join(self.data_dir, filename))
         signal = np.concatenate(signal)
         index = np.concatenate(index)
