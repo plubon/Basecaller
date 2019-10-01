@@ -272,7 +272,7 @@ class EvalDataExtractor:
         self.files = [x for x in self.files if x.endswith('.fast5') or x.endswith('.signal')]
         if file_list is not None:
             self.files = [x for x in self.files if x.split('.')[0] in file_list]
-        self.output_types = (tf.float32, tf.string, tf.int64)
+        self.output_types = (tf.float32, tf.int64, tf.string)
         self.output_shapes = (tf.TensorShape([None, 300, 1]), tf.TensorShape([]), tf.TensorShape([]))
         self.current_file = 0
 
@@ -298,11 +298,11 @@ class EvalDataExtractor:
         signal = np.stack(signal)
         index = np.array(index)
         filenames = np.repeat(filename, index.shape[0])
-        dataset = tf.data.Dataset.from_tensor_slices({
-            'signal': signal,
-            'index': index,
-            'filenames': filenames
-        })
+        dataset = tf.data.Dataset.from_tensor_slices((
+            signal,
+            index,
+            filenames
+        ))
         print(dataset.output_types)
         return dataset
 
