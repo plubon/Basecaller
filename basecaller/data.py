@@ -280,7 +280,7 @@ class EvalDataExtractor:
         self.files = [x for x in self.files if x.endswith('.fast5') or x.endswith('.signal')]
         if file_list is not None:
             self.files = [x for x in self.files if x.split('.')[0] in file_list]
-        self.output_types = (tf.float32, tf.int64, tf.string)
+        self.output_types = (tf.float64, tf.int64, tf.string)
         self.output_shapes = (tf.TensorShape([None, 300, 1]), tf.TensorShape([]), tf.TensorShape([]))
         self.current_file = 0
 
