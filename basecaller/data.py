@@ -295,7 +295,7 @@ class EvalDataExtractor:
         else:
             raise ValueError(f"Format was {filename.split('.')[1]}, but it must be one of {', '.join(['.fast5', '.signal'])}.")
         signal, index = reader.read_for_eval(os.path.join(self.data_dir, filename))
-        signal = np.concatenate(signal)
+        signal = np.stack(signal)
         index = np.array(index)
         filenames = np.repeat(filename, index.shape[0])
         return tf.data.Dataset.from_tensor_slices({
