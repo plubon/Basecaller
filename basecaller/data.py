@@ -298,11 +298,13 @@ class EvalDataExtractor:
         signal = np.stack(signal)
         index = np.array(index)
         filenames = np.repeat(filename, index.shape[0])
-        return tf.data.Dataset.from_tensor_slices({
+        dataset = tf.data.Dataset.from_tensor_slices({
             'signal': signal,
             'index': index,
             'filenames': filenames
         })
+        print(dataset.output_types)
+        return dataset
 
 
 if __name__ == "__main__":
