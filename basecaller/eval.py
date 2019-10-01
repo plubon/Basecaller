@@ -41,6 +41,8 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
 
 
 def save_file_results(out_dir, logits, filenames, indices):
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
     filename = os.path.join(out_dir, f"{filenames[0]}.tfrecords")
     with tf.python_io.TFRecordWriter(filename) as writer:
         logits_feature = tf.train.FloatList(value=logits)
