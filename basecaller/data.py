@@ -273,7 +273,7 @@ class EvalDataExtractor:
         if file_list is not None:
             self.files = [x for x in self.files if x.split('.')[0] in file_list]
         self.output_types = (tf.float32, tf.string, tf.int64)
-        self.output_shapes = (tf.TensorShape([300]), tf.TensorShape([]), tf.TensorShape([]))
+        self.output_shapes = (tf.TensorShape([None, 300, 1]), tf.TensorShape([]), tf.TensorShape([]))
         self.current_file = 0
 
     def has_next_file(self):
