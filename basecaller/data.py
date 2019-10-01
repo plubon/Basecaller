@@ -26,7 +26,7 @@ class H5FileReader:
         self.parser = parser
 
     def read_for_eval(self, path):
-        with h5py.File(path + '.fast5', 'r') as h5_file:
+        with h5py.File(path, 'r') as h5_file:
             raw_signal = h5_file['Raw/Reads']
             signal_path = raw_signal.visit(self.find_signal)
             dataset = raw_signal[signal_path][()]
