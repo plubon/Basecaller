@@ -13,7 +13,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
     dataset_handle = tf.placeholder(tf.string, shape=[])
     feedable_iterator = tf.data.Iterator.from_string_handle(dataset_handle, data_extractor.output_types,
                                                             data_extractor.output_shapes)
-    signal, filename, index = feedable_iterator.get_next()
+    signal, index, filename = feedable_iterator.get_next()
     model = ModelFactory.get(config.model_name, signal, config)
     saver = tf.train.Saver()
     with tf.Session() as sess:
@@ -28,7 +28,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
             eval_handle = sess.run(eval_iterator.string_handle())
             while True:
                 try:
-                    logits, filenames, indices = sess.run([model.logits, filename, index],
+                    logits, indices, filenames = sess.run([model.logits, index, filename],
                                                           feed_dict={dataset_handle: eval_handle})
                     filenames_list.append(filenames)
                     logits_list.append(logits)
