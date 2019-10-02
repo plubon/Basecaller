@@ -44,9 +44,9 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
 def save_file_results(out_dir, logits, filenames, indices):
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
-    filename = os.path.join(out_dir, f"{filenames[0].decode('utf-8').split('.')}.npy")
-    with open(os.path.join(out_dir, filename), 'w') as file:
-        np.save(file, logits)
+    file_path = os.path.join(out_dir, f"{filenames[0].decode('utf-8')}")
+    np.save(file_path, logits)
+
 
 if __name__ == "__main__":
     evaluate(sys.argv[1], sys.argv[2], sys.argv[3],
