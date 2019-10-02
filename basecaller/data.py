@@ -311,7 +311,6 @@ class EvalDataExtractor:
             index,
             filenames
         ))
-        print(dataset.output_types)
         return dataset
 
 

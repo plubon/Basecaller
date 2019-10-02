@@ -49,5 +49,7 @@ def save_file_results(out_dir, logits, filenames, indices):
 
 
 if __name__ == "__main__":
-    evaluate(sys.argv[1], sys.argv[2], sys.argv[3],
-             ['DEAMERNANOPORE_20161117_FNFAB43577_MN16450_sequencing_run_MA_821_R9_4_NA12878_11_17_16_88738_ch101_read1454_strand'])
+    with open(sys.argv[4]) as file_list:
+        lines = file_list.readlines()
+    lines = [x.strip() for x in lines]
+    evaluate(sys.argv[1], sys.argv[2], sys.argv[3], lines)
