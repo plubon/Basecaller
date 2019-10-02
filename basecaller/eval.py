@@ -16,10 +16,12 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
     signal, index, filename = feedable_iterator.get_next()
     model = ModelFactory.get(config.model_name, signal, config)
     saver = tf.train.Saver()
+    n = 1
     with tf.Session() as sess:
         saver.restore(sess, os.path.join(model_dir, "model.ckpt"))
         print('Model restored')
         while data_extractor.has_next_file():
+            print(f"Processing {n} out of {data_extractor.get_size()} files")
             logits_list = []
             filenames_list = []
             indices_list = []
