@@ -32,7 +32,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                                                           feed_dict={dataset_handle: eval_handle})
                     filenames_list.append(filenames)
                     logits_list.append(logits)
-                    indices_list.append(index)
+                    indices_list.append(indices)
                 except tf.errors.OutOfRangeError:
                     break
             file_logits = np.concatenate(logits_list)
