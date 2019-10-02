@@ -30,7 +30,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                 try:
                     logits, filenames, indices = sess.run([model.logits, filename, index],
                                                           feed_dict={dataset_handle: eval_handle})
-                    filenames_list.append(filename)
+                    filenames_list.append(filenames)
                     logits_list.append(logits)
                     indices_list.append(index)
                 except tf.errors.OutOfRangeError:
