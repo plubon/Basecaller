@@ -44,23 +44,9 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
 def save_file_results(out_dir, logits, filenames, indices):
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
-    filename = os.path.join(out_dir, f"{filenames[0]}.tfrecords")
-    with tf.python_io.TFRecordWriter(filename) as writer:
-        logits_feature = tf.train.FloatList(value=logits)
-        logits_feature = tf.train.Feature(float_list=logits_feature)
-        filenames_feature = tf.train.BytesList(value=filenames)
-        filenames_feature = tf.train.Feature(bytes_list=filenames_feature)
-        indices_feature = tf.train.Int64List(value=indices)
-        indices_feature = tf.train.Feature(int64_list=indices_feature)
-        feature_dict = {
-            'logits': logits_feature,
-            'filenames': filenames_feature,
-            'indices': indices_feature
-
-        }
-        record = tf.train.Features(feature=feature_dict)
-        record = tf.train.Example(features=record)
-        writer.write(record.SerializeToString())
+    filename = os.path.join(out_dir, f"{filenames[0].decode('utf-8').split('.')}.npy")
+    with open(os.path.join(out_dir, filename), 'w') as file:
+        np.save(file, logits)
 
 if __name__ == "__main__":
     evaluate(sys.argv[1], sys.argv[2], sys.argv[3],
