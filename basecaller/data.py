@@ -284,6 +284,9 @@ class EvalDataExtractor:
         self.output_shapes = (tf.TensorShape([None, 300, 1]), tf.TensorShape([None]), tf.TensorShape([None]))
         self.current_file = 0
 
+    def get_size(self):
+        return len(self.files)
+
     def has_next_file(self):
         return self.current_file < len(self.files)
 
