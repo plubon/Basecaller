@@ -42,6 +42,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
             file_filenames = np.concatenate(filenames_list)
             file_indices = np.concatenate(indices_list)
             save_file_results(out_dir, file_logits, file_filenames, file_indices)
+            n = n + 1
 
 
 def save_file_results(out_dir, logits, filenames, indices):
