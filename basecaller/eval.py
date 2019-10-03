@@ -5,6 +5,7 @@ import tensorflow as tf
 from model import ModelFactory
 import numpy as np
 import sys
+import json
 
 
 def evaluate(model_dir, data_dir, out_dir, file_list=None):
@@ -52,6 +53,6 @@ def save_file_results(out_dir, logits, filenames, indices):
 
 if __name__ == "__main__":
     with open(sys.argv[4]) as file_list:
-        lines = file_list.readlines()
-    lines = [x.strip() for x in lines]
+        data = json.loads(file_list)
+        lines = data['files']
     evaluate(sys.argv[1], sys.argv[2], sys.argv[3], lines)
