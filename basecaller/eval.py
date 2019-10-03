@@ -53,6 +53,6 @@ def save_file_results(out_dir, logits, filenames, indices):
 
 if __name__ == "__main__":
     with open(sys.argv[4]) as file_list:
-        data = json.loads(file_list)
+        data = json.loads(file_list.read())
         lines = data['files']
     evaluate(sys.argv[1], sys.argv[2], sys.argv[3], lines)
