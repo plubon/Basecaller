@@ -295,9 +295,9 @@ class EvalDataExtractor:
             self.current_file_len = self.current_file_data[1].shape[0]
             while self.current_row < self.current_file_len:
                 self.current_row = self.current_row + 1
-                yield (self.current_file_data[0][self.current_row - 1, :, :],
-                       self.current_file_data[1][self.current_row - 1],
-                       self.current_file_data[2][self.current_row - 1])
+                yield (np.expand_dims(self.current_file_data[0][self.current_row - 1, :, :], 0),
+                       np.expand_dims(self.current_file_data[1][self.current_row - 1], 0),
+                       np.expand_dims(self.current_file_data[2][self.current_row - 1],0))
 
     def get_size(self):
         return len(self.files)
