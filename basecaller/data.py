@@ -292,7 +292,7 @@ class EvalDataExtractor:
         while self.has_next_file():
             self.current_file_data = self.extract_next_file()
             self.current_row = 0
-            self.current_file_len = self.current_file[1].shape[0]
+            self.current_file_len = self.current_file_data[1].shape[0]
             while self.current_row < self.current_file_len:
                 self.current_row = self.current_row + 1
                 yield (self.current_file_data[0][self.current_row - 1, :, :],
