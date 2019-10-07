@@ -274,7 +274,7 @@ class DatasetExtractor:
 
 class EvalDataExtractor:
 
-    def __init__(self, data_dir, file_list):
+    def __init__(self, data_dir, file_list, batch_size=100):
         self.data_dir = data_dir
         self.files = os.listdir(data_dir)
         self.files = [x for x in self.files if x.endswith('.fast5') or x.endswith('.signal')]
@@ -283,19 +283,27 @@ class EvalDataExtractor:
         self.output_types = (tf.float32, tf.int64, tf.string)
         self.output_shapes = (tf.TensorShape([None, 300, 1]), tf.TensorShape([None]), tf.TensorShape([None]))
         self.current_file = 0
+        self.current_row = 0
+        self.batch_size = batch_size
+        self.current_file_data = None
+        self.current_file_len = None
+
+    def generator(self):
+        while self.has_next_file():
+            self.current_file_data = self.extract_next_file()
+            self.current_row = 0
+            self.current_file_len = self.current_file[1].shape[0]
+            while self.current_row < self.current_file_len:
+                self.current_row = self.current_row + 1
+                yield (self.current_file_data[0][self.current_row - 1, :, :],
+                       self.current_file_data[1][self.current_row - 1],
+                       self.current_file_data[2][self.current_row - 1])
 
     def get_size(self):
         return len(self.files)
 
     def has_next_file(self):
         return self.current_file < len(self.files)
-
-    def get_next_file_dataset(self, batch_size=100):
-        dataset = self.extract_next_file()
-        dataset = dataset.prefetch(batch_size * 5)
-        dataset = dataset.batch(batch_size)
-        self.current_file = self.current_file + 1
-        return dataset
 
     def extract_next_file(self):
         filename = self.files[self.current_file]
@@ -309,12 +317,13 @@ class EvalDataExtractor:
         signal = np.expand_dims(np.stack(signal).astype(np.float32), -1)
         index = np.array(index)
         filenames = np.repeat(filename, index.shape[0])
-        dataset = tf.data.Dataset.from_tensor_slices((
-            signal,
-            index,
-            filenames
-        ))
-        return dataset
+        self.current_file = self.current_file + 1
+        return signal, index, filenames
+
+    def get_dataset(self):
+        return tf.data.Dataset.from_generator(self.generator,
+                                              self.output_types,
+                                              self.output_shapes)
 
 
 if __name__ == "__main__":
