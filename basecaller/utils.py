@@ -20,8 +20,13 @@ alphabet_dict = {
 	't':3
 	}
 
+int_to_string_label = ['A', 'C', 'G', 'T']
+
 def string_label_to_int(label):
 	return [alphabet_dict[x] for x in label]
+
+def int_label_to_string(label):
+	return ''.join([int_to_string_label[x] for x in label])
 
 def write_lines_to_file(path, lines):
     with open(path, 'w') as file:
