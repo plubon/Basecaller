@@ -4,6 +4,7 @@ import tensorflow as tf
 import numpy as np
 import os
 from utils import int_label_to_string
+import sys
 
 
 def assemble(input_path, output_path, decoder, assembler):
@@ -25,3 +26,7 @@ def assemble(input_path, output_path, decoder, assembler):
             out_filename = f"{''.join(file.split('.')[:-1])}.fast5"
             with open(os.path.join(output_path, out_filename), 'w') as out_file:
                 out_file.write(int_label_to_string(np.argmax(assembled, axis=0)))
+
+
+if __name__ == "__main__":
+    assemble(sys.argv[1], sys.argv[2], 'beam_search', 'simple')
