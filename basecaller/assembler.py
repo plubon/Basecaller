@@ -22,6 +22,8 @@ class SimpleAssembler:
             if indx == 0:
                 self.add_count(consensus, 0, bpread)
                 continue
+            if np.any(bpread == -1):
+                bpread = bpread[:np.argmax(-1)]
             d = difflib.SequenceMatcher(None, file_reads[indx - 1], bpread)
             match_block = max(d.get_matching_blocks(), key=lambda x: x[2])
             disp = match_block[0] - match_block[1]
@@ -38,4 +40,4 @@ class SimpleAssembler:
             segment = segment[-start_indx, :]
             start_indx = 0
         for i, base in enumerate(segment):
-            consensus[alphabet_dict[base]][start_indx + 1] += 1
+            consensus[base][start_indx + 1] += 1

@@ -14,7 +14,7 @@ def assemble(input_path, output_path, decoder, assembler):
     logits_input = tf.placeholder(tf.float32, shape=(None, 300, 5))
     len_input = tf.placeholder(tf.int32, shape=(None,))
     decoder = DecoderFactory.get(decoder, logits_input, len_input)
-    decoded_out = tf.sparse.to_dense(tf.sparse.reorder(decoder.decoded))
+    decoded_out = tf.sparse.to_dense(decoder.decoded, default_value=-1)
     assembler = AssemblerFactory.get(assembler)
     with tf.Session() as sess:
         for file in data_files:
