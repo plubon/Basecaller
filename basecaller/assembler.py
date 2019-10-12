@@ -23,7 +23,7 @@ class SimpleAssembler:
                 self.add_count(consensus, 0, bpread)
                 continue
             if np.any(bpread == -1):
-                bpread = bpread[:np.argmax(-1)]
+                bpread = bpread[:np.argmax(bpread == -1)]
             d = difflib.SequenceMatcher(None, file_reads[indx - 1], bpread)
             match_block = max(d.get_matching_blocks(), key=lambda x: x[2])
             disp = match_block[0] - match_block[1]
