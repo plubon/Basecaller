@@ -21,7 +21,7 @@ def assemble(input_path, output_path, decoder, assembler):
             logits = np.load(os.path.join(input_path, file))
             size = logits.shape[0]
             decoded = sess.run([decoded_out], feed_dict={
-                logits_input: logits_input,
+                logits_input: logits,
                 len_input: np.full(size, 300)})
             assembled = assembler.assemble(decoded)
             out_filename = f"{''.join(file.split('.')[:-1])}.fast5"
