@@ -17,7 +17,7 @@ def assemble(input_path, output_path, decoder, assembler):
     decoded_out = tf.sparse.to_dense(decoder.decoded, default_value=-1)
     assembler = AssemblerFactory.get(assembler)
     with tf.Session() as sess:
-        for file in data_files:
+        for no, file in enumerate(data_files):
             logits = np.load(os.path.join(input_path, file))
             size = logits.shape[0]
             decoded = sess.run([decoded_out], feed_dict={
@@ -27,6 +27,7 @@ def assemble(input_path, output_path, decoder, assembler):
             out_filename = f"{''.join(file.split('.')[:-1])}.fast5"
             with open(os.path.join(output_path, out_filename), 'w') as out_file:
                 out_file.write(int_label_to_string(np.argmax(assembled, axis=0)))
+            print(f"{no}/{len(data_files)} Processed {file}")
 
 
 if __name__ == "__main__":
