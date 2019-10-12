@@ -18,12 +18,16 @@ class SimpleAssembler:
         pos = 0
         length = 0
         census_len = 1000
+        first = True
         for indx, bpread in enumerate(file_reads):
-            if indx == 0:
-                self.add_count(consensus, 0, bpread)
-                continue
             if np.any(bpread == -1):
                 bpread = bpread[:np.argmax(bpread == -1)]
+            if len(bpread) == 0:
+                continue
+            if first:
+                self.add_count(consensus, 0, bpread)
+                first = False
+                continue
             d = difflib.SequenceMatcher(None, file_reads[indx - 1], bpread)
             match_block = max(d.get_matching_blocks(), key=lambda x: x[2])
             disp = match_block[0] - match_block[1]
