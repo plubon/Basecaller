@@ -13,7 +13,8 @@ def assemble(input_path, output_path, decoder, assembler):
     data_files = [x for x in os.listdir(input_path) if x.endswith('.npy')]
     logits_input = tf.placeholder(tf.float32, shape=(None, 300, 5))
     len_input = tf.placeholder(tf.int32, shape=(None,))
-    decoded_out = tf.sparse.to_dense(tf.sparse.reorder(DecoderFactory.get(decoder, logits_input, len_input)))
+    decoder = DecoderFactory.get(decoder, logits_input, len_input)
+    decoded_out = tf.sparse.to_dense(tf.sparse.reorder(decoder.decoded))
     assembler = AssemblerFactory.get(assembler)
     with tf.Session() as sess:
         for file in data_files:
