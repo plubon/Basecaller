@@ -31,9 +31,9 @@ def test(model_path, dataset_path):
     sess = tf.Session()
     saver.restore(sess, os.path.join(model_path, "model.ckpt"))
     tf.saved_model.simple_save(sess,
-                               model_path,
+                               os.path.join(model_path, 'saved_model'),
                                inputs={"signal": signal,
-                                       "lenghts": signal_len},
+                                       "lengths": signal_len},
                                outputs={"logits": model.logits})
 
 
