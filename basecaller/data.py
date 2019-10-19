@@ -295,9 +295,9 @@ class EvalDataExtractor:
             self.current_file_len = self.current_file_data[1].shape[0]
             while self.current_row < self.current_file_len:
                 self.current_row = self.current_row + 1
-                yield (np.expand_dims(self.current_file_data[0][self.current_row - 1, :, :], 0),
-                       np.expand_dims(self.current_file_data[1][self.current_row - 1], 0),
-                       np.expand_dims(self.current_file_data[2][self.current_row - 1],0))
+                yield (self.current_file_data[0][self.current_row - 1, :, :],
+                       self.current_file_data[1][self.current_row - 1],
+                       self.current_file_data[2][self.current_row - 1])
 
     def get_size(self):
         return len(self.files)
@@ -321,9 +321,12 @@ class EvalDataExtractor:
         return signal, index, filenames
 
     def get_dataset(self):
-        return tf.data.Dataset.from_generator(self.generator,
+        dataset = tf.data.Dataset.from_generator(self.generator,
                                               self.output_types,
-                                              self.output_shapes)
+                                              (tf.TensorShape([300, 1]), tf.TensorShape([]), tf.TensorShape([])))
+        dataset = dataset.batch(self.batch_size)
+        dataset = dataset.prefetch(self.batch_size * 5)
+        return dataset
 
 
 if __name__ == "__main__":

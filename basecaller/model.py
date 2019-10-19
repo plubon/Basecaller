@@ -21,9 +21,18 @@ class ModelFactory:
             return WavenetModel(signal, config)
         if name.lower() == 'wavenet_bidirectional':
             return WavenetBidirectionalModel(signal, config)
+        if name.lower() == 'placeholder':
+            return PlaceholderModel(signal, config)
         else:
             raise ValueError(f'No model with name: {name}')
 
+
+class PlaceholderModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        self.logits = signal
 
 class WavenetModel:
 
