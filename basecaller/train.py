@@ -9,13 +9,7 @@ import os
 from shutil import copyfile
 import sys
 from tensorflow.python import debug as tf_debug
-
-
-def log_to_file(path, line):
-    with open(path, 'a+') as log_file:
-        log_file.write(line)
-        log_file.write('\n')
-
+from utils import log_to_file
 
 def train(config_path, dataset_path, output_path):
     if not os.path.exists(output_path):

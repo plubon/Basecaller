@@ -37,3 +37,8 @@ def write_dict_to_file(path, params):
 	with open(path, "w") as json_file:
 		json.dump(params, json_file)
 		json_file.write("\n")
+
+def log_to_file(path, line):
+    with open(path, 'a+') as log_file:
+        log_file.write(line)
+        log_file.write('\n')
