@@ -30,24 +30,12 @@ def test(model_path, dataset_path):
     saver = tf.train.Saver()
     sess = tf.Session()
     saver.restore(sess, os.path.join(model_path, "model.ckpt"))
-    test_handle = sess.run(test_iterator.string_handle())
-    test_distances = []
-    test_losses = []
-    while True:
-        try:
-            test_distance, test_loss = sess.run([distance_op, optimizer.loss],
-                                          feed_dict={dataset_handle: test_handle})
-            print(test_distance)
-            test_distances.append(test_distance)
-            test_losses.append(test_loss)
-        except tf.errors.OutOfRangeError:
-            break
-    mean_test_distance = np.mean(test_distances)
-    mean_test_loss = np.mean(test_losses)
-    print(flush=True)
-    log_message = f"Test Loss: {mean_test_loss} Edit Distance: {mean_test_distance}"
-    print(log_message, flush=True)
-    log_to_file(log_path, log_message)
+    tf.saved_model.simple_save(sess,
+                               model_path,
+                               inputs={"signal": signal,
+                                       "lenghts": signal_len},
+                               outputs={"logits": model.logits})
+
 
 
 if __name__ == "__main__":
