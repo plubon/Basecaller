@@ -53,6 +53,4 @@ def test(model_path, dataset_path):
 
 if __name__ == "__main__":
     test(sys.argv[1],
-          sys.argv[2],
-          sys.argv[3],
-          sys.argv[4])
+          sys.argv[2])
