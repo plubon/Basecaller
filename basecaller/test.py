@@ -12,12 +12,9 @@ from tensorflow.python import debug as tf_debug
 from utils import  log_to_file
 
 
-def test(config_path, dataset_path, output_path, model_dir):
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-    copyfile(config_path, os.path.join(output_path, 'config.json'))
-    log_path = os.path.join(output_path, 'log')
-    config = ConfigReader(config_path).read()
+def test(model_path, dataset_path):
+    log_path = os.path.join(model_path, 'test_log')
+    config = ConfigReader(os.path.join(model_path, 'config.json')).read()
     dataset_extractor = DatasetExtractor(dataset_path, config)
     dataset_test, test_size = dataset_extractor.extract_train()
     test_iterator = dataset_test.make_one_shot_iterator()
@@ -32,9 +29,7 @@ def test(config_path, dataset_path, output_path, model_dir):
     distance_op = tf.reduce_mean(tf.edit_distance(tf.cast(decoder.decoded, dtype=tf.int32), label))
     saver = tf.train.Saver()
     sess = tf.Session()
-    saver.restore(sess, os.path.join(model_dir, "model.ckpt"))
-    if config.debug:
-        sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+    saver.restore(sess, os.path.join(model_path, "model.ckpt"))
     sess.run(tf.global_variables_initializer())
     test_handle = sess.run(test_iterator.string_handle())
     test_distances = []
@@ -43,6 +38,7 @@ def test(config_path, dataset_path, output_path, model_dir):
         try:
             test_distance, test_loss = sess.run([distance_op, optimizer.loss],
                                           feed_dict={dataset_handle: test_handle})
+            print(test_distance)
             test_distances.append(test_distance)
             test_losses.append(test_loss)
         except tf.errors.OutOfRangeError:
