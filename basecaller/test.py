@@ -30,7 +30,6 @@ def test(model_path, dataset_path):
     saver = tf.train.Saver()
     sess = tf.Session()
     saver.restore(sess, os.path.join(model_path, "model.ckpt"))
-    sess.run(tf.global_variables_initializer())
     test_handle = sess.run(test_iterator.string_handle())
     test_distances = []
     test_losses = []
