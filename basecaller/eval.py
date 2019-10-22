@@ -13,7 +13,6 @@ batch_size = 150
 
 def evaluate(model_dir, data_dir, out_dir, file_list=None):
     data_extractor = EvalDataExtractor(data_dir, file_list)
-    current_file = None
     logits_input = tf.placeholder(tf.float32, shape=(None, 300, 5), name='decode_logits_input')
     len_input = tf.placeholder(tf.int32, shape=(None,), name='decode_lengths_input')
     decoded = tf.sparse.to_dense(tf.nn.ctc_beam_search_decoder(tf.transpose(logits_input, perm=[1, 0, 2]),
@@ -48,7 +47,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                 batch_index = batch_index + batch_size
             file_logits = np.concatenate(logits_list, axis=0)
             save_file_results(out_dir, file_logits, filename, indices)
-            print(f"Processed file :{current_file} Distance: {np.mean(distances)}")
+            print(f"Processed file :{filename} Distance: {np.mean(distances)}")
 
 
 def save_file_results(out_dir, logits, filename, indices):
