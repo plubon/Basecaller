@@ -43,7 +43,7 @@ class H5FileReader:
                 label = sequence[label_index:label_end]
                 for idx, char in enumerate(label):
                     if char not in alphabet_dict.keys():
-                        signal_index[idx] = 'A'
+                        label[idx] = b'A'
                 segments.append(normalized_signal)
                 labels.append(label)
                 indices.append(signal_index)
@@ -162,20 +162,20 @@ class ChironFileReader:
                 signal_index = event_position[0]
                 label_index = 0
                 end = event_position[-1] + event_length[-1]
-                while signal_index + 300 < end:
+                while signal_index + 300 < end and signal_index + 300 < len(dataset):
                     signal = dataset[signal_index:signal_index + 300]
                     normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
-                    label_end = label_index
-                    while event_position[label_end] <= signal_index + 300:
+                    label_end = label_index + 1
+                    while label_end < len(event_position) and event_position[label_end] <= signal_index + 300:
                         label_end = label_end + 1
-                    label = sequence[label_index:label_end - 1]
-                    for idx, char in label:
+                    label = sequence[label_index:label_end]
+                    for idx, char in enumerate(label):
                         if char not in alphabet_dict.keys():
-                            signal_index[idx] = 'A'
+                            label[idx] = b'A'
                     segments.append(normalized_signal)
                     labels.append(label)
                     indices.append(signal_index)
                     signal_index = signal_index + 30
                     while event_position[label_index + 1] < signal_index:
-                        label_index = label_index + 30
+                        label_index = label_index + 1
                 return segments, labels, indices
