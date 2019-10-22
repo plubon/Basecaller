@@ -1,164 +1,12 @@
-from utils import alphabet_dict, string_label_to_int, write_dict_to_file
+from utils import string_label_to_int, write_dict_to_file
 from sklearn.model_selection import train_test_split
-import h5py
+from entities import TrainingExample
+from reader import ChironFileReader, H5FileReader
 import numpy as np
 import os
 import tensorflow as tf
 import sys
 import json
-
-
-class TrainingExample:
-
-    def __init__(self, id, filename, index, signal, raw_signal, sequence, breaks):
-        self.id = id
-        self.filename = filename
-        self.index = index
-        self.signal = signal
-        self.sequence = sequence
-        self.breaks = breaks
-        self.raw_signal = raw_signal
-
-
-class H5FileReader:
-
-    def __init__(self, parser=None):
-        self.parser = parser
-
-    def read_for_eval(self, path):
-        with h5py.File(path, 'r') as h5_file:
-            raw_signal = h5_file['Raw/Reads']
-            signal_path = raw_signal.visit(self.find_signal)
-            dataset = raw_signal[signal_path][()]
-            i = 0
-            signal = []
-            indices = []
-            mean = np.mean(np.unique(dataset))
-            std = np.std(np.unique(dataset))
-            while i + 300 < len(dataset):
-                raw = dataset[i:i + 300]
-                normalized = (raw - mean) / std
-                signal.append(normalized)
-                indices.append(i)
-                i = i + 30
-            return signal, indices
-
-    def filter_files(self, files):
-        return [x for x in files if x.endswith('fast5')]
-
-    def find_signal(self, name):
-        if 'Signal' in name:
-            return name
-
-    def read(self, path):
-        with h5py.File(path + '.fast5', 'r') as h5_file:
-            if 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' not in h5_file:
-                return []
-            corrected_events = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
-            corrected_events_array = corrected_events[()]
-            raw_signal = h5_file['Raw/Reads']
-            signal_path = raw_signal.visit(self.find_signal)
-            dataset = raw_signal[signal_path][()]
-            offset = corrected_events.attrs.get('read_start_rel_to_raw')
-            event_position = np.array([x[2] + offset for x in corrected_events_array])
-            event_length = np.array([x[3] for x in corrected_events_array])
-            sequence = np.array([x[4] for x in corrected_events_array])
-            i = self.parser.skip
-            current_start = i
-            current_len = 0
-            examples = []
-            while i < len(event_position) - self.parser.skip:
-                if sequence[i] not in alphabet_dict.keys():
-                    current_len = 0
-                    current_start = i + 1
-                    i += 1
-                else:
-                    if current_len + event_length[i] < self.parser.segment_length:
-                        current_len += event_length[i]
-                        i += 1
-                    else:
-                        if i - current_start > 4:
-                            signal = dataset[event_position[current_start]: event_position[
-                                                                                current_start] + self.parser.segment_length]
-                            normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
-                            breaks = event_position[current_start + 1:i - 1] - event_position[current_start]
-                            current_seq = sequence[current_start:i - 1]
-                            example = TrainingExample(self.parser.get_id(), path, current_start, normalized_signal,
-                                                      signal, current_seq, breaks)
-                            examples.append(example)
-                        current_len = 0
-                        current_start = i + 1
-                        i += 1
-            return examples
-
-
-class ChironFileReader:
-
-    def __init__(self, parser=None):
-        self.parser = parser
-
-    def read_for_eval(self, path):
-        with open(path, 'r') as signal_file:
-            dataset = signal_file.readlines()
-            dataset = dataset[0].strip()
-            dataset = dataset.split(' ')
-            dataset = [int(x) for x in dataset]
-            i = 0
-            signal = []
-            indices = []
-            mean = np.mean(np.unique(dataset))
-            std = np.std(np.unique(dataset))
-            while i + 300 < len(dataset):
-                raw = dataset[i:i + 300]
-                normalized = (raw - mean) / std
-                signal.append(normalized)
-                indices.append(i)
-                i = i + 30
-            return signal, indices
-
-    def filter_files(self, files):
-        return [x for x in files if x.endswith('signal') or x.endswith('label')]
-
-    def read(self, path):
-        with open(path + '.label', 'r') as label_file:
-            with open(path + '.signal', 'r') as signal_file:
-                dataset = signal_file.readlines()
-                dataset = dataset[0].strip()
-                dataset = dataset.split(' ')
-                dataset = [int(x) for x in dataset]
-                corrected_events_array = label_file.readlines()
-                corrected_events_array = [x.strip() for x in corrected_events_array]
-                corrected_events_array = [x.split(' ') for x in corrected_events_array]
-                event_position = np.array([int(x[0]) for x in corrected_events_array])
-                event_length = np.array([int(x[1]) - int(x[0]) for x in corrected_events_array])
-                sequence = np.array([x[2] for x in corrected_events_array])
-                i = self.parser.skip
-                current_start = i
-                current_len = 0
-                examples = []
-                while i < len(event_position) - self.parser.skip:
-                    if sequence[i] not in alphabet_dict.keys():
-                        current_len = 0
-                        current_start = i + 1
-                        i += 1
-                    else:
-                        if current_len + event_length[i] < self.parser.segment_length:
-                            current_len += event_length[i]
-                            i += 1
-                        else:
-                            if i - current_start > 4:
-                                signal = dataset[event_position[current_start]: event_position[
-                                                                                    current_start] + self.parser.segment_length]
-                                normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
-                                breaks = event_position[current_start + 1:i - 1] - event_position[current_start]
-                                current_seq = sequence[current_start:i - 1]
-                                example = TrainingExample(self.parser.get_id(), path, current_start, normalized_signal,
-                                                          signal, current_seq, breaks)
-                                examples.append(example)
-                            current_len = 0
-                            current_start = i + 1
-                            i += 1
-                return examples
 
 
 class SignalFileParser:
@@ -274,30 +122,14 @@ class DatasetExtractor:
 
 class EvalDataExtractor:
 
-    def __init__(self, data_dir, file_list, batch_size=100):
+    def __init__(self, data_dir, file_list):
         self.data_dir = data_dir
         self.files = os.listdir(data_dir)
         self.files = [x for x in self.files if x.endswith('.fast5') or x.endswith('.signal')]
         if file_list is not None:
             self.files = [x for x in self.files if x.split('.')[0] in file_list]
-        self.output_types = (tf.float32, tf.int64, tf.string)
-        self.output_shapes = (tf.TensorShape([None, 300, 1]), tf.TensorShape([None]), tf.TensorShape([None]))
         self.current_file = 0
         self.current_row = 0
-        self.batch_size = batch_size
-        self.current_file_data = None
-        self.current_file_len = None
-
-    def generator(self):
-        while self.has_next_file():
-            self.current_file_data = self.extract_next_file()
-            self.current_row = 0
-            self.current_file_len = self.current_file_data[1].shape[0]
-            while self.current_row < self.current_file_len:
-                self.current_row = self.current_row + 1
-                yield (self.current_file_data[0][self.current_row - 1, :, :],
-                       self.current_file_data[1][self.current_row - 1],
-                       self.current_file_data[2][self.current_row - 1])
 
     def get_size(self):
         return len(self.files)
@@ -313,20 +145,12 @@ class EvalDataExtractor:
             reader = ChironFileReader()
         else:
             raise ValueError(f"Format was {filename.split('.')[1]}, but it must be one of {', '.join(['.fast5', '.signal'])}.")
-        signal, index = reader.read_for_eval(os.path.join(self.data_dir, filename))
+        signal, label, index = reader.read_for_eval(os.path.join(self.data_dir, filename))
         signal = np.expand_dims(np.stack(signal).astype(np.float32), -1)
         index = np.array(index)
-        filenames = np.repeat(filename, index.shape[0])
+        lengths = np.repeat(300, index.shape[0])
         self.current_file = self.current_file + 1
-        return signal, index, filenames
-
-    def get_dataset(self):
-        dataset = tf.data.Dataset.from_generator(self.generator,
-                                              self.output_types,
-                                              (tf.TensorShape([300, 1]), tf.TensorShape([]), tf.TensorShape([])))
-        dataset = dataset.batch(self.batch_size)
-        dataset = dataset.prefetch(self.batch_size * 5)
-        return dataset
+        return signal, lengths, label, index, filename
 
 
 if __name__ == "__main__":
