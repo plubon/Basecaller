@@ -16,7 +16,7 @@ class H5FileReader:
             return name
 
     def read_for_eval(self, path):
-        with h5py.File(path + '.fast5', 'r') as h5_file:
+        with h5py.File(path, 'r') as h5_file:
             if 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' not in h5_file:
                 return []
             corrected_events = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
@@ -37,10 +37,10 @@ class H5FileReader:
             while signal_index + 300 < end:
                 signal = dataset[signal_index:signal_index+300]
                 normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
-                label_end = label_index
+                label_end = label_index + 1
                 while event_position[label_end] <= signal_index + 300:
                     label_end = label_end + 1
-                label = sequence[label_index:label_end-1]
+                label = sequence[label_index:label_end]
                 for idx, char in label:
                     if char not in alphabet_dict.keys():
                         signal_index[idx] = 'A'
@@ -49,7 +49,7 @@ class H5FileReader:
                 indices.append(signal_index)
                 signal_index = signal_index + 30
                 while event_position[label_index + 1] < signal_index:
-                    label_index = label_index + 30
+                    label_index = label_index + 1
             return segments, labels, indices
 
     def read(self, path):
