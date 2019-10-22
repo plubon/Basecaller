@@ -41,11 +41,12 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                         continue
                     string_result = int_label_to_string(bpread)
                     str_target = [x.decode("utf-8") for x in label[indx]]
+                    print(str_target)
                     joined_target = ''.join(str_target)
                     dist = distance(string_result, joined_target) / len(joined_target)
                     distances.append(dist)
                 batch_index = batch_index + batch_size
-            file_logits = np.stack(logits_list)
+            file_logits = np.concatenate(logits_list, axis=0)
             save_file_results(out_dir, file_logits, filename, indices)
             print(f"Processed file :{current_file} Distance: {np.mean(distances)}")
 
