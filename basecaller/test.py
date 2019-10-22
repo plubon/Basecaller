@@ -30,6 +30,11 @@ def test(model_path, dataset_path):
     saver = tf.train.Saver()
     sess = tf.Session()
     saver.restore(sess, os.path.join(model_path, "model.ckpt"))
+    imported_graph = tf.get_default_graph()
+    graph_op = imported_graph.get_operations()
+    with open('output.txt', 'w') as f:
+        for i in graph_op:
+            f.write(str(i))
     tf.saved_model.simple_save(sess,
                                os.path.join(model_path, 'saved_model'),
                                inputs={"signal": signal,
