@@ -16,7 +16,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
     current_file = None
     logits_input = tf.placeholder(tf.float32, shape=(None, 300, 5), name='decode_logits_input')
     len_input = tf.placeholder(tf.int32, shape=(None,), name='decode_lengths_input')
-    decoded = tf.sparse.to_dense(tf.nn.ctc_beam_search_decoder(tf.transpose(logits_input, perm=[1, 0, 2], name='aaa1'),
+    decoded = tf.sparse.to_dense(tf.nn.ctc_beam_search_decoder(tf.transpose(logits_input, perm=[1, 0, 2]),
                                   tf.cast(len_input, tf.int32 , name='aaa2'), merge_repeated=False)[0][0],
                                  default_value=-1, name='s_to_d')
     with tf.Session() as sess:
