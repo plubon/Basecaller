@@ -34,7 +34,7 @@ class H5FileReader:
             signal_index = event_position[0]
             label_index = 0
             end = event_position[-1] + event_length[-1]
-            while signal_index + 300 < end:
+            while signal_index + 300 < end and signal_index+300 < len(dataset):
                 signal = dataset[signal_index:signal_index+300]
                 normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
                 label_end = label_index + 1
