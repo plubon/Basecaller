@@ -17,7 +17,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
     logits_input = tf.placeholder(tf.float32, shape=(None, 300, 5), name='decode_logits_input')
     len_input = tf.placeholder(tf.int32, shape=(None,), name='decode_lengths_input')
     decoded = tf.sparse.to_dense(tf.nn.ctc_beam_search_decoder(tf.transpose(logits_input, perm=[1, 0, 2], name='aaa1'),
-                                  tf.cast(len_input, tf.int32 , name='aaa2'), merge_repeated=False, name='decoded_out_1')[0][0],
+                                  tf.cast(len_input, tf.int32 , name='aaa2'), merge_repeated=False)[0][0],
                                  default_value=-1, name='s_to_d')
     with tf.Session() as sess:
         tf.saved_model.loader.load(sess, ["serve"], os.path.join(model_dir, 'saved_model'))
@@ -28,10 +28,10 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
             distances = []
             while batch_index < signal.shape[0]:
                 feed_dict = {
-                    'signal:0': signal[batch_index:batch_index + batch_size, :, :],
-                    'lengths:0': lengths[batch_index:batch_index + batch_size]
+                    'IteratorGetNext:0': signal[batch_index:batch_index + batch_size, :, :],
+                    'IteratorGetNext:2': lengths[batch_index:batch_index + batch_size]
                 }
-                logits = sess.run('logits:0', feed_dict=feed_dict)
+                logits = sess.run('dense/BiasAdd:0', feed_dict=feed_dict)
                 logits_list.append(logits)
                 decoded_out = sess.run(decoded, feed_dict={logits_input: logits, len_input: lengths})
                 for indx, bpread in enumerate(decoded_out):
