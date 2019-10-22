@@ -41,7 +41,7 @@ class H5FileReader:
                 while event_position[label_end] <= signal_index + 300:
                     label_end = label_end + 1
                 label = sequence[label_index:label_end]
-                for idx, char in label:
+                for idx, char in enumerate(label):
                     if char not in alphabet_dict.keys():
                         signal_index[idx] = 'A'
                 segments.append(normalized_signal)
