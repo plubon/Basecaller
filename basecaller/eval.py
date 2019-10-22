@@ -33,7 +33,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                 }
                 logits = sess.run('dense/BiasAdd:0', feed_dict=feed_dict)
                 logits_list.append(logits)
-                decoded_out = sess.run(decoded, feed_dict={logits_input: logits, len_input: lengths})
+                decoded_out = sess.run(decoded, feed_dict={logits_input: logits, len_input: lengths[batch_index:batch_index + batch_size]})
                 for indx, bpread in enumerate(decoded_out):
                     if np.any(bpread == -1):
                         bpread = bpread[:np.argmax(bpread == -1)]
