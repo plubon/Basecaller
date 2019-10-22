@@ -40,7 +40,8 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                     if len(bpread) == 0:
                         continue
                     string_result = int_label_to_string(bpread)
-                    joined_target = ''.join(label[indx])
+                    str_target = [x.decode("utf-8") for x in label[indx]]
+                    joined_target = ''.join(str_target)
                     dist = distance(string_result, joined_target) / len(joined_target)
                     distances.append(dist)
                 batch_index = batch_index + batch_size
