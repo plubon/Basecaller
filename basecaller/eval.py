@@ -18,6 +18,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
     decoded = tf.sparse.to_dense(tf.nn.ctc_beam_search_decoder(tf.transpose(logits_input, perm=[1, 0, 2]),
                                   tf.cast(len_input, tf.int32 , name='aaa2'), merge_repeated=False)[0][0],
                                  default_value=-1, name='s_to_d')
+    file_results = {}
     with tf.Session() as sess:
         tf.saved_model.loader.load(sess, ["serve"], os.path.join(model_dir, 'saved_model'))
         while data_extractor.has_next_file():
@@ -46,7 +47,11 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                 batch_index = batch_index + batch_size
             file_logits = np.concatenate(logits_list, axis=0)
             save_file_results(out_dir, file_logits, filename, indices)
-            print(f"Processed file :{filename} Distance: {np.mean(distances)}")
+            file_results[filename] = np.mean(distances)
+            print(f"Processed file :{filename} Distance: {file_results[filename]}")
+    with open(os.path.join(out_dir, 'file_results.csv'),'w') as results_file:
+        for key, value in file_results.items():
+            results_file.write(f"{key},{value}\n")
 
 
 def save_file_results(out_dir, logits, filename, indices):
