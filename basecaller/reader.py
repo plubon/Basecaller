@@ -18,7 +18,7 @@ class H5FileReader:
     def read_for_eval(self, path):
         with h5py.File(path, 'r') as h5_file:
             if 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' not in h5_file:
-                return []
+                return [], [], []
             corrected_events = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
             corrected_events_array = corrected_events[()]
             raw_signal = h5_file['Raw/Reads']
@@ -45,7 +45,7 @@ class H5FileReader:
                     if char not in alphabet_dict.keys():
                         label[idx] = b'A'
                 segments.append(normalized_signal)
-                labels.append(label)
+                labels.append([x.decode("utf-8") for x in label])
                 indices.append(signal_index)
                 signal_index = signal_index + 30
                 while event_position[label_index + 1] < signal_index:

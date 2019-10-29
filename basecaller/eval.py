@@ -25,6 +25,8 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
             print(f"Processing file..")
             logits_list = []
             signal, lengths, label, indices, filename = data_extractor.extract_next_file()
+            if len(signal) == 0:
+                continue
             batch_index = 0
             distances = []
             while batch_index < signal.shape[0]:
@@ -41,8 +43,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                     if len(bpread) == 0:
                         continue
                     string_result = int_label_to_string(bpread)
-                    str_target = [x.decode("utf-8") for x in label[indx]]
-                    joined_target = ''.join(str_target)
+                    joined_target = ''.join(label[indx])
                     dist = distance(string_result, joined_target) / len(joined_target)
                     distances.append(dist)
                 batch_index = batch_index + batch_size
