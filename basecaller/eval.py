@@ -22,6 +22,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
     with tf.Session() as sess:
         tf.saved_model.loader.load(sess, ["serve"], os.path.join(model_dir, 'saved_model'))
         while data_extractor.has_next_file():
+            print(f"Processing file..")
             logits_list = []
             signal, lengths, label, indices, filename = data_extractor.extract_next_file()
             batch_index = 0

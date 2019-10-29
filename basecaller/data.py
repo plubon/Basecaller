@@ -125,9 +125,9 @@ class EvalDataExtractor:
     def __init__(self, data_dir, file_list):
         self.data_dir = data_dir
         self.files = os.listdir(data_dir)
-        self.files = [x for x in self.files if x.endswith('.fast5') or x.endswith('.signal')]
         if file_list is not None:
             self.files = [x for x in self.files if x.split('.')[0] in file_list]
+        print(self.files)
         self.current_file = 0
         self.current_row = 0
 
@@ -141,11 +141,9 @@ class EvalDataExtractor:
         filename = self.files[self.current_file]
         if filename.endswith('fast5'):
             reader = H5FileReader()
-        elif filename.endswith('signal'):
-            reader = ChironFileReader()
         else:
-            raise ValueError(f"Format was {filename.split('.')[1]}, but it must be one of {', '.join(['.fast5', '.signal'])}.")
-        signal, label, index = reader.read_for_eval(os.path.join(self.data_dir, filename))
+            reader = ChironFileReader()
+        signal, label, index = reader.read_for_eval(os.path.join(self.data_dir, filename.split('.')[0]))
         signal = np.expand_dims(np.stack(signal).astype(np.float32), -1)
         index = np.array(index)
         lengths = np.repeat(300, index.shape[0])
