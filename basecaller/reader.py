@@ -16,7 +16,7 @@ class H5FileReader:
             return name
 
     def read_for_eval(self, path):
-        with h5py.File(path, 'r') as h5_file:
+        with h5py.File(path + '.fast5', 'r') as h5_file:
             if 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' not in h5_file:
                 return [], [], []
             corrected_events = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
