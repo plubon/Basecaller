@@ -145,7 +145,7 @@ class EvalDataExtractor:
             reader = ChironFileReader()
         signal, label, index = reader.read_for_eval(os.path.join(self.data_dir, filename.split('.')[0]))
         if len(signal) == 0:
-            self.current_file = self.current_fi
+            self.current_file = self.current_file + 1
             return [], [], [], [], []
         signal = np.expand_dims(np.stack(signal).astype(np.float32), -1)
         index = np.array(index)
