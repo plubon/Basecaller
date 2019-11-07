@@ -15,6 +15,18 @@ class H5FileReader:
         if 'Signal' in name:
             return name
 
+    def read_entire_sequence(self, path):
+        with h5py.File(path, 'r') as h5_file:
+            if 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' not in h5_file:
+                return []
+            corrected_events = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
+            corrected_events_array = corrected_events[()]
+            sequence = np.array([x[4] for x in corrected_events_array])
+            for idx, char in enumerate(sequence):
+                if char not in alphabet_dict.keys():
+                    sequence[idx] = b'A'
+            return ''.join([x.decode("utf-8") for x in sequence])
+
     def read_for_eval(self, path):
         with h5py.File(path + '.fast5', 'r') as h5_file:
             if 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' not in h5_file:
@@ -101,6 +113,17 @@ class ChironFileReader:
 
     def filter_files(self, files):
         return [x for x in files if x.endswith('signal') or x.endswith('label')]
+
+    def read_entire_sequence(self, path):
+        with open(path, 'r') as label_file:
+            corrected_events_array = label_file.readlines()
+            corrected_events_array = [x.strip() for x in corrected_events_array]
+            corrected_events_array = [x.split(' ') for x in corrected_events_array]
+            sequence = np.array([x[2] for x in corrected_events_array])
+            for idx, char in enumerate(sequence):
+                if char not in alphabet_dict.keys():
+                    sequence[idx] = 'A'
+            return ''.join(sequence)
 
     def read(self, path):
         with open(path + '.label', 'r') as label_file:

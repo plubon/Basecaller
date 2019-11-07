@@ -125,9 +125,9 @@ class EvalDataExtractor:
     def __init__(self, data_dir, file_list):
         self.data_dir = data_dir
         self.files = os.listdir(data_dir)
+        self.files = [x for x in self.files if x.endswith('fast5') or x.endswith('signal')]
         if file_list is not None:
             self.files = [x for x in self.files if x.split('.')[0] in file_list]
-        print(self.files)
         self.current_file = 0
         self.current_row = 0
 
