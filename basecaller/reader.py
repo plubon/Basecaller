@@ -199,6 +199,8 @@ class ChironFileReader:
                     labels.append(label)
                     indices.append(signal_index)
                     signal_index = signal_index + 30
-                    while event_position[label_index + 1] < signal_index:
+                    if signal_index + 300 >= end:
+                        break
+                    while label_index + 1 < len(event_position) and event_position[label_index + 1] < signal_index:
                         label_index = label_index + 1
                 return segments, labels, indices
