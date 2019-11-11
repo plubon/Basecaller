@@ -72,12 +72,30 @@ class SignalFileParser:
             'files': files
         })
 
-    def create(self):
-        train, rest = train_test_split(self.files, train_size=1 - self.test_size - self.val_size)
-        val, test = train_test_split(rest, train_size=self.val_size / (self.val_size + self.test_size))
-        self.create_split_record(train, 'train')
-        self.create_split_record(test, 'test')
-        self.create_split_record(val, 'val')
+    def create_record(self):
+        count = 0
+        test_filename = os.path.join(self.output_path, 'dataset.tfrecords')
+        with tf.python_io.TFRecordWriter(test_filename) as writer:
+            for file in self.files:
+                examples = self.reader.read(os.path.join(self.input_path, file))
+                count += len(examples)
+                for example in examples:
+                    writer.write(self.get_tf_example(example).SerializeToString())
+        info_filename = os.path.join(self.output_path, 'info.json')
+        write_dict_to_file(info_filename, {
+            'count': count,
+            'files': self.files
+        })
+
+    def create(self, split=False):
+        if split:
+            train, rest = train_test_split(self.files, train_size=1 - self.test_size - self.val_size)
+            val, test = train_test_split(rest, train_size=self.val_size / (self.val_size + self.test_size))
+            self.create_split_record(train, 'train')
+            self.create_split_record(test, 'test')
+            self.create_split_record(val, 'val')
+        else:
+            self.create_record()
 
 
 class DatasetExtractor:
