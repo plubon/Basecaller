@@ -9,7 +9,7 @@ import time
 
 
 def log_time(path, name, time):
-    with open(os.path.join(path, 'times.csv'), 'a') as out:
+    with open(os.path.join(path, 'times.csv'), 'a+') as out:
         out.write(f"{name};{time}\n")
 
 
@@ -18,6 +18,8 @@ def run(config_path,
         val_dataset_path,
         output_path,
         raw_data_path):
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     train_start = time.time()
     log_time(output_path, 'train_start', train_start)
     train(config_path, train_dataset_path, val_dataset_path, output_path)
