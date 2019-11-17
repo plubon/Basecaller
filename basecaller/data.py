@@ -113,6 +113,19 @@ class DatasetExtractor:
     def extract_train(self):
         return self._extract('train')
 
+    def extract(self):
+        with tf.device('/cpu:0'):
+            dataset = tf.data.TFRecordDataset([os.path.join(self.path, 'dataset.tfrecords')])
+            dataset = dataset.shuffle(self.config.batch_size * 5)
+            dataset = dataset.repeat(self.config.epochs)
+            dataset = dataset.map(self._extract_fn)
+            dataset = dataset.batch(self.config.batch_size)
+            dataset = dataset.prefetch(self.config.batch_size * 5)
+            with open(os.path.join(self.path, 'info.json'), 'r') as info_file:
+                info = json.load(info_file)
+                size = int(info['count'])
+        return dataset, size
+
     def extract_test(self):
         return self._extract('test')
 

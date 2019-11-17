@@ -11,18 +11,20 @@ import sys
 from tensorflow.python import debug as tf_debug
 from utils import log_to_file
 
-def train(config_path, dataset_path, output_path):
+def train(config_path, train_dataset_path, val_dataset_path, output_path):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     copyfile(config_path, os.path.join(output_path, 'config.json'))
     log_path = os.path.join(output_path, 'log')
     config = ConfigReader(config_path).read()
-    dataset_extractor = DatasetExtractor(dataset_path, config)
-    dataset_train, train_size = dataset_extractor.extract_train()
+    train_dataset_extractor = DatasetExtractor(train_dataset_path, config)
+    val_dataset_extractor = DatasetExtractor(val_dataset_path, config)
+    dataset_train, train_size = train_dataset_extractor.extract()
     train_iterator = dataset_train.make_one_shot_iterator()
-    dataset_val, val_size = dataset_extractor.extract_val()
+    dataset_val, val_size = val_dataset_extractor.extract()
+    dataset_test = dataset_val.take(300)
+    dataset_val = dataset_val.take(75)
     val_iterator = dataset_val.make_initializable_iterator()
-    dataset_test, test_size = dataset_extractor.extract_train()
     test_iterator = dataset_test.make_one_shot_iterator()
     dataset_handle = tf.placeholder(tf.string, shape=[])
     feedable_iterator = tf.data.Iterator.from_string_handle(dataset_handle, dataset_train.output_types,
@@ -108,4 +110,5 @@ def train(config_path, dataset_path, output_path):
 if __name__ == "__main__":
     train(sys.argv[1],
           sys.argv[2],
-          sys.argv[3])
+          sys.argv[3],
+          sys.argv[4])

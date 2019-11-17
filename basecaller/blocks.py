@@ -94,6 +94,17 @@ def residual_block(input_layer, bn=False):
     return sum_layer
 
 
+def pre_activation_residual_block(input_layer):
+    layer = tf.keras.layers.BatchNormalization()(input_layer)
+    layer = tf.keras.layers.ReLU()(layer)
+    layer = tf.keras.layers.Conv1D(filters=256, kernel_size=3, strides=1, use_bias=False, padding='same')(layer)
+    layer = tf.keras.layers.BatchNormalization()(layer)
+    layer = tf.keras.layers.ReLU()(layer)
+    layer = tf.keras.layers.Conv1D(filters=256, kernel_size=3, strides=1, use_bias=False, padding='same')(layer)
+    sum_layer = tf.keras.layers.Add()([layer, input_layer])
+    return sum_layer
+
+
 def lstm_block(input):
     model = input
     for _ in range(3):

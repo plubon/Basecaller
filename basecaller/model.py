@@ -23,6 +23,8 @@ class ModelFactory:
             return WavenetBidirectionalModel(signal, config)
         if name.lower() == 'placeholder':
             return PlaceholderModel(signal, config)
+        if name.lower() == 'wavenet_pre':
+            return WavenetPreActivationModel(signal, config)
         else:
             raise ValueError(f'No model with name: {name}')
 
@@ -33,6 +35,26 @@ class PlaceholderModel:
         self.input = signal
         self.params = params
         self.logits = signal
+
+
+class WavenetPreActivationModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        max_dilation = 128
+        model = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(signal)
+        for i in range(5):
+            model = blocks.pre_activation_residual_block(model)
+        i = 1
+        skip_connections = []
+        while i <= max_dilation:
+            model, skip = blocks.wavenet_bidirectional_block(model, i)
+            skip_connections.append(skip)
+            i = i * 2
+        skip_sum = tf.keras.layers.Add()(skip_connections)
+        self.logits = tf.keras.layers.Dense(5)(skip_sum)
+
 
 class WavenetModel:
 
