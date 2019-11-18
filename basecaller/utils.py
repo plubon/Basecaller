@@ -1,4 +1,22 @@
 import json
+import os
+import re
+
+
+def get_first_free_device():
+    ns = os.popen('nvidia-smi')
+    lines = ns.readlines()
+    device_lines = []
+    for idx, line in enumerate(lines):
+        if 'GeForce' in line:
+            device_lines.append((idx, line))
+    for device_line in device_lines:
+        device_id = device_line[1][4]
+        split = lines[device_line[0]+1].split('|')
+        mem_use = re.findall(r'\d+', split[2])
+        if float(mem_use[0])/float(mem_use[1]) < 0.3:
+            return device_id
+    return None
 
 
 alphabet_dict = {

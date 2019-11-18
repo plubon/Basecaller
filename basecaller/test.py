@@ -17,7 +17,7 @@ def test(model_path, dataset_path):
     log_path = os.path.join(model_path, 'test_log')
     config = ConfigReader(os.path.join(model_path, 'config.json')).read()
     dataset_extractor = DatasetExtractor(dataset_path, config)
-    dataset_test, test_size = dataset_extractor.extract_train()
+    dataset_test, test_size = dataset_extractor.extract()
     test_iterator = dataset_test.make_one_shot_iterator()
     dataset_handle = tf.placeholder(tf.string, shape=[])
     feedable_iterator = tf.data.Iterator.from_string_handle(dataset_handle, dataset_test.output_types,
