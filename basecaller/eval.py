@@ -19,7 +19,7 @@ def evaluate(model_dir, data_dir, out_dir, file_list=None):
                                   tf.cast(len_input, tf.int32 , name='aaa2'), merge_repeated=False)[0][0],
                                  default_value=-1, name='s_to_d')
     file_results = {}
-    with tf.Session() as sess:
+    with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
         tf.saved_model.loader.load(sess, ["serve"], os.path.join(model_dir, 'saved_model'))
         i = 1
         size = data_extractor.get_size()

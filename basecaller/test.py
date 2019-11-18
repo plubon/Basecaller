@@ -17,7 +17,7 @@ def test(model_path, dataset_path):
     log_path = os.path.join(model_path, 'test_log')
     config = ConfigReader(os.path.join(model_path, 'config.json')).read()
     dataset_extractor = DatasetExtractor(dataset_path, config)
-    dataset_test, test_size = dataset_extractor.extract_train()
+    dataset_test, test_size = dataset_extractor.extract()
     test_iterator = dataset_test.make_one_shot_iterator()
     dataset_handle = tf.placeholder(tf.string, shape=[])
     feedable_iterator = tf.data.Iterator.from_string_handle(dataset_handle, dataset_test.output_types,
@@ -29,7 +29,7 @@ def test(model_path, dataset_path):
     decoder = DecoderFactory.get(config.decoder, model.logits, signal_len)
     distance_op = tf.reduce_mean(tf.edit_distance(tf.cast(decoder.decoded, dtype=tf.int32), label))
     saver = tf.train.Saver()
-    sess = tf.Session()
+    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
     saver.restore(sess, os.path.join(model_path, "model.ckpt"))
     tf.saved_model.simple_save(sess,
                                os.path.join(model_path, 'saved_model'),
