@@ -1,0 +1,432 @@
+\documentclass[a4paper,11pt,twoside]{report}
+% KOMPILOWAĆ ZA POMOCĄ pdfLaTeXa, PRZEZ XeLaTeXa MOŻE NIE BYĆ POLSKICH ZNAKÓW
+
+% -------------- Kodowanie znaków, język polski -------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[MeX]{polski}
+\usepackage[T1]{fontenc}
+\usepackage[english,polish]{babel}
+
+
+\usepackage{amsmath, amsfonts, amsthm, latexsym} % głównie symbole matematyczne, środowiska twierdzeń
+
+\usepackage[final]{pdfpages} % inputowanie pdfa
+%\usepackage[backend=bibtex, style=verbose-trad2]{biblatex}
+
+
+% ---------------- Marginesy, akapity, interlinia ------------------
+
+\usepackage[inner=20mm, outer=20mm, bindingoffset=10mm, top=25mm, bottom=25mm]{geometry}
+
+
+\linespread{1.5}
+\allowdisplaybreaks
+
+\usepackage{indentfirst} % opcjonalnie; pierwszy akapit z wcięciem
+\setlength{\parindent}{5mm}
+
+
+%--------------------------- ŻYWA PAGINA ------------------------
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+% numery stron: lewa do lewego, prawa do prawego 
+\fancyfoot[LE,RO]{\thepage} 
+% prawa pagina: zawartość \rightmark do lewego, wewnętrznego (marginesu) 
+\fancyhead[LO]{\sc \nouppercase{\rightmark}}
+% lewa pagina: zawartość \leftmark do prawego, wewnętrznego (marginesu) 
+\fancyhead[RE]{\sc \leftmark}
+
+\renewcommand{\chaptermark}[1]{
+\markboth{\thechapter.\ #1}{}}
+
+% kreski oddzielające paginy (górną i dolną):
+\renewcommand{\headrulewidth}{0 pt} % 0 - nie ma, 0.5 - jest linia
+
+
+\fancypagestyle{plain}{% to definiuje wygląd pierwszej strony nowego rozdziału - obecnie tylko numeracja
+  \fancyhf{}%
+  \fancyfoot[LE,RO]{\thepage}%
+  
+  \renewcommand{\headrulewidth}{0pt}% Line at the header invisible
+  \renewcommand{\footrulewidth}{0.0pt}
+}
+
+
+
+% ---------------- Nagłówki rozdziałów ---------------------
+
+\usepackage{titlesec}
+\titleformat{\chapter}%[display]
+  {\normalfont\Large \bfseries}
+  {\thechapter.}{1ex}{\Large}
+
+\titleformat{\section}
+  {\normalfont\large\bfseries}
+  {\thesection.}{1ex}{}
+\titlespacing{\section}{0pt}{30pt}{20pt} 
+%\titlespacing{\co}{akapit}{ile przed}{ile po} 
+    
+\titleformat{\subsection}
+  {\normalfont \bfseries}
+  {\thesubsection.}{1ex}{}
+
+
+% ----------------------- Spis treści ---------------------------
+\def\cleardoublepage{\clearpage\if@twoside
+\ifodd\c@page\else\hbox{}\thispagestyle{empty}\newpage
+\if@twocolumn\hbox{}\newpage\fi\fi\fi}
+
+
+% kropki dla chapterów
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\l@chapter}
+  {\hfil}
+  {\leaders\hbox{\normalfont$\m@th\mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}\hfill}
+  {}{}
+\makeatother
+
+\usepackage{titletoc}
+\makeatletter
+\titlecontents{chapter}% <section-type>
+  [0pt]% <left>
+  {}% <above-code>
+  {\bfseries \thecontentslabel.\quad}% <numbered-entry-format>
+  {\bfseries}% <numberless-entry-format>
+  {\bfseries\leaders\hbox{\normalfont$\m@th\mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}\hfill\contentspage}% <filler-page-format>
+
+\titlecontents{section}
+  [1em]
+  {}
+  {\thecontentslabel.\quad}
+  {}
+  {\leaders\hbox{\normalfont$\m@th\mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}\hfill\contentspage}
+
+\titlecontents{subsection}
+  [2em]
+  {}
+  {\thecontentslabel.\quad}
+  {}
+  {\leaders\hbox{\normalfont$\m@th\mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}\hfill\contentspage}
+\makeatother
+
+
+
+% ---------------------- Spisy tabel i obrazków ----------------------
+
+\renewcommand*{\thetable}{\arabic{chapter}.\arabic{table}}
+\renewcommand*{\thefigure}{\arabic{chapter}.\arabic{figure}}
+%\let\c@table\c@figure % jeśli włączone, numeruje tabele i obrazki razem
+
+
+% --------------------- Definicje, twierdzenia etc. ---------------
+
+
+\makeatletter
+\newtheoremstyle{definition}%    % Name
+{3ex}%                          % Space above
+{3ex}%                          % Space below
+{\upshape}%                      % Body font
+{}%                              % Indent amount
+{\bfseries}%                     % Theorem head font
+{.}%                             % Punctuation after theorem head
+{.5em}%                            % Space after theorem head, ' ', or \newline
+{\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}%  % Theorem head spec (can be left empty, meaning `normal')
+\makeatother
+
+% ----------------------------- POLSKI --------------------------------
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Twierdzenie}[chapter]
+\newtheorem{lemma}[theorem]{Lemat}
+\newtheorem{example}[theorem]{Przykład}
+\newtheorem{proposition}[theorem]{Stwierdzenie}
+\newtheorem{corollary}[theorem]{Wniosek}
+\newtheorem{definition}[theorem]{Definicja}
+\newtheorem{remark}[theorem]{Uwaga}
+
+
+
+% ----------------------------- Dowód -----------------------------
+
+%\makeatletter
+%\renewenvironment{proof}[1][\proofname]
+%{\par
+%  \vspace{-12pt}% remove the space after the theorem
+%  \pushQED{\qed}%
+%  \normalfont
+%  \topsep0pt \partopsep0pt % no space before
+%  \trivlist
+%  \item[\hskip\labelsep
+%        \sc
+%    #1\@addpunct{:}]\ignorespaces
+%}
+%{%
+%  \popQED\endtrivlist\@endpefalse
+%  \addvspace{20pt} % some space after
+%}
+%
+%\renewcommand{\qedhere}{\hfill \qedsymbol}
+%\makeatother
+
+
+
+
+
+% -------------------------- POCZĄTEK --------------------------
+
+
+% --------------------- Ustawienia użytkownika ------------------
+
+\newcommand{\tytul}{Tytuł pracy dyplomowej w języku polskim}
+\renewcommand{\title}{English title}
+\newcommand{\type}{inżyniers} % magisters, licencjac
+\newcommand{\supervisor}{dr inż. Promotor X}
+
+
+
+\begin{document}
+\sloppy
+
+\includepdf[pages=-]{strona_tytulowa-jeden-autor.pdf}
+
+
+% ------------------ STRONA Z PODPISAMI AUTORA/AUTORÓW I PROMOTORA ------------------
+
+
+\thispagestyle{empty}\newpage
+\null
+
+\vfill
+
+\begin{center}
+\begin{tabular}[t]{ccc}
+
+............................................. & \hspace*{100pt} & .............................................\\
+podpis promotora & \hspace*{100pt} & podpis autora
+
+
+\end{tabular}
+\end{center}
+
+
+
+% ---------------------------- ABSTRAKTY -----------------------------
+% W PRACY PO POLSKU, NAPIERW STRESZCZENIE PL, POTEM ABSTRACT EN
+
+{
+\begin{abstract}
+
+\begin{center}
+\tytul
+\end{center}
+
+Streszczam.
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elit, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+\noindent \textbf{Słowa kluczowe:} slowo1, slowo2, ...
+\end{abstract}
+}
+
+\null\thispagestyle{empty}\newpage
+
+{\selectlanguage{english}
+\begin{abstract}
+
+\begin{center}
+\title
+\end{center}
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+
+\noindent \textbf{Keywords:} keyword1, keyword2, ...
+\end{abstract}
+}
+
+
+% --------------------- OŚWIADCZENIE -----------------------------------------
+
+
+\null\thispagestyle{empty}\newpage
+
+\null \hfill Warszawa, dnia ..................\\
+
+\par\vspace{5cm}
+
+\begin{center}
+Oświadczenie
+\end{center}
+
+\indent Oświadczam, że pracę \type ką pod
+tytułem ,,\tytul '', której promotorem jest \supervisor , wykonałam/wykonałem
+samodzielnie, co poświadczam własnoręcznym podpisem.
+\vspace{2cm}
+
+
+\begin{flushright}
+  \begin{minipage}{50mm}
+    \begin{center}
+      ..............................................
+
+    \end{center}
+  \end{minipage}
+\end{flushright}
+
+\thispagestyle{empty}
+\newpage
+
+\null\thispagestyle{empty}\newpage
+
+
+% ------------------- 4. Spis treści ---------------------
+\pagenumbering{gobble}
+\tableofcontents
+\thispagestyle{empty}
+
+\newpage % JEŻELI SPIS TREŚCI MA PARZYSTĄ LICZBĘ STRON, ZAKOMENTOWAĆ
+% ALBO JAK KTOŚ WOLI WTEDY DWIE STRONY ODSTĘPU, DODAĆ \null\newpage
+
+% -------------- 5. ZASADNICZA CZĘŚĆ PRACY --------------------
+\null\thispagestyle{empty}\newpage
+\pagestyle{fancy}
+\pagenumbering{arabic}
+\setcounter{page}{11} % JEŻELI Z POWODU DUŻEJ ILOŚCI STRON W SPISIE TREŚCI SIĘ NIE ZGADZA, TRZEBA ZMODYFIKOWAĆ RĘCZNIE
+
+\chapter*{Wstęp}
+\markboth{}{Wstęp}
+\addcontentsline{toc}{chapter}{Wstęp}
+
+\section*{DNA}
+
+\section*{Sekwencjonowanie DNA}
+
+\subsection*{Technologie sekwencjonowania DNA}
+
+\chapter*{Opis problemu}
+
+\section*{Oxford Nanopore MinION}
+Zalety, opis dlaczego potrzebny jest basecalling, co to jest basecalling, jak wyglądają dane
+
+\section*{Istniejące rozwiązania}
+istniejące basecallery
+
+\chapter*{Opis rozwiązania}
+
+\section*{Przygotowanie zbiorów danych danych}
+
+W celu nauczenia i testowania sieci neuronowej przygotowane zostały 2 zbiory danych w postaci par \textit{wektor synału, odpowiadające mu nukleotydy}.
+Pierwszy zbiór powstał z danych z sekwencjonowania genomu ludzkiego z lini komórkowej NA12878. Wykorzystano wyłącznie DNA pochodzące z chromosomu mitochondrialnego, na które składa się 5000 odczytów.
+Dane pochodzące z sekwencjonowania metodą Nanopore pochodzą z repozytorium udostępnionego przez Whole Human Genome Sequencing Project\cite{nanoporeHuman},a genom referencyjny sekwencjonwany metodą Illumina pochodzi z The International Genome Sample Resource\cite{refGenome}. Aby uzyskać dane treningowe nie będące obciążone błędem innego \textit{basecallera} wykorzystano pakiet \textit{nanoraw}\cite{nanoraw}. Dokonuje on uliniowienia sygnału pochodzącego z sekwencjonowania technologią nanopore i genomu referencyjnego. W efekcie otrzymano podział sygnału na fragmenty, z których każdy odpowiada jednem z nukleotydów.
+
+W celu poprawienia generalności rozwiązania do uczenia sieci wykorzystano również zbiór danych z sewkwencjonowania gatunków \textit{Escherichia virus Lambda} i \textit{Escherichia coli} składający się z 4000 odczytów \cite{chironData}. Uliniowienie z genomami referencyjnymi zostało wykonane przez autorów zbioru, sposób analogiczny do opisanego powyżej.
+
+\section*{Eksploracyjna analiza danych}
+
+\section*{Reprezentacja i przygotowanie danych wejściowych}
+
+\section*{Sieci konwolucyjne, ResNet}
+
+Sieci konwolucyjne(splotowe) to klasa głębokich sieci neuronowych wykorzystujących operację konwolucji. Charakteryzują się one mniejszą ilością parametrów i lepszą umiejętnością uczenia się lokalnych cech danych wejśćiowych niż sieci w pełni połączone\cite{cnn} i dzięki temu znajdują zastosowanie w ekstrakcji cech w problemach, w których dane wejśćiowe są zależne od położenia lub czasu, takich jak rozpoznawanie obrazu \cite{vgg}, wideo\cite{cnnVideo} lub dźwięku\cite{cnnAudio}.
+
+W przypadku sieci konwolucyjnych składających się z wielu warstw występuje problem zanikającego gradientu, co znacznie spowalnia lub uniemożliwa uczenia takich sieci\cite{difficulty}.
+Architekturą, która próbuje rozwiązać tą trudność jest \textit{resNet}, osiągający jedne z najlepszych wyników w dziedzinie klasyfikacji obrazu\cite{resnet}. Sieci tego typu składają się z bloków zawierających połączenia omijające część warstw sieci, dzięki czemu sygnał nie zanika przed osiągnięciem dalszej części sieci i zwiększenie liczby warstw nie pogarsza celnośći predykcji dokonywanych przez sieć\cite{resnetBlock}.
+
+Tu obrazek
+
+\section*{Sieci w pełni konwolucyjne}
+
+Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z warstw konwolucyjnych, które mogą być zastosowane w problemach w których rozmiar danych wejściowych, jest zależny od rozmiaru danych wejściowych, takich jak segmentacja obrazu\cite{segmentation} czy modelowanie sekwencji np. dzwięku i tekstu \cite{sequenceModelling}. Wykorzystują one fakt, że każdy neuron w sieci przetwarza tylko dane wejściowe znajdującym się w w jego otoczeniu, którego rozmiar zależy od rozmiaru filtrów w poprzedzających go warstwach. Zatem w sieci składające sie wyłącznie z warstw konwolucyjnych, liczba neuronów w ostatniej warstwie jest zależna od rozmiaru danych wejśćiowych i każdy z tych neuronów odpowiada, pewnemu elementowi z danych wejśćiowych, np. krokowi czasowemu lub pikselowi w obrazie\cite{fcn}. 
+\section*{WaveNet}
+
+\section*{CTC}
+
+\section*{Architektury przetestowanych sieci neuronowych}
+
+\section*{Składanie odczytów}
+
+\chapter*{Analiza wyników}
+
+\section*{Zbiory danych}
+
+\section*{Szczegóły techniczne implementacji}
+
+\section*{Ewaluacja testowanych architektur sieci}
+
+\section*{Porównanie najlepszego z przygotowanych rozwiązań z istniejącymi rozwiązaniami}
+
+\section*{Testy wydajności}
+
+\chapter{Wnioski}
+% -------------------- 6. Bibliografia -----------------------
+% Bibliografia leksykograficznie wg nazwisk autorów
+% Dla ambitnych - można skorzystać z BibTeX-a
+
+\begin{thebibliography}{20}%jak ktoś ma więcej książek, to niech wpisze większą liczbę
+% \bibitem[numerek]{referencja} Autor, \emph{Tytuł}, Wydawnictwo, rok, strony
+% cytowanie: \cite{referencja1, referencja 2,...}
+
+\bibitem{refGenome} Susan Fairley, Ernesto Lowy-Gallego, Emily Perry, Paul Flicek, The International Genome Sample Resource (IGSR) collection of open human genomic variation resources, Nucleic Acids Research.
+\bibitem{nanoporeHuman} Miten Jain, Sergey Koren, Karen H Miga, Josh Quick, Arthur C Rand, Thomas A Sasani, John R Tyson, Andrew D Beggs, Alexander T Dilthey, Ian T Fiddes, Sunir Malla, Hannah Marriott, Tom Nieto, Justin O'Grady, Hugh E Olsen, Brent S Pedersen, Arang Rhie, Hollian Richardson, Aaron R Quinlan, Terrance P Snutch, Louise Tee, Benedict Paten, Adam M Phillippy, Jared T Simpson, Nicholas J Loman \& Matthew Loose. Nanopore sequencing and assembly of a human genome with ultra-long reads. Nature Biotechnology
+\bibitem{nanoraw}Stoiber, M.H. et al. De novo Identification of DNA Modifications Enabled by Genome-Guided Nanopore Signal Processing. bioRxiv (2016).
+\bibitem{chironData} Teng H; Cao MD; Hall MB; Duarte T; Wang S; Coin LJM (2018): Supporting data for "Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning" GigaScience Database.
+\bibitem{resnet} K. He, X. Zhang, S. Ren and J. Sun, “Deep Residual Learning for Image Recognition,” in CVPR, 2016.
+\bibitem{resnetBlock}K. He, X. Zhang, S. Ren, and J. Sun. Identity Mappings in Deep Residual Networks. arXiv preprint arXiv:1603.05027v3,2016.
+\bibitem{cnn}Yann LeCunn, Leon Bottou, Yoshua Bengio, Patrick Haffner, Gradient-Based Learning Applied to Document Recognition, 1998
+\bibitem{vgg}Very Deep Convolutional Networks for Large-Scale Image Recognition Karen Simonyan, Andrew Zisserman
+\bibitem{cnnVideo} Exploiting Image-trained CNN Architectures for Unconstrained Video Classification Shengxin Zha, Florian Luisier, Walter Andrews, Nitish Srivastava, Ruslan Salakhutdinov
+\bibitem{cnnAudio} Environmental Sound Classification With Convolutional Neural Networks Karol J. Piczak
+\bibitem{difficulty}Understanding the difficulty of training deep feedforward neural networks Xavier Glorot, Yoshua Bengio
+\bibitem{segmentation} Recent progress in semantic image segmentation Xiaolong Liu, Zhidong Deng, Yuhan Yang
+\bibitem{sequenceModelling} An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling Shaojie Bai, J. Zico Kolter, Vladlen Koltun
+\bibitem{fcn}Fully Convolutional Networks for Semantic Segmentation Jonathan Long, Evan Shelhamer, Trevor Darrell
+\end{thebibliography}
+
+\thispagestyle{empty}
+\pagenumbering{gobble}
+
+
+
+% --- 7. Wykaz symboli i skrótów - jeśli nie ma, zakomentować
+\chapter*{Wykaz symboli i skrótów}
+
+\begin{tabular}{cl}
+nzw. & nadzwyczajny \\
+* & operator gwiazdka \\
+$\widetilde{}$ & tylda
+\end{tabular}
+\\
+Jak nie występują, usunąć.
+\thispagestyle{empty}
+
+
+% ----- 8. Spis rysunków - jeśli nie ma, zakomentować --------
+\listoffigures
+\thispagestyle{empty}
+Jak nie występują, usunąć.
+
+
+% ------------ 9. Spis tabel - jak wyżej ------------------
+\renewcommand{\listtablename}{Spis tabel}
+\listoftables
+\thispagestyle{empty}
+Jak nie występują, usunąć.
+
+
+% 10. Spis załączników - jak nie ma załączników, to zakomentować lub usunąć
+
+\chapter*{Spis załączników}
+\begin{enumerate}
+\item Załącznik 1
+\item Załącznik 2
+\item Jak nie występują, usunąć rozdział.
+\end{enumerate}
+\thispagestyle{empty}
+
+
+\end{document}

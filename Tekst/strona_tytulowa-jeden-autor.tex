@@ -1,0 +1,74 @@
+\documentclass[12pt,twoside,a4paper]{article}
+% ten dokument należy kompilować za pomocą XeLaTeX-a
+
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+
+
+\usepackage{graphicx}
+\usepackage[vmargin = 25mm, hmargin = 20mm, bindingoffset=10mm]{geometry}
+
+
+\newfontfamily\arial{arial.ttf}
+
+\linespread{1.5}
+\setlength{\parindent}{0mm}
+
+% ---------------------- Do wypełnienia ------------------------------
+
+\newcommand{\discipline}{Matematyka}
+\newcommand{\spec}{Matematyka w naukach informacyjnych} % jak nie ma, to skasować
+\renewcommand{\title}{Tytuł pracy dyplomowej}
+\renewcommand{\author}{Imię Nazwisko}
+\newcommand{\album}{000000}
+\newcommand{\supervisor}{dr inż. Promotor Promotorski}
+\renewcommand{\year}{2018}
+
+% ------------------------------------------------------------------------------
+
+
+% --------------- TU SIĘ ZACZYNA DOKUMENT -------------------------------------
+% DO WYPEŁNIENIA JEST TYP PRACY (LIC, MGR, INŻ) ORAZ BYĆ MOŻE USUNIĘCIE LINIJKI ZE SPECJALIZACJĄ, RESZTY LEPIEJ NIE RUSZAĆ, A JAK RUSZAĆ, TO Z POSZANOWANIEM ZARZĄDZENIA REKTORA: https://www.bip.pw.edu.pl/var/pw/storage/original/application/fb48a514799968a2fe7fdd17d3bf3cbe.pdf
+
+\begin{document}
+\pagestyle{empty}
+
+\begin{center}
+\includegraphics[scale=1.]{img/politechnika} 
+\vspace{70pt}
+
+
+\includegraphics[scale=1.]{img/praca_lic} % LUB praca_mgr LUB praca_inz
+
+{ \arial na kierunku \discipline
+\\ w specjalności \spec % JEŚLI NIE MA, TO WYWALIĆ LUB ZAKOMENTOWAĆ
+
+\vspace{40pt}
+{\arial \large \title}
+
+\vspace{50pt}
+
+{\arial \huge \author}
+
+\vspace{5pt}
+
+Numer albumu \album
+
+\vspace{40pt}
+
+promotor \\
+{\arial \supervisor}
+
+\vspace{15pt}
+ 
+konsultacje (opcjonalnie)\\
+{\arial
+dr hab. K. Konsultant
+}
+
+ \vfill
+WARSZAWA \year \\
+}
+\end{center}
+
+\end{document}
