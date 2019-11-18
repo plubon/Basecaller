@@ -223,7 +223,7 @@ class CnnLstmModel:
         self.config = config
         model = signal
         for i in range(5):
-            model = blocks.residual_block(model, bn=(i == 0))
+            model = blocks.pre_activation_residual_block(model)
         model = blocks.lstm_block(model)
         weight_bi = tf.Variable(tf.truncated_normal([2, hidden_num], stddev=np.sqrt(2.0 / (2*hidden_num))))
         bias_bi = tf.Variable(tf.zeros([hidden_num]))
