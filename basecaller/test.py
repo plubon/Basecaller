@@ -29,7 +29,7 @@ def test(model_path, dataset_path):
     decoder = DecoderFactory.get(config.decoder, model.logits, signal_len)
     distance_op = tf.reduce_mean(tf.edit_distance(tf.cast(decoder.decoded, dtype=tf.int32), label))
     saver = tf.train.Saver()
-    sess = tf.Session()
+    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
     saver.restore(sess, os.path.join(model_path, "model.ckpt"))
     tf.saved_model.simple_save(sess,
                                os.path.join(model_path, 'saved_model'),

@@ -19,7 +19,7 @@ def assemble(input_path, output_path, decoder, assembler, target_dir=None):
     decoded_out = tf.sparse.to_dense(decoder.decoded, default_value=-1)
     assembler = AssemblerFactory.get(assembler)
     distances = []
-    with tf.Session() as sess:
+    with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
         for no, file in enumerate(data_files):
             logits = np.load(os.path.join(input_path, file))
             size = logits.shape[0]

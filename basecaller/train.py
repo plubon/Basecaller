@@ -36,7 +36,7 @@ def train(config_path, train_dataset_path, val_dataset_path, output_path):
     decoder = DecoderFactory.get(config.decoder, model.logits, signal_len)
     distance_op = tf.reduce_mean(tf.edit_distance(tf.cast(decoder.decoded, dtype=tf.int32), label))
     saver = tf.train.Saver()
-    sess = tf.Session()
+    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
     if config.debug:
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
     sess.run(tf.global_variables_initializer())
