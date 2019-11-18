@@ -26,9 +26,11 @@ class ModelFactory:
         if name.lower() == 'wavenet_pre':
             return WavenetPreActivationModel(signal, config)
         if name.lower() == 'dense_net':
-            return DenseNet(signal, config)
+            return DenseNetModel(signal, config)
+        if name.lower() == 'dense_net_lstm':
+            return DenseNetLstmModel(signal, config)
         if name.lower() == 'dense_wave_net':
-            return DenseWaveNet(signal, config)
+            return DenseWaveNetModel(signal, config)
         else:
             raise ValueError(f'No model with name: {name}')
 
@@ -41,7 +43,23 @@ class PlaceholderModel:
         self.logits = signal
 
 
-class DenseWaveNet:
+class DenseNetLstmModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        hidden_num = 100
+        model = blocks.dense_net(self.input)
+        model = blocks.lstm_block(model)
+        weight_bi = tf.Variable(tf.truncated_normal([2, hidden_num], stddev=np.sqrt(2.0 / (2 * hidden_num))))
+        bias_bi = tf.Variable(tf.zeros([hidden_num]))
+        model = tf.reshape(model, [tf.shape(model)[0], 300, 2, hidden_num])
+        model = tf.nn.bias_add(tf.reduce_sum(tf.multiply(model, weight_bi), axis=2), bias_bi)
+        model = tf.keras.layers.Dense(5)(model)
+        self.logits = model
+
+
+class DenseWaveNetModel:
 
     def __init__(self, signal, params):
         self.input = signal
@@ -58,7 +76,7 @@ class DenseWaveNet:
         self.logits = tf.keras.layers.Dense(5)(skip_sum)
 
 
-class DenseNet:
+class DenseNetModel:
 
     def __init__(self, signal, params):
         self.input = signal
