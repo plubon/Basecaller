@@ -65,7 +65,7 @@ class DenseWaveNetModel:
         self.input = signal
         self.params = params
         model = blocks.dense_net(self.input)
-        model = tf.keras.layers.Conv1D(filters=256, padding='same')(model)
+        model = tf.keras.layers.Conv1D(filters=256, padding='same', kernel_size=1)(model)
         max_dilation = 128
         i = 1
         skip_connections = []
