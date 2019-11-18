@@ -24,11 +24,11 @@ def run(config_path,
         os.makedirs(output_path)
     attempts = 0
     device = get_first_free_device()
-    while attempts < 5 and device is not None:
-        print("All devices busy, retrying...")
+    while attempts < 5 and device is None:
+        print("All devices busy, retrying...", flush=True)
         time.sleep(60)
         device = get_first_free_device()
-    print(f"Using device:{device}")
+    print(f"Using device:{device}", flush=True)
     with tf.device(f'/device:GPU:{device}'):
         train_start = datetime.fromtimestamp(time.time()).isoformat()
         log_time(output_path, 'train_start', train_start)
