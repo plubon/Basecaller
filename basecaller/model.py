@@ -25,6 +25,10 @@ class ModelFactory:
             return PlaceholderModel(signal, config)
         if name.lower() == 'wavenet_pre':
             return WavenetPreActivationModel(signal, config)
+        if name.lower() == 'dense_net':
+            return DenseNet(signal, config)
+        if name.lower() == 'dense_wave_net':
+            return DenseWaveNet(signal, config)
         else:
             raise ValueError(f'No model with name: {name}')
 
@@ -35,6 +39,32 @@ class PlaceholderModel:
         self.input = signal
         self.params = params
         self.logits = signal
+
+
+class DenseWaveNet:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        model = blocks.dense_net(self.input)
+        max_dilation = 128
+        i = 1
+        skip_connections = []
+        while i <= max_dilation:
+            model, skip = blocks.wavenet_bidirectional_block(model, i)
+            skip_connections.append(skip)
+            i = i * 2
+        skip_sum = tf.keras.layers.Add()(skip_connections)
+        self.logits = tf.keras.layers.Dense(5)(skip_sum)
+
+
+class DenseNet:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        model = blocks.dense_net(self.input)
+        self.logits = tf.keras.layers.Dense(5)(model)
 
 
 class WavenetPreActivationModel:

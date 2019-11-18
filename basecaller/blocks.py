@@ -1,6 +1,34 @@
 import tensorflow as tf
 
 
+def dense_block(x, nb_layers, nb_channels, growth_rate):
+    x_list = [x]
+    for i in range(nb_layers):
+        cb = tf.keras.layers.BatchNormalization()(x)
+        cb = tf.keras.layers.ReLU()(cb)
+        cb = tf.keras.layers.Conv1D(filters=growth_rate, kernel_size=3, use_bias=False, padding='same')(cb)
+        x_list.append(cb)
+        x = tf.keras.layers.Concatenate(axis=-1)(x_list)
+        nb_channels += growth_rate
+    return x, nb_channels
+
+
+def dense_net(input_layer, blocks=3, depth=30, growth_rate=12):
+    dense_layers = (depth - (blocks + 1)) // blocks
+    dense_layers = [int(dense_layers) for _ in range(blocks)]
+    nb_channels = growth_rate * 2
+    x = tf.keras.layers.Conv1D(filters=nb_channels, kernel_size=3, padding='same', use_bias=False)(input_layer)
+    for block in range(blocks):
+        x, nb_channels = dense_block(x, dense_layers[block], nb_channels, growth_rate)
+        if block < blocks - 1:
+            x = tf.keras.layers.BatchNormalization()(x)
+            x = tf.keras.layers.ReLU()(x)
+            x = tf.keras.layers.Conv1D(nb_channels, 1, padding='same', use_bias=False)(x)
+    x = tf.keras.layers.BatchNormalization()(x)
+    x = tf.keras.layers.ReLU()(x)
+    return x
+
+
 def wavenet_gate(input, dilation, filters):
     tanh = tf.keras.layers.Conv1D(filters,
                                   2,
