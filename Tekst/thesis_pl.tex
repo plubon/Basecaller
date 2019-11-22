@@ -324,7 +324,7 @@ W celu nauczenia i testowania sieci neuronowej przygotowane zostały 2 zbiory da
 Pierwszy zbiór powstał z danych z sekwencjonowania genomu ludzkiego z lini komórkowej NA12878. Wykorzystano wyłącznie DNA pochodzące z chromosomu mitochondrialnego, na które składa się 5000 odczytów.
 Dane pochodzące z sekwencjonowania metodą Nanopore pochodzą z repozytorium udostępnionego przez Whole Human Genome Sequencing Project\cite{nanoporeHuman},a genom referencyjny sekwencjonwany metodą Illumina pochodzi z The International Genome Sample Resource\cite{refGenome}. Aby uzyskać dane treningowe nie będące obciążone błędem innego \textit{basecallera} wykorzystano pakiet \textit{nanoraw}\cite{nanoraw}. Dokonuje on uliniowienia sygnału pochodzącego z sekwencjonowania technologią nanopore i genomu referencyjnego. W efekcie otrzymano podział sygnału na fragmenty, z których każdy odpowiada jednem z nukleotydów.
 
-W celu poprawienia generalności rozwiązania do uczenia sieci wykorzystano również zbiór danych z sewkwencjonowania gatunków \textit{Escherichia virus Lambda} i \textit{Escherichia coli} składający się z 4000 odczytów \cite{chironData}. Uliniowienie z genomami referencyjnymi zostało wykonane przez autorów zbioru, sposób analogiczny do opisanego powyżej.
+W celu poprawienia generalności rozwiązania do uczenia sieci wykorzystano również zbiór danych z sewkwencjonowania gatunków \textit{Escherichia virus Lambda} i \textit{Escherichia coli} składający się z 4000 odczytów \cite{chironData}. Uliniowienie z genomami referencyjnymi zostało wykonane przez autorów zbioru, w sposób analogiczny do opisanego powyżej.
 
 \section*{Eksploracyjna analiza danych}
 
@@ -335,13 +335,23 @@ W celu poprawienia generalności rozwiązania do uczenia sieci wykorzystano rów
 Sieci konwolucyjne(splotowe) to klasa głębokich sieci neuronowych wykorzystujących operację konwolucji. Charakteryzują się one mniejszą ilością parametrów i lepszą umiejętnością uczenia się lokalnych cech danych wejśćiowych niż sieci w pełni połączone\cite{cnn} i dzięki temu znajdują zastosowanie w ekstrakcji cech w problemach, w których dane wejśćiowe są zależne od położenia lub czasu, takich jak rozpoznawanie obrazu \cite{vgg}, wideo\cite{cnnVideo} lub dźwięku\cite{cnnAudio}.
 
 W przypadku sieci konwolucyjnych składających się z wielu warstw występuje problem zanikającego gradientu, co znacznie spowalnia lub uniemożliwa uczenia takich sieci\cite{difficulty}.
-Architekturą, która próbuje rozwiązać tą trudność jest \textit{resNet}, osiągający jedne z najlepszych wyników w dziedzinie klasyfikacji obrazu\cite{resnet}. Sieci tego typu składają się z bloków zawierających połączenia omijające część warstw sieci, dzięki czemu sygnał nie zanika przed osiągnięciem dalszej części sieci i zwiększenie liczby warstw nie pogarsza celnośći predykcji dokonywanych przez sieć\cite{resnetBlock}.
+Architekturą, która próbuje rozwiązać tą trudność jest \textit{resNet}, osiągający jedne z najlepszych wyników w dziedzinie klasyfikacji obrazu. Sieci tego typu składają się z bloków zawierających połączenia omijające część warstw. Na wyjściu z każdego bloku znajduje się suma danych wejściowych i danych przetworzonych przez warstwy wenątrz bloku. Dzięki temu. sygnał nie zanika przed osiągnięciem dalszej części sieci. Umożliwiło to trenowanie sieci o większej liczbie warstw bez utraty celności predykcji.\cite{resnet}.
+
+Ulepszona wersja tej architektury została zaprezentowana w \cite{preResnet}. Autorzy propnują taką modyfikację sieci, aby dane wejściowe były dodawane do kolejnych warstw bez żadnych modyfikacji.We wcześniejszej wersji do danych wejśćiowych stosowano funkcje aktywacji i funkcje normalizujące. Zapobiega to zanikaniu gradientu nawet w sieciach składających się z tysiąca warstw. Dzięki temu można uniknąć efektu pogarszania się jakości predykcji wraz ze zwiekszaniem ilości warstw w sieci powyżej określonej liczby.
 
 Tu obrazek
 
+\section{DenseNet}
+
+W architekturze DenseNet, będącej rozwnięciem idei wykorzystanych w ResNet, każda z warstw przekazuje do dalszej części sieci skontatenowane wyniki obliczeń wykonanych przez siebie i każdą z poprzednich warstw. Na wyjściu z sieci znajdują sie cechy obliczone, przez każdą z warstw w sieci - wynikami kolejnych warstw są cechy danych wejśćiowych coraz wyższego rzędu. Dzięki temu wszystkie warstwy w sieci podlegają nadzorowi, podobnie jak w sieciach DSN(Deeply-Supervised Nets)\cite{DSN}. Wykorzystanie cech obliczonych w począktwych warstwach w dalszej części sieci, umożliwia zastosowanie modeli o mniejszej liczbie parametrów. Klasyfikacja jest dokonywana na podstawie cech niskiego i wysokiego rzędu. Dzięki temu sieci typu DenseNet osiągają lepszą precyzję klasyfikacji, niż sieci typu ResNet, mimo zastosowania mniej złożonego modelu\cite{denseNet}. 
+
 \section*{Sieci w pełni konwolucyjne}
 
-Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z warstw konwolucyjnych, które mogą być zastosowane w problemach w których rozmiar danych wejściowych, jest zależny od rozmiaru danych wejściowych, takich jak segmentacja obrazu\cite{segmentation} czy modelowanie sekwencji np. dzwięku i tekstu \cite{sequenceModelling}. Wykorzystują one fakt, że każdy neuron w sieci przetwarza tylko dane wejściowe znajdującym się w w jego otoczeniu, którego rozmiar zależy od rozmiaru filtrów w poprzedzających go warstwach. Zatem w sieci składające sie wyłącznie z warstw konwolucyjnych, liczba neuronów w ostatniej warstwie jest zależna od rozmiaru danych wejśćiowych i każdy z tych neuronów odpowiada, pewnemu elementowi z danych wejśćiowych, np. krokowi czasowemu lub pikselowi w obrazie\cite{fcn}. 
+Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z warstw konwolucyjnych, które mogą być zastosowane w problemach w których rozmiar danych wyjściowych, jest zależny od rozmiaru danych wejściowych, takich jak segmentacja obrazu\cite{segmentation} czy modelowanie sekwencji np. dzwięku i tekstu \cite{sequenceModelling}. Wykorzystują one fakt, że każdy neuron w sieci przetwarza tylko dane wejściowe znajdującym się w w jego otoczeniu, którego rozmiar zależy od rozmiaru filtrów w poprzedzających go warstwach. Zatem w sieci składające sie wyłącznie z warstw konwolucyjnych, liczba neuronów w ostatniej warstwie jest zależna od rozmiaru danych wejśćiowych i każdy z tych neuronów odpowiada, pewnemu elementowi z danych wejśćiowych, np. krokowi czasowemu lub pikselowi w obrazie\cite{fcn}.
+
+Czasowe sieci konwolucyjne(\textit{temporal convolutional networks}) to sieci w pełni konwolucyjne dostosowane do problemów, w których dane wejściowe zależą od czasu. Stosuje się w nich konwolucje przyczynowe(causal convolutions), czyli takie, w których predykcja dla kroku czasowego \textit{t} zależy tylko od danych wejśćiowych dla kroku czasowego \textit{t} i wcześniejszych. Aby zwiększyć pole recepcyjne wykorzystano konwolucje rozszerzone (\textit{dilated convolutions}). Polega ona na wykorzystaniu wartośći oddalonych o \textit{d} kroków czasowych przy obliczaniu wartości filtra, gdzie \textit{d} jest parameterem. Paramter ten jest zwiększany wykładniczo w kolejnych warstwach, co pozwala na wykorzystanie w predykcji danych dla oddalonych kroków czasowych.
+
+Czasowe sieci konwolucyjne znalazły zastosowanie w problemach, w których dane wejśćiowe są zależne od czasu np. tłumaczenie maszynowe\cite{fcnTranslation} i synteza dźwięku. Innym typem sieci znajdujących zastosowanie w tej klasie problemów są sieci LSTM\cite{lstm}, lecz zademonstrowano, że sieci w pełni konwolucyjne są w stanie osiągać lepsze wyniki, mimo mniejszego zużycia pamięci i krótszego czasu potrzebnego do wykonania obliczeń \cite{sequenceModelling}.
 \section*{WaveNet}
 
 \section*{CTC}
@@ -376,7 +386,7 @@ Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z wa
 \bibitem{nanoraw}Stoiber, M.H. et al. De novo Identification of DNA Modifications Enabled by Genome-Guided Nanopore Signal Processing. bioRxiv (2016).
 \bibitem{chironData} Teng H; Cao MD; Hall MB; Duarte T; Wang S; Coin LJM (2018): Supporting data for "Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning" GigaScience Database.
 \bibitem{resnet} K. He, X. Zhang, S. Ren and J. Sun, “Deep Residual Learning for Image Recognition,” in CVPR, 2016.
-\bibitem{resnetBlock}K. He, X. Zhang, S. Ren, and J. Sun. Identity Mappings in Deep Residual Networks. arXiv preprint arXiv:1603.05027v3,2016.
+\bibitem{preResnet}K. He, X. Zhang, S. Ren, and J. Sun. Identity Mappings in Deep Residual Networks. arXiv preprint arXiv:1603.05027v3,2016.
 \bibitem{cnn}Yann LeCunn, Leon Bottou, Yoshua Bengio, Patrick Haffner, Gradient-Based Learning Applied to Document Recognition, 1998
 \bibitem{vgg}Very Deep Convolutional Networks for Large-Scale Image Recognition Karen Simonyan, Andrew Zisserman
 \bibitem{cnnVideo} Exploiting Image-trained CNN Architectures for Unconstrained Video Classification Shengxin Zha, Florian Luisier, Walter Andrews, Nitish Srivastava, Ruslan Salakhutdinov
@@ -385,6 +395,11 @@ Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z wa
 \bibitem{segmentation} Recent progress in semantic image segmentation Xiaolong Liu, Zhidong Deng, Yuhan Yang
 \bibitem{sequenceModelling} An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling Shaojie Bai, J. Zico Kolter, Vladlen Koltun
 \bibitem{fcn}Fully Convolutional Networks for Semantic Segmentation Jonathan Long, Evan Shelhamer, Trevor Darrell
+\bibitem{DSN}Deeply-Supervised Nets Chen-Yu Lee, Saining Xie, Patrick Gallagher, Zhengyou Zhang, Zhuowen Tu
+\bibitem{denseNet}Densely Connected Convolutional Networks Gao Huang, Zhuang Liu, Laurens van der Maaten, Kilian Q. Weinberger
+\bibitem{fcnTranslation}Pervasive Attention: 2D Convolutional Neural Networks for Sequence-to-Sequence Prediction Maha Elbayad, Laurent Besacier, Jakob Verbeek
+\bibitem{lstm} Sepp Hochreiter; Jürgen Schmidhuber Long short-term memory. Neural Computation
+\bibitem{tcn} Nal Kalchbrenner  Lasse Espeholt  Karen Simonyan  A ̈aron van den Oord  Alex Graves  Koray Kavukcuoglu Neural Machine Translation in Linear Time
 \end{thebibliography}
 
 \thispagestyle{empty}
