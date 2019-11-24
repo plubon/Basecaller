@@ -78,29 +78,26 @@ def tcn_block(input, dilation):
     return tf.keras.layers.ReLU()(model)
 
 
-def tcn_block_both_direction(original, reversed, dilation):
+def tcn_block_both_directions(input, dilation):
+    model = input
     for _ in range(2):
-        conv = tf.keras.layers.Conv1D(filters=256,
-                                      kernel_size=3,
-                                      dilation_rate=dilation,
-                                      padding='causal')
-        original = conv(original)
-        reversed = conv(reversed)
-        bn = tf.keras.layers.BatchNormalization()
-        original = bn(original)
-        reversed = bn(reversed)
-        activation = tf.keras.layers.ReLU()
-        original = activation(original)
-        reversed = activation(reversed)
+        reversed = tf.reverse(model, [1])
+        model = tf.keras.layers.Conv1D(filters=128,
+                                       kernel_size=3,
+                                       dilation_rate=dilation,
+                                       padding='causal')(model)
+        reversed = tf.keras.layers.Conv1D(filters=128,
+                                       kernel_size=3,
+                                       dilation_rate=dilation,
+                                       padding='causal')(reversed)
+        model = tf.concat([model, tf.reverse(reversed, [1])], axis=-1)
+        model = tf.keras.layers.BatchNormalization()(model)
+        model = tf.keras.layers.ReLU()(model)
     jump = tf.keras.layers.Conv1D(filters=256,
                                   kernel_size=1,
-                                  padding='same')
-    jump_original = jump(original)
-    jump_reversed = jump(reversed)
-    original = tf.keras.layers.Add()([jump_original, original])
-    reversed = tf.keras.layers.Add()([jump_reversed, reversed])
-    relu = tf.keras.layers.ReLU()
-    return relu(original), relu(reversed)
+                                  padding='same')(input)
+    model = tf.keras.layers.Add()([jump, model])
+    return tf.keras.layers.ReLU()(model)
 
 
 def residual_block(input_layer, bn=False):

@@ -337,13 +337,29 @@ Sieci konwolucyjne(splotowe) to klasa głębokich sieci neuronowych wykorzystuj�
 W przypadku sieci konwolucyjnych składających się z wielu warstw występuje problem zanikającego gradientu, co znacznie spowalnia lub uniemożliwa uczenia takich sieci\cite{difficulty}.
 Architekturą, która próbuje rozwiązać tą trudność jest \textit{resNet}, osiągający jedne z najlepszych wyników w dziedzinie klasyfikacji obrazu. Sieci tego typu składają się z bloków zawierających połączenia omijające część warstw. Na wyjściu z każdego bloku znajduje się suma danych wejściowych i danych przetworzonych przez warstwy wenątrz bloku. Dzięki temu. sygnał nie zanika przed osiągnięciem dalszej części sieci. Umożliwiło to trenowanie sieci o większej liczbie warstw bez utraty celności predykcji.\cite{resnet}.
 
-Ulepszona wersja tej architektury została zaprezentowana w \cite{preResnet}. Autorzy propnują taką modyfikację sieci, aby dane wejściowe były dodawane do kolejnych warstw bez żadnych modyfikacji.We wcześniejszej wersji do danych wejśćiowych stosowano funkcje aktywacji i funkcje normalizujące. Zapobiega to zanikaniu gradientu nawet w sieciach składających się z tysiąca warstw. Dzięki temu można uniknąć efektu pogarszania się jakości predykcji wraz ze zwiekszaniem ilości warstw w sieci powyżej określonej liczby.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{resnet}
+	\caption{Schemat połączeń w sieci ResNet składającej się z 3 bloków.}
+\end{figure}
 
-Tu obrazek
+Ulepszona wersja tej architektury zawierająca mapowania identycznościowe została zaprezentowana w \cite{preResnet}. Autorzy propnują taką modyfikację sieci, aby dane wejściowe były dodawane do kolejnych warstw bez żadnych modyfikacji.We wcześniejszej wersji do danych wejśćiowych stosowano funkcje aktywacji i funkcje normalizujące. Zapobiega to zanikaniu gradientu nawet w sieciach składających się z tysiąca warstw. Dzięki temu można uniknąć efektu pogarszania się jakości predykcji wraz ze zwiekszaniem ilości warstw w sieci powyżej określonej liczby.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics{resnetBlock}
+	\caption{Konstrukcja bloku użytego w sieci resNet w wersji a) orygninalnej i b) z mapowaniem identycznościowym}
+\end{figure}
 
 \section{DenseNet}
 
 W architekturze DenseNet, będącej rozwnięciem idei wykorzystanych w ResNet, każda z warstw przekazuje do dalszej części sieci skontatenowane wyniki obliczeń wykonanych przez siebie i każdą z poprzednich warstw. Na wyjściu z sieci znajdują sie cechy obliczone, przez każdą z warstw w sieci - wynikami kolejnych warstw są cechy danych wejśćiowych coraz wyższego rzędu. Dzięki temu wszystkie warstwy w sieci podlegają nadzorowi, podobnie jak w sieciach DSN(Deeply-Supervised Nets)\cite{DSN}. Wykorzystanie cech obliczonych w począktwych warstwach w dalszej części sieci, umożliwia zastosowanie modeli o mniejszej liczbie parametrów. Klasyfikacja jest dokonywana na podstawie cech niskiego i wysokiego rzędu. Dzięki temu sieci typu DenseNet osiągają lepszą precyzję klasyfikacji, niż sieci typu ResNet, mimo zastosowania mniej złożonego modelu\cite{denseNet}. 
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{densenet}
+	\caption{Schemat połączeń w sieci DenseNet składającej się z 3 bloków.}
+\end{figure}
 
 \section*{Sieci w pełni konwolucyjne}
 
@@ -351,19 +367,37 @@ Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z wa
 
 Czasowe sieci konwolucyjne(\textit{temporal convolutional networks}) to sieci w pełni konwolucyjne dostosowane do problemów, w których dane wejściowe zależą od czasu. Stosuje się w nich konwolucje przyczynowe(causal convolutions), czyli takie, w których predykcja dla kroku czasowego \textit{t} zależy tylko od danych wejśćiowych dla kroku czasowego \textit{t} i wcześniejszych. Aby zwiększyć pole recepcyjne wykorzystano konwolucje rozszerzone (\textit{dilated convolutions}). Polega ona na wykorzystaniu wartośći oddalonych o \textit{d} kroków czasowych przy obliczaniu wartości filtra, gdzie \textit{d} jest parameterem. Paramter ten jest zwiększany wykładniczo w kolejnych warstwach, co pozwala na wykorzystanie w predykcji danych dla oddalonych kroków czasowych.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.5]{tcn}
+	\caption{Schemat przedstawiający połaczenia w sieci używającej konwolucji czasowych i przyczynowych.}
+\end{figure}
+
 Czasowe sieci konwolucyjne znalazły zastosowanie w problemach, w których dane wejśćiowe są zależne od czasu np. tłumaczenie maszynowe\cite{fcnTranslation} i synteza dźwięku. Innym typem sieci znajdujących zastosowanie w tej klasie problemów są sieci LSTM\cite{lstm}, lecz zademonstrowano, że sieci w pełni konwolucyjne są w stanie osiągać lepsze wyniki w wielu problemach, mimo mniejszego zużycia pamięci i krótszego czasu potrzebnego do wykonania obliczeń \cite{sequenceModelling}.
 
 \section*{WaveNet}
 
 Wavenet to głęboka sieć neuronowa wykorzystana oryginalnie do syntezy mowy\cite{wavenet}. Wykorzystano w niej konwolucje rozszerzone i przyczynowe tak jak w czasowych sieciach konwolucyjnych. Do wyniku obliczeń każdej z warstw konwolucyjnych stosuje sie funkcję sigmoidalną i tangens hiperboliczny. Do dalszej części sieci przekazywany iloczyn wyników zastosowania tych funkcji. Podobna operacja jest wykonywana w sieciach LSTM \cite{lstm}, i tak ja tam ma za zadanie znormalizowanie cech i wybranie, które z nich mają przekazane do dalszej części sieci. Dodatkowo wykorzystano połączenia rezydualne podobne do tych w sieci ResNet\cite{resnet}, a klasyfikacja jest dokonywana na podstawie sumy cech obliczonej przez każdą z warstw.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{wavenet_block}
+	\caption{Blok sieci Waveneta. Sieć składa się z pewnej liczby takich bloków połączonych w serii.}
+\end{figure}
+
 Sieci Wavenet udało się wygenerować mowę bardzo podobną do ludzkiej\cite{wavenet}, znalazła ona również zastosowanie w problemach rozpoznawania mowy, redukcji hałasu i generowania muzyki\cite{wavenetReview}.
 
 \section*{Dekodowanie CTC}
 
-Zarówno sieci konwolucyjne jak i sieci LSTM mogą przyjmować dane wejściowe różnych rozmiarów, ale rozmiar danych wyjściowych jest funkcją rozmiaru danych wejściowych. W celu zbudowania modelu, który dla danych o określonym rozmiarze może zwracać sekwencje różnych długości stosuje sie dekodowanie CTC(\textit{Connectionist Temporal Classification})\cite{ctc}. Dekoder CTC przyjmuje na wejśćiu macierz o rozmiarze \textit{(rozmiar alfabetu wyjśćiowego + 1, długość sekwencji wejśćiowej)}. Element macierzy na pozycji  \textit{(n, t)} opisuje prawdopodbieńśtwo, że krok czasowy \textit{t} danych wejśćiowych odpowiada \textit{n}-temu elementowi alfabetu wyjśćiowego. Ostatnia kolumna macierzy odpowiada prawdopobieństwu wystąpienia dodatkowego symbolu - znaku pustego odpowiadającemu granicom pomiędzy kolejnymi znakami w ciągu wyjściowym. 
+Zarówno sieci konwolucyjne jak i sieci LSTM mogą przyjmować dane wejściowe różnych rozmiarów, ale rozmiar danych wyjściowych jest funkcją rozmiaru danych wejściowych. W celu zbudowania modelu, który dla danych o określonym rozmiarze może zwracać sekwencje różnych długości stosuje sie dekodowanie CTC(\textit{Connectionist Temporal Classification})\cite{ctc}. Dekoder CTC przyjmuje na wejśćiu macierz o rozmiarze \textit{(rozmiar alfabetu wyjśćiowego + 1, długość sekwencji wejśćiowej)}. Element macierzy na pozycji  \textit{(n, t)} opisuje prawdopodbieńśtwo, że krok czasowy \textit{t} danych wejśćiowych odpowiada \textit{n}-temu elementowi alfabetu wyjśćiowego. Ostatni wiersz macierzy odpowiada prawdopobieństwu wystąpienia dodatkowego symbolu - znaku pustego odpowiadającemu granicom pomiędzy kolejnymi znakami w ciągu wyjściowym. 
 
 Sekwencje są enkodowane w tej macierzy przez ścieżki, które powstają poprzez wybranie jednego znaku dla każdego kroku czasowego. Ścieżka zostaje zamieniona na sekwencję wyjśćiową poprzez połączenie w nieprzerwanych podciągów składających się z jednego znaku w pojedyńczy symbol(AAAAAA -> A), a następnie usunięcie znaków pustych. Zatem sekwencje wyjśćiowe mogą być krótsze niż sekwencje wejściowe i mogą zawierać te same znaki na sąsiadujących pozycjach, w przypadku gdy w ścieżce znajduje się pomiędzy nimi znak pusty. Prawdopodbieńśtwo śćieżki jest zdefiniowane prez iloczyn prawdopodbieństw wybranych znaków dla każdego kroku czasowego.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.8]{ctc_array}
+	\caption{Przykład dekodowania CTC dla alfabetu wyjśćioweg {A,C,G,T} i sekwencji wejściowej długośći 6.}
+\end{figure}
 
 Prawdopodobieństwo sekwencji wyjściowej to suma prawdopodobieństw wszystkich ścieżek, które mogą zostać zamienione na tą sekwencję. Znalezienie optymalnego rozwiązania problemu wybrania ścieżki o największym prawdopodbieństwie jest zbyt skomplinowane obliczeniowo, więc zamiast tego stosuje się alogrytm zachłanny, który wybiera dla każdego kroku czasowego znak o największym prawdopodobieństwie lub algorytm \textit{beam search}, który dla każdego kolejnego kroku czasowego zapamiętuje określoną liczbę najlepszych kandydatów. W przypadku dokonywania predykcji przez model jako sekwencja wyjśćiowa wybierana jest ta znaleziona przez jeden z tych algorytmów.
 

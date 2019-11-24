@@ -196,7 +196,7 @@ class CnnTcnModelBothDirections:
         max_dilation = 64
         i = 1
         while i <= max_dilation:
-            jump, model = blocks.tcn_block(model, i)
+            jump, model = blocks.tcn_block_both_directions(model, i)
             skip_connections.append(jump)
             i = i * 2
         model = tf.keras.layers.Add()(skip_connections)
