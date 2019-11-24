@@ -66,7 +66,7 @@ class BaseFileParser:
         with tf.python_io.TFRecordWriter(test_filename) as writer:
             i = 1
             for file in self.files:
-                print(f"{i}/{len(self.files)}")
+                print(f"{i}/{len(self.files)}", flush=True)
                 examples = self.reader.read(os.path.join(self.input_path, file))
                 count += len(examples)
                 i = i + 1
