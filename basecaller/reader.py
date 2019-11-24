@@ -97,7 +97,7 @@ class H5FileReader:
                                                                                 current_start] + self.parser.segment_length]
                             normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
                             breaks = event_position[current_start + 1:i - 1] - event_position[current_start]
-                            current_seq = sequence[current_start:i - 1]
+                            current_seq = sequence[current_start:i]
                             example = TrainingExample(self.parser.get_id(), path, current_start, normalized_signal,
                                                       signal, current_seq, breaks)
                             examples.append(example)
@@ -158,7 +158,7 @@ class ChironFileReader:
                                                                                     current_start] + self.parser.segment_length]
                                 normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
                                 breaks = event_position[current_start + 1:i - 1] - event_position[current_start]
-                                current_seq = sequence[current_start:i - 1]
+                                current_seq = sequence[current_start:i]
                                 example = TrainingExample(self.parser.get_id(), path, current_start, normalized_signal,
                                                           signal, current_seq, breaks)
                                 examples.append(example)
@@ -228,7 +228,7 @@ class DirtyChironFileReader:
                                                                                     current_start] + self.parser.segment_length - back]
                                 normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
                                 breaks = event_position[current_start + 1:i - 1] - event_position[current_start]
-                                current_seq = sequence[current_start:i - 1]
+                                current_seq = sequence[current_start:i]
                                 example = TrainingExample(self.parser.get_id(), path, current_start, normalized_signal,
                                                           signal, current_seq, breaks)
                                 examples.append(example)
@@ -267,7 +267,7 @@ class OverlapChironFileReader:
                 signal_end = event_position[-skip]
                 examples = []
                 while current_signal_start + 300 < signal_end:
-                    current_seq = sequence[i:j - 1]
+                    current_seq = sequence[i:j]
                     if all([x in alphabet_dict.keys() for x in current_seq]) and len(current_seq)>2:
                         signal = dataset[current_signal_start:current_signal_start+300]
                         normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
@@ -275,7 +275,7 @@ class OverlapChironFileReader:
                         example = TrainingExample(self.parser.get_id(), path, i, normalized_signal,
                                                   signal, current_seq, breaks)
                         examples.append(example)
-                    current_signal_start = current_signal_start + 10
+                    current_signal_start = current_signal_start + 30
                     while event_position[i] < current_signal_start:
                         i = i + 1
                     while event_position[j] < current_signal_start + 300:
