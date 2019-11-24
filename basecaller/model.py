@@ -33,9 +33,142 @@ class ModelFactory:
             return DenseNetLstmModel(signal, config)
         if name.lower() == 'dense_wave_net':
             return DenseWaveNetModel(signal, config)
+        if name.lower() == 'cnn_lstm_identity':
+            return CnnLstmIdentityModel(signal, config)
+        if name.lower() == 'tcn_identity':
+            return CnnTcnIdentityModel(signal, config)
+        if name.lower() == 'wavenet_identity':
+            return WavenetIdentityModel(signal, config)
+        if name.lower() == 'cnn_lstm_dense':
+            return CnnLstmDenseModel(signal, config)
+        if name.lower() == 'tcn_dense':
+            return CnnTcnDenseModel(signal, config)
+        if name.lower() == 'wavenet_dense':
+            return WavenetDenseModel(signal, config)
         else:
             raise ValueError(f'No model with name: {name}')
 
+
+class WavenetDenseModel:
+
+    def __init__(self, signal, config):
+        growth_rate = 15
+        self.input = signal
+        self.config = config
+        features = signal
+        for i in range(11):
+            cb = tf.keras.layers.BatchNormalization()(features)
+            cb = tf.keras.layers.ReLU()(cb)
+            cb = tf.keras.layers.Conv1D(filters=growth_rate, kernel_size=3, use_bias=False, padding='same')(cb)
+            features = tf.concat([features, cb], axis=-1)
+        max_dilation = 64
+        dilation = 1
+        while dilation <= max_dilation:
+            reversed = tf.reverse(features, [1])
+            original_branch = blocks.wavenet_gate(features, dilation, 10)
+            reversed_branch = blocks.wavenet_gate(reversed, dilation, 10)
+            features = tf.concat([features, original_branch, reversed_branch], axis=-1)
+            dilation = dilation * 2
+        model = tf.keras.layers.Dense(5)(features)
+        self.logits = model
+
+
+class WavenetIdentityModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        max_dilation = 128
+        model = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(signal)
+        for i in range(5):
+            model = blocks.pre_activation_residual_block(signal)
+        i = 1
+        while i <= max_dilation:
+            model, _ = blocks.wavenet_identity_block(model, i)
+            i = i * 2
+        self.logits = tf.keras.layers.Dense(5)(model)
+
+
+class CnnTcnDenseModel:
+
+    def __init__(self, signal, config):
+        growth_rate = 15
+        self.input = signal
+        self.config = config
+        features = signal
+        for i in range(11):
+            cb = tf.keras.layers.BatchNormalization()(features)
+            cb = tf.keras.layers.ReLU()(cb)
+            cb = tf.keras.layers.Conv1D(filters=growth_rate, kernel_size=3, use_bias=False, padding='same')(cb)
+            features = tf.concat([features, cb], axis=-1)
+        max_dilation = 64
+        dilation = 1
+        while dilation <= max_dilation:
+            reversed = tf.reverse(features, [1])
+            model = tf.keras.layers.Conv1D(filters=10,
+                                           kernel_size=3,
+                                           dilation_rate=dilation,
+                                           padding='causal')(features)
+            reversed = tf.keras.layers.Conv1D(filters=10,
+                                              kernel_size=3,
+                                              dilation_rate=dilation,
+                                              padding='causal')(reversed)
+            features = tf.concat([features, model, reversed], axis=-1)
+            dilation = dilation * 2
+        model = tf.keras.layers.Dense(5)(features)
+        self.logits = model
+
+
+class CnnTcnIdentityModel:
+
+    def __init__(self, signal, config):
+        self.input = signal
+        self.config = config
+        model = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(signal)
+        for i in range(5):
+            model = blocks.pre_activation_residual_block(model)
+        max_dilation = 64
+        i = 1
+        while i <= max_dilation:
+            model = blocks.tcn_identity_block(model, i)
+            i = i * 2
+        self.logits = tf.keras.layers.Dense(5)(model)
+
+
+class CnnLstmDenseModel:
+    def __init__(self, signal, config):
+        growth_rate = 15
+        self.input = signal
+        self.config = config
+        features = signal
+        for i in range(11):
+            cb = tf.keras.layers.BatchNormalization()(features)
+            cb = tf.keras.layers.ReLU()(cb)
+            cb = tf.keras.layers.Conv1D(filters=growth_rate, kernel_size=3, use_bias=False, padding='same')(cb)
+            features = tf.concat([features, cb], axis=-1)
+        for _ in range(3):
+            cb = tf.keras.layers.Bidirectional(
+                tf.keras.layers.LSTM(growth_rate, return_sequences=True), merge_mode='concat')(features)
+            features = tf.concat([features, cb], axis=-1)
+        model = tf.keras.layers.Dense(5)(features)
+        self.logits = model
+
+
+class CnnLstmIdentityModel:
+    def __init__(self, signal, config):
+        hidden_num = 128
+        self.input = signal
+        self.config = config
+        model = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(signal)
+        for i in range(5):
+            model = blocks.pre_activation_residual_block(model)
+        model = blocks.lstm_identity_block(model)
+        weight_bi = tf.Variable(tf.truncated_normal([2, hidden_num], stddev=np.sqrt(2.0 / (2*hidden_num))))
+        bias_bi = tf.Variable(tf.zeros([hidden_num]))
+        model = tf.reshape(model, [tf.shape(model)[0], 300, 2, hidden_num])
+        model = tf.nn.bias_add(tf.reduce_sum(tf.multiply(model, weight_bi), axis=2), bias_bi)
+        model = tf.keras.layers.Dense(5)(model)
+        self.logits = model
 
 class PlaceholderModel:
 

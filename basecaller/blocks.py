@@ -51,6 +51,15 @@ def wavenet_block(input, dilation, params=None):
     return res, skip
 
 
+def wavenet_identity_block(input_layer, dilation):
+    reversed = tf.reverse(input_layer, [1])
+    original_branch = wavenet_gate(input_layer, dilation, 128)
+    reversed_branch = wavenet_gate(reversed, dilation, 128)
+    merged = tf.concat([original_branch, tf.reverse(reversed_branch, [1])], axis=-1)
+    res = tf.keras.layers.Add()([input_layer, merged])
+    return res, merged
+
+
 def wavenet_bidirectional_block(input, dilation):
     reversed = tf.reverse(input, [1])
     original_branch = wavenet_gate(input, dilation, 128)
@@ -129,6 +138,33 @@ def pre_activation_residual_block(input_layer):
     sum_layer = tf.keras.layers.Add()([layer, input_layer])
     return sum_layer
 
+
+def lstm_identity_block(input_layer):
+    model = input_layer
+    for _ in range(3):
+        lstm = tf.keras.layers.Bidirectional(
+            tf.keras.layers.LSTM(128, return_sequences=True), merge_mode='concat')(model)
+        model = tf.keras.layers.Add()([lstm, model])
+    return model
+
+
+def tcn_identity_block(input_layer, dilation):
+    model = input_layer
+    for _ in range(2):
+        reversed = tf.reverse(model, [1])
+        model = tf.keras.layers.Conv1D(filters=128,
+                                       kernel_size=3,
+                                       dilation_rate=dilation,
+                                       padding='causal')(model)
+        reversed = tf.keras.layers.Conv1D(filters=128,
+                                       kernel_size=3,
+                                       dilation_rate=dilation,
+                                       padding='causal')(reversed)
+        model = tf.concat([model, tf.reverse(reversed, [1])], axis=-1)
+        model = tf.keras.layers.BatchNormalization()(model)
+        model = tf.keras.layers.ReLU()(model)
+    model = tf.keras.layers.Add()([input_layer, model])
+    return model
 
 def lstm_block(input):
     model = input
