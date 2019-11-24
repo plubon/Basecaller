@@ -84,15 +84,15 @@ class EvalDataExtractor:
             reader = H5FileReader()
         else:
             reader = ChironFileReader()
-        signal, label, index = reader.read_for_eval(os.path.join(self.data_dir, filename.split('.')[0]))
+        signal, index = reader.read_for_eval(os.path.join(self.data_dir, filename.split('.')[0]))
         if len(signal) == 0:
             self.current_file = self.current_file + 1
-            return [], [], [], [], []
+            return [], [], [], []
         signal = np.expand_dims(np.stack(signal).astype(np.float32), -1)
         index = np.array(index)
         lengths = np.repeat(300, index.shape[0])
         self.current_file = self.current_file + 1
-        return signal, lengths, label, index, filename
+        return signal, lengths, index, filename
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from utils import string_label_to_int, write_dict_to_file
 from sklearn.model_selection import train_test_split
 from entities import TrainingExample
-from reader import ChironFileReader, H5FileReader, DirtyChironFileReader
+from reader import ChironFileReader, H5FileReader, DirtyChironFileReader, OverlapChironFileReader
 import os
 import tensorflow as tf
 
@@ -64,9 +64,12 @@ class BaseFileParser:
         count = 0
         test_filename = os.path.join(self.output_path, 'dataset.tfrecords')
         with tf.python_io.TFRecordWriter(test_filename) as writer:
+            i = 1
             for file in self.files:
+                print(f"{i}/{len(self.files)}")
                 examples = self.reader.read(os.path.join(self.input_path, file))
                 count += len(examples)
+                i = i + 1
                 for example in examples:
                     writer.write(self.get_tf_example(example).SerializeToString())
         info_filename = os.path.join(self.output_path, 'info.json')
@@ -114,5 +117,20 @@ class DirtyFileParser(BaseFileParser):
             return H5FileReader(self)
         elif format == 'chiron':
             return DirtyChironFileReader(self)
+        else:
+            raise ValueError(f"Format was {format}, but it must be one of {', '.join(self.known_formats)}.")
+
+class OverlapFileParser(BaseFileParser):
+
+    def __init__(self, input_path, output_path, seg_length=300, skip=10, format='h5', test_size=0.2, val_size=0.2):
+        super().__init__(input_path, output_path, seg_length, skip, format, test_size, val_size)
+
+    known_formats = ['h5', 'chiron']
+
+    def get_reader(self, format):
+        if format == 'h5':
+            return H5FileReader(self)
+        elif format == 'chiron':
+            return OverlapChironFileReader(self)
         else:
             raise ValueError(f"Format was {format}, but it must be one of {', '.join(self.known_formats)}.")

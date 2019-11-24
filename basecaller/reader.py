@@ -168,43 +168,21 @@ class ChironFileReader:
                 return examples
 
     def read_for_eval(self, path):
-        with open(path + '.label', 'r') as label_file:
-            with open(path + '.signal', 'r') as signal_file:
-                dataset = signal_file.readlines()
-                dataset = dataset[0].strip()
-                dataset = dataset.split(' ')
-                dataset = [int(x) for x in dataset]
-                corrected_events_array = label_file.readlines()
-                corrected_events_array = [x.strip() for x in corrected_events_array]
-                corrected_events_array = [x.split(' ') for x in corrected_events_array]
-                event_position = np.array([int(x[0]) for x in corrected_events_array])
-                event_length = np.array([int(x[1]) - int(x[0]) for x in corrected_events_array])
-                sequence = np.array([x[2] for x in corrected_events_array])
-                segments = []
-                labels = []
-                indices = []
-                signal_index = event_position[0]
-                label_index = 0
-                end = event_position[-1] + event_length[-1]
-                while signal_index + 300 < end and signal_index + 300 < len(dataset):
-                    signal = dataset[signal_index:signal_index + 300]
-                    normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
-                    label_end = label_index + 1
-                    while label_end < len(event_position) and event_position[label_end] <= signal_index + 300:
-                        label_end = label_end + 1
-                    label = sequence[label_index:label_end]
-                    for idx, char in enumerate(label):
-                        if char not in alphabet_dict.keys():
-                            label[idx] = b'A'
-                    segments.append(normalized_signal)
-                    labels.append(label)
-                    indices.append(signal_index)
-                    signal_index = signal_index + 30
-                    if signal_index + 300 >= end:
-                        break
-                    while label_index + 1 < len(event_position) and event_position[label_index + 1] < signal_index:
-                        label_index = label_index + 1
-                return segments, labels, indices
+        with open(path + '.signal', 'r') as signal_file:
+            dataset = signal_file.readlines()
+            dataset = dataset[0].strip()
+            dataset = dataset.split(' ')
+            dataset = [int(x) for x in dataset]
+            segments = []
+            indices = []
+            signal_index = 40
+            while signal_index + 300 < len(dataset) - 40:
+                signal = dataset[signal_index:signal_index + 300]
+                normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
+                segments.append(normalized_signal)
+                indices.append(signal_index)
+                signal_index = signal_index + 30
+            return segments, indices
 
 
 class DirtyChironFileReader:
@@ -214,17 +192,6 @@ class DirtyChironFileReader:
 
     def filter_files(self, files):
         return [x for x in files if x.endswith('signal') or x.endswith('label')]
-
-    def read_entire_sequence(self, path):
-        with open(path, 'r') as label_file:
-            corrected_events_array = label_file.readlines()
-            corrected_events_array = [x.strip() for x in corrected_events_array]
-            corrected_events_array = [x.split(' ') for x in corrected_events_array]
-            sequence = np.array([x[2] for x in corrected_events_array])
-            for idx, char in enumerate(sequence):
-                if char not in alphabet_dict.keys():
-                    sequence[idx] = 'A'
-            return ''.join(sequence)
 
     def read(self, path):
         skip = 4
@@ -270,7 +237,17 @@ class DirtyChironFileReader:
                             i += 1
                 return examples
 
-    def read_for_eval(self, path):
+
+class OverlapChironFileReader:
+
+    def __init__(self, parser=None):
+        self.parser = parser
+
+    def filter_files(self, files):
+        return [x for x in files if x.endswith('signal') or x.endswith('label')]
+
+    def read(self, path):
+        skip = 4
         with open(path + '.label', 'r') as label_file:
             with open(path + '.signal', 'r') as signal_file:
                 dataset = signal_file.readlines()
@@ -281,30 +258,26 @@ class DirtyChironFileReader:
                 corrected_events_array = [x.strip() for x in corrected_events_array]
                 corrected_events_array = [x.split(' ') for x in corrected_events_array]
                 event_position = np.array([int(x[0]) for x in corrected_events_array])
-                event_length = np.array([int(x[1]) - int(x[0]) for x in corrected_events_array])
                 sequence = np.array([x[2] for x in corrected_events_array])
-                segments = []
-                labels = []
-                indices = []
-                signal_index = event_position[0]
-                label_index = 0
-                end = event_position[-1] + event_length[-1]
-                while signal_index + 300 < end and signal_index + 300 < len(dataset):
-                    signal = dataset[signal_index:signal_index + 300]
-                    normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
-                    label_end = label_index + 1
-                    while label_end < len(event_position) and event_position[label_end] <= signal_index + 300:
-                        label_end = label_end + 1
-                    label = sequence[label_index:label_end]
-                    for idx, char in enumerate(label):
-                        if char not in alphabet_dict.keys():
-                            label[idx] = b'A'
-                    segments.append(normalized_signal)
-                    labels.append(label)
-                    indices.append(signal_index)
-                    signal_index = signal_index + 30
-                    if signal_index + 300 >= end:
-                        break
-                    while label_index + 1 < len(event_position) and event_position[label_index + 1] < signal_index:
-                        label_index = label_index + 1
-                return segments, labels, indices
+                i = skip
+                current_signal_start = event_position[i]
+                j = i
+                while event_position[j] <= current_signal_start + 300:
+                    j = j + 1
+                signal_end = event_position[-skip]
+                examples = []
+                while current_signal_start + 300 < signal_end:
+                    current_seq = sequence[i:j - 1]
+                    if all([x in alphabet_dict.keys() for x in current_seq]) and len(current_seq)>2:
+                        signal = dataset[current_signal_start:current_signal_start+300]
+                        normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
+                        breaks = event_position[i + 1:j - 1] - event_position[i]
+                        example = TrainingExample(self.parser.get_id(), path, i, normalized_signal,
+                                                  signal, current_seq, breaks)
+                        examples.append(example)
+                    current_signal_start = current_signal_start + 10
+                    while event_position[i] < current_signal_start:
+                        i = i + 1
+                    while event_position[j] < current_signal_start + 300:
+                        j = j + 1
+                return examples
