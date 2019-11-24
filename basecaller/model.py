@@ -17,6 +17,8 @@ class ModelFactory:
             return TcnModel(signal, config)
         if name.lower() == 'cnn_tcn':
             return CnnTcnModel(signal, config)
+        if name.lower() == 'cnn_tcn_bidirectional':
+            return CnnTcnModelBothDirections(signal, config)
         if name.lower() == 'wavenet':
             return WavenetModel(signal, config)
         if name.lower() == 'wavenet_bidirectional':
