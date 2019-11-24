@@ -5,7 +5,7 @@ import os
 import tensorflow as tf
 import sys
 import json
-from parser import CleanFileParser, DirtyFileParser
+from parser import CleanFileParser, DirtyFileParser, OverlapFileParser
 
 
 class DatasetExtractor:
@@ -96,5 +96,5 @@ class EvalDataExtractor:
 
 
 if __name__ == "__main__":
-    parser = DirtyFileParser(sys.argv[1], sys.argv[2], format=sys.argv[3])
+    parser = OverlapFileParser(sys.argv[1], sys.argv[2], format=sys.argv[3])
     parser.create()
