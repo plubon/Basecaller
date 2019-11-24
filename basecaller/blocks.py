@@ -75,11 +75,11 @@ def tcn_block(input, dilation):
                                   kernel_size=1,
                                   padding='same')(input)
     model = tf.keras.layers.Add()([jump, model])
-    return tf.keras.layers.ReLU()(model)
+    return jump, tf.keras.layers.ReLU()(model)
 
 
-def tcn_block_both_directions(input, dilation):
-    model = input
+def tcn_block_both_directions(input_layer, dilation):
+    model = input_layer
     for _ in range(2):
         reversed = tf.reverse(model, [1])
         model = tf.keras.layers.Conv1D(filters=128,
@@ -95,9 +95,9 @@ def tcn_block_both_directions(input, dilation):
         model = tf.keras.layers.ReLU()(model)
     jump = tf.keras.layers.Conv1D(filters=256,
                                   kernel_size=1,
-                                  padding='same')(input)
+                                  padding='same')(input_layer)
     model = tf.keras.layers.Add()([jump, model])
-    return tf.keras.layers.ReLU()(model)
+    return jump, tf.keras.layers.ReLU()(model)
 
 
 def residual_block(input_layer, bn=False):
