@@ -64,7 +64,7 @@ def eval_assemble(model_dir, data_dir, out_dir):
     logits_input = tf.placeholder(tf.float32, shape=(None, 300, 5), name='d1')
     len_input = tf.placeholder(tf.int32, shape=(None,), name='d2')
     decoded = tf.nn.ctc_beam_search_decoder(tf.transpose(logits_input, perm=[1, 0, 2], name='d4'),
-                                            tf.cast(len_input, tf.int32, name='d3'), merge_repeated=False, name='d5')[0][0]
+                                            tf.cast(len_input, tf.int32, name='d3'), merge_repeated=False)[0][0]
     decoded_out = tf.sparse.to_dense(decoded, default_value=-1, name='d6')
     assembler = AssemblerFactory.get('simple')
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
