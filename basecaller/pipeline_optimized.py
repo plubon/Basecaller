@@ -88,7 +88,7 @@ def eval_assemble(model_dir, data_dir, out_dir):
                 logits_list.append(logits)
                 batch_index = batch_index + eval_batch_size
             file_logits = np.concatenate(logits_list, axis=0)
-            size = logits.shape[0]
+            size = file_logits.shape[0]
             decoded = sess.run(decoded_out, feed_dict={
                 logits_input: file_logits,
                 len_input: np.full(size, 300)})
