@@ -73,7 +73,7 @@ class EvalDataExtractor:
         self.current_row = 0
         self.limit = None
 
-    def limit(self, limit):
+    def set_limit(self, limit):
         self.limit = limit
 
     def filter(self, name):
