@@ -11,7 +11,8 @@ import sys
 from tensorflow.python import debug as tf_debug
 from utils import log_to_file
 
-def train(config_path, train_dataset_path, val_dataset_path, output_path):
+def train(config_path, train_dataset_path, val_dataset_path, output_path, early_stop=False):
+    keep_training = True
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     copyfile(config_path, os.path.join(output_path, 'config.json'))
@@ -47,7 +48,9 @@ def train(config_path, train_dataset_path, val_dataset_path, output_path):
     steps = 0
     previous_print_length = 0
     losses = []
-    while True:
+    prev_val_distance = None
+    prev_val_loss = None
+    while keep_training:
         try:
             loss_value, _ = sess.run([optimizer.loss, optimizer.optimizer],
                                      feed_dict={dataset_handle: training_handle})
@@ -61,7 +64,7 @@ def train(config_path, train_dataset_path, val_dataset_path, output_path):
             print(message, end='', flush=True)
             if steps >= train_size:
                 saver.save(sess, os.path.join(output_path, f"model.ckpt"))
-                if config.validate:
+                if config.validate or early_stop:
                     distances = []
                     val_losses = []
                     sess.run(val_iterator.initializer)
@@ -78,6 +81,11 @@ def train(config_path, train_dataset_path, val_dataset_path, output_path):
                             break
                     mean_distance = np.mean(distances)
                     mean_val_loss = np.mean(val_losses)
+                    if prev_val_distance is not None and prev_val_loss is not None:
+                        if prev_val_distance < mean_distance and prev_val_loss < mean_val_loss:
+                            keep_training = False
+                    prev_val_loss = mean_val_loss
+                    prev_val_distance = mean_distance
                     print(flush=True)
                     log_message = f"Epoch: {epoch} Validation Loss: {mean_val_loss} Edit Distance: {mean_distance}"
                     print(log_message, flush=True)
