@@ -80,7 +80,10 @@ class EvalDataExtractor:
         self.files = [x for x in self.files if name in x]
 
     def get_size(self):
-        return len(self.files)
+        size = len(self.files)
+        if self.limit is not None and self.limit < len(self.files):
+            size = self.limit
+        return size
 
     def has_next_file(self):
         size = len(self.files)

@@ -98,7 +98,6 @@ def eval_assemble(model_dir, data_dir, out_dir):
             with open(os.path.join(out_dir, out_filename), 'w') as out_file:
                 out_file.write(predicted_seq)
             print(f"Processed file :{filename}", flush=True)
-            calculate()
 
 
 if __name__ == "__main__":
