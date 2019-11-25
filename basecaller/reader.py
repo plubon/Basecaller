@@ -276,8 +276,10 @@ class OverlapChironFileReader:
                                                   signal, current_seq, breaks)
                         examples.append(example)
                     current_signal_start = current_signal_start + 30
-                    while event_position[i] < current_signal_start:
+                    while i < len(event_position) and event_position[i] < current_signal_start:
                         i = i + 1
-                    while event_position[j] < current_signal_start + 300:
+                    while j < len(event_position) and event_position[j] < current_signal_start + 300:
                         j = j + 1
+                    if i >= len(event_position) or j >= len(event_position):
+                        break
                 return examples
