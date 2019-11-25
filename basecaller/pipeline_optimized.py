@@ -10,6 +10,7 @@ import numpy as np
 from data import EvalDataExtractor
 from assembler import AssemblerFactory
 from utils import int_label_to_string
+from calculate_metrics import calculate
 eval_batch_size = 250
 
 
@@ -47,13 +48,16 @@ def run(config_path,
         print("Skipping training since saved model is present", flush=True)
     eval_start = datetime.fromtimestamp(time.time()).isoformat()
     log_time(output_path, 'eval_start', eval_start)
-    eval_assemble(output_path, raw_data_path, output_path)
+    eval_assemble(output_path, raw_data_path, os.path.join(output_path, 'fasta'))
     eval_end = datetime.fromtimestamp(time.time()).isoformat()
     log_time(output_path, 'eval_end', eval_end)
     print('Finished eval', flush=True)
+    calculate(os.path.join(output_path, 'fasta'), output_path)
 
 
 def eval_assemble(model_dir, data_dir, out_dir):
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
     data_extractor = EvalDataExtractor(data_dir)
     data_extractor.filter('coli')
     data_extractor.limit(200)
@@ -94,6 +98,7 @@ def eval_assemble(model_dir, data_dir, out_dir):
             with open(os.path.join(out_dir, out_filename), 'w') as out_file:
                 out_file.write(predicted_seq)
             print(f"Processed file :{filename}", flush=True)
+            calculate()
 
 
 if __name__ == "__main__":
