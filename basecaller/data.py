@@ -63,7 +63,7 @@ class DatasetExtractor:
 
 class EvalDataExtractor:
 
-    def __init__(self, data_dir, file_list):
+    def __init__(self, data_dir, file_list=None):
         self.data_dir = data_dir
         self.files = os.listdir(data_dir)
         self.files = [x for x in self.files if x.endswith('fast5') or x.endswith('signal')]
@@ -71,12 +71,22 @@ class EvalDataExtractor:
             self.files = [x for x in self.files if x.split('.')[0] in file_list]
         self.current_file = 0
         self.current_row = 0
+        self.limit = None
+
+    def limit(self, limit):
+        self.limit = limit
+
+    def filter(self, name):
+        self.files = [x for x in self.files if name in x]
 
     def get_size(self):
         return len(self.files)
 
     def has_next_file(self):
-        return self.current_file < len(self.files)
+        size = len(self.files)
+        if self.limit is not None and self.limit < len(self.files):
+            size = self.limit
+        return self.current_file < size
 
     def extract_next_file(self):
         filename = self.files[self.current_file]
