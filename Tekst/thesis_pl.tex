@@ -302,20 +302,49 @@ samodzielnie, co poświadczam własnoręcznym podpisem.
 \markboth{}{Wstęp}
 \addcontentsline{toc}{chapter}{Wstęp}
 
+\chapter*{Opis problemu}
+
 \section*{DNA}
+
+DNA to molekuła składająca się z dwóch zwiniętych siebie nici tworzących podwójną helisę. DNA jest nośnikiem informacji genetycznej, przenoszącej instrukcje dotyczące rozwoju, funkcjonowania i reprodukcji wszystkich znanych organizmów żyjących i niektórych wirusów. Podstawowym składnikiem budującym DNA są nukleotydy. Każdy z nich zawiera jedną z czterech z zasad: adeninę, cytozynę, guaninę lub tyminę, często oznaczane pierwszą literą nazwy (odpowiednio A, C, G lub T). Sekwencja tych baz w DNA definiuje kod genetyczny. Kompletny kod genetyczny organizmu jest nazywany genomem. Długośc genomu znacznie róźni się pomiędzy gatunkami.
+
+
+\begin{table}
+\centering
+\begin{tabular}{ll}
+	Bakteria e. coli                                                                           & $\sim$4.6 miliona  \\
+	\begin{tabular}[c]{@{}l@{}}Schizosaccharomyces pombe\\ (grzyb jednokomórkowy)\end{tabular} & $\sim$12.5 miliona \\
+	\begin{tabular}[c]{@{}l@{}}Drosophila melanogaster\\ (muszka owocowa)\end{tabular}         & $\sim$170 milionów \\
+	Oryza sativa (ryż)                                                                         & $\sim$470 milionów \\
+	Canis familiaris (pies)                                                                    & $\sim$2.4 miliarda \\
+	Homo sapiens (czlowiek)                                                                    & $\sim$2.9 miliarda
+\end{tabular}
+\caption{\label{}Liczba par zasad w genomach wybranych organizmów.}
+\end{table}
 
 \section*{Sekwencjonowanie DNA}
 
-\subsection*{Technologie sekwencjonowania DNA}
+Sekwencjonowanie DNA to proces ropoznawania sekwencji DNA danego organizmu. Wczesne metody sekwencjonowania (np. metoda Sangera opracowana w 1977 r. \cite{sequencingTechnologies}) były zbyt kosztowne do powszechnych zastosowań, lecz metody dugiej i trzeciej generacji umożliwiły zbadanie DNA organizmów na szerszą skalę i wykorzystanie tej wiedzy w celach takich jak badanie odpornośći na nowotwory\cite{cancerImmunity} i przyczyn zachorwania na nie\cite{cancerNonCoding}, badanie historii adaptacji w procesie ewolucji człowieka \cite{adaptation}, medycyna spersonalizowana do kodu genetycznego człowieka \cite{personalizedMedicine}, badania prenatalne \cite{prenatal} i diagnostyka chorób o podłożu genetycznym\cite{diagnosis}.
 
-\chapter*{Opis problemu}
+Wynikiem sekwencjonowania jest fragment całego genomu. nazywanym odczytem(\textit{read}). Długośc odczytów jest zależna od użytej technologii - sekwencjonowanie technologią produkuje odczyty o długośći do 600 par zasad przy celności do 99.9\%, a przy użyciu technologii PacBio odczyty osiągają długośc nawet do 100 tysięcy par zasad przy celnośći 87\%. Odczyty są dopasowywane i łączone tak aby otrzymać cały genom(po angielsku ten proces jest nazywany \textit{genome assembly}).  Pomimo większej ilośći błędów w długich odczytach są one potrzebne do dopasowania regionów repetytywnych, czyli podsekwencji genomu występujących w nim wielokrotnie. Dla tego do składania genomu wykorzystuje się zarówno odczyty długie i krótkie.
 
 \section*{Oxford Nanopore MinION}
-Zalety, opis dlaczego potrzebny jest basecalling, co to jest basecalling, jak wyglądają dane
+
+Oxford Nanopore MinION to technologia sekwencjonowania dostępna publicznie od maja 2015 r. produkująca długie odczyty, nawet do 2 milionów par zasad. Wykorzystuje ona pory przez, które przepływa pojedyncza nić DNA. Wewnątrz nich mierzony jest sygnał elektryczny, które zmieniy się w zależności od tego, które nukleotydy znadują się wewnątrz poru. Na podstawie tego sygnału jest możliwe rozponanie sewkwencji DNA, nawet w trakcie procesu sekwencjonowania. Urządznie MinION jest bardzo przenośne (ma rozmiar zszywacza) i jego koszt jest znacznie mniejszy niż konkurencyjnych urządzeń. 
+
+Proces rozpoznawania baz na podstawie sygnału elektrycznego wewnątrz poru nazywany jest basecallingiem. Jakość oprogramowania użytego do basecallingu (nazywanego basecallerem) ma znaczny wpływ na celność odczytów pochodzących z MinIONa.
 
 \section*{Istniejące rozwiązania}
-istniejące basecallery
 
+Oxford Nanopore Technologies (producent MinIONa) oferuje kilka basecallerów. Są to oficjalny basecaller Albacore, Guppy wykorzystujący procesory graficzne i Scrappie opisany przez producenta jako "demonstracja technologii". W przeszłości ONT oferowało również NanoNet oparty o sieci neuronowe, a także Metrichor działający w chmurze obliczeniowej.
+
+Opublikowano również następujące basecallery z otwartym kodem źródłowym pochodzące od społecznośći badawczej.
+
+DeepNano\cite{deepNano} wykonuje proces basecallingu w dwóch krokach. W pierwszym sygnał jest dzielony na fragmenty odpowiadjące k-merom. W drugim dwukierunkowa rekurencyjna sieć neuronowa wykorzystuje statystyki powstałych w pierwszym kroku fragmentów do przewidzenia k-meru odpowiadjącemu każdemu fragmentowi. 
+
+BasecRAWller\cite{basecrawler} wykorzystuje dwie rekurencyjne sieci neuronowe. Pierwsza z nich przewiduje dla każdego kroku czasowego w sygnale wejściowym prawdopodobieństwo tego, że jest on granicą pomiędzy segmentom sygnału odpowiadjącego kolejnym nukleotydom. Druga mapuje w ten sposób powstałe segmenty na odpowiadające nim bazy.
+
+Chiron\cite{chiron} tłumaczy sygnał elektryczny bezpośrednio na sekwencję DNA. Wykorzystuje on model oparty o sieci konwolucyjne, sieci rekurencyjne i dekodowanie CTC.
 \chapter*{Opis rozwiązania}
 
 \section*{Przygotowanie zbiorów danych danych}
@@ -329,6 +358,17 @@ W celu poprawienia generalności rozwiązania do uczenia sieci wykorzystano rów
 \section*{Eksploracyjna analiza danych}
 
 \section*{Reprezentacja i przygotowanie danych wejściowych}
+
+\section{ReLU}
+
+Funkcje aktywacji są stosowane w sieciach neuronowych w celu dodania nieliniowości do modelu. Są one stosowane do wyniku obliczeń warstw wewnątrz sieci. \textit{Recitified linear unit} czyli ReLU jest funkcją aktywacji daną wzorem
+\[Relu(x) = max(0,x)\]
+
+\section{\textit{Batch Normalization}}
+
+\textit{Batch normalization} to metoda przyspieszająca uczenie sieci neuronowych, polegająca na normalizacji danych wejśćiowych do warstw ukrytych. Dzięki temu rozkład wartości aktywacji tych warstw pozostaje taki sam podczas całego procesu uczenia sieci. Wynik zastosowania \textit{Batch normalization } dla danych wejściowy $h$ jest danym wzorem:
+\[BN(h, \lambda, \beta)=\beta+\lambda\frac{h-\hat{E}}{\sqrt{\hat{Var}(h)+\epsilon}}\]
+gdzie $\lambda$ i $\beta$ są wagami nauczonymi przez sieć a $\epsilon$ to parametr regularyzujący.
 
 \section*{Sieci konwolucyjne, ResNet}
 
@@ -430,9 +470,21 @@ gdzie $p(x|z)$ to prawdopobieńśtwo prawdziwej sekwencji dla danej macierzy pra
 \begin{thebibliography}{20}%jak ktoś ma więcej książek, to niech wpisze większą liczbę
 % \bibitem[numerek]{referencja} Autor, \emph{Tytuł}, Wydawnictwo, rok, strony
 % cytowanie: \cite{referencja1, referencja 2,...}
-
+\bibitem{genome}James Fraser, Iain Williamson, Wendy A. Bickmore,  Josée Dostie, An Overview of Genome Organization and How We Got There: from FISH to Hi-C
+\bibitem{cancerImmunity}Finotello, F., Rieder, D., Hackl, H. et al. Next-generation computational tools for interrogating cancer immunity. Nat Rev Genet 20, 724–746 (2019) doi:10.1038/s41576-019-0166-7
+\bibitem{cancerNonCoding}Khurana, E., Fu, Y., Chakravarty, D. et al. Role of non-coding sequence variants in cancer. Nat Rev Genet 17, 93–108 (2016) doi:10.1038/nrg.2015.17
+\bibitem{adaptation} Marciniak, S., Perry, G. Harnessing ancient genomes to study the history of human adaptation. Nat Rev Genet 18, 659–674 (2017) doi:10.1038/nrg.2017.65
+\bibitem{personalizedMedicine} Ashley, E. Towards precision medicine. Nat Rev Genet 17, 507–522 (2016) doi:10.1038/nrg.2016.86
+\bibitem{prenatal} Chiu, R. W. et al. Noninvasive prenatal diagnosis of fetal chromosomal aneuploidy by massively parallel genomic sequencing of DNA in maternal plasma. Proc. Natl Acad. Sci. USA105, 20458–20463 (2008)
+\bibitem{diagnosis} Choi, M. et al. Genetic diagnosis by whole exome capture and massively parallel DNA sequencing. Proc. Natl Acad. Sci. USA106, 19096–19101 (2009).
+\bibitem{sequencingComparison} Liu L, Li Y, Li S, Hu N, He Y, Pong R, Lin D, Lu L, Law M (1 January 2012). "Comparison of Next-Generation Sequencing Systems". Journal of Biomedicine and Biotechnology. 2012: 251364. doi:10.1155/2012/251364.
+\bibitem{sequencing} Jay Shendure Shankar Balasubramanian, George M. Church, Walter Gilbert, Jane Rogers, Jeffery A. Schloss, Robert h. Waterston DNA sequencing at 40: past, present and future
+\bibitem{sequencingTechnologies} James M.Heather, Benjamin Chain The sequence of sequencers: The history of sequencing DNA
 \bibitem{refGenome} Susan Fairley, Ernesto Lowy-Gallego, Emily Perry, Paul Flicek, The International Genome Sample Resource (IGSR) collection of open human genomic variation resources, Nucleic Acids Research.
 \bibitem{nanoporeHuman} Miten Jain, Sergey Koren, Karen H Miga, Josh Quick, Arthur C Rand, Thomas A Sasani, John R Tyson, Andrew D Beggs, Alexander T Dilthey, Ian T Fiddes, Sunir Malla, Hannah Marriott, Tom Nieto, Justin O'Grady, Hugh E Olsen, Brent S Pedersen, Arang Rhie, Hollian Richardson, Aaron R Quinlan, Terrance P Snutch, Louise Tee, Benedict Paten, Adam M Phillippy, Jared T Simpson, Nicholas J Loman \& Matthew Loose. Nanopore sequencing and assembly of a human genome with ultra-long reads. Nature Biotechnology
+\bibitem{deepNano}Boza, V., Brejova, B. \& Vinar, T. Deepnano: Deep recurrent neural networks for base calling in minion nanopore reads.PloS one12, e0178751 (2017).
+\bibitem{basecrawler}Stoiber, M. \& Brown, J. Basecrawller: Streaming nanopore basecalling directly from raw signal.bioRxiv133058 (2017).
+\bibitem{chiron} Haotian Teng, Minh Duc Cao, Michael B Hall, Tania Duarte, Sheng Wang, Lachlan J M Coin, Chiron: translating nanopore raw signal directly into nucleotide sequence using deep learning, GigaScience, Volume 7, Issue 5, May 2018, giy037, https://doi.org/10.1093/gigascience/giy037
 \bibitem{nanoraw}Stoiber, M.H. et al. De novo Identification of DNA Modifications Enabled by Genome-Guided Nanopore Signal Processing. bioRxiv (2016).
 \bibitem{chironData} Teng H; Cao MD; Hall MB; Duarte T; Wang S; Coin LJM (2018): Supporting data for "Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning" GigaScience Database.
 \bibitem{resnet} K. He, X. Zhang, S. Ren and J. Sun, “Deep Residual Learning for Image Recognition,” in CVPR, 2016.
@@ -444,6 +496,7 @@ gdzie $p(x|z)$ to prawdopobieńśtwo prawdziwej sekwencji dla danej macierzy pra
 \bibitem{difficulty}Understanding the difficulty of training deep feedforward neural networks Xavier Glorot, Yoshua Bengio
 \bibitem{segmentation} Recent progress in semantic image segmentation Xiaolong Liu, Zhidong Deng, Yuhan Yang
 \bibitem{sequenceModelling} An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling Shaojie Bai, J. Zico Kolter, Vladlen Koltun
+\bibitem{bn}Sergey Ioffe, Christian Szegedy Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift https://arxiv.org/abs/1502.03167
 \bibitem{fcn}Fully Convolutional Networks for Semantic Segmentation Jonathan Long, Evan Shelhamer, Trevor Darrell
 \bibitem{DSN}Deeply-Supervised Nets Chen-Yu Lee, Saining Xie, Patrick Gallagher, Zhengyou Zhang, Zhuowen Tu
 \bibitem{denseNet}Densely Connected Convolutional Networks Gao Huang, Zhuang Liu, Laurens van der Maaten, Kilian Q. Weinberger
