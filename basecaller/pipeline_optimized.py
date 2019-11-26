@@ -72,7 +72,7 @@ def eval_assemble(model_dir, data_dir, out_dir):
         i = 1
         ds_size = data_extractor.get_size()
         while data_extractor.has_next_file():
-            print(f"{i}/{ds_size} : {data_extractor.get_next_file_name()} ")
+            print(f"{i}/{ds_size} : {data_extractor.get_next_file_name()} ", flush=True)
             logits_list = []
             signal, lengths, indices, filename = data_extractor.extract_next_file()
             i = i + 1
