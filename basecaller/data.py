@@ -91,6 +91,9 @@ class EvalDataExtractor:
             size = self.limit
         return self.current_file < size
 
+    def get_next_file_name(self):
+        return self.files[self.current_file]
+
     def extract_next_file(self):
         filename = self.files[self.current_file]
         if filename.endswith('fast5'):
