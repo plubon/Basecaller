@@ -74,7 +74,7 @@ def eval_assemble(model_dir, data_dir, out_dir):
         decoded = sess.run(decoded_out, feed_dict={
             logits_input: file_logits,
             len_input: np.full(size, 300)})
-        log_time(model_dir, 'decode end')
+        log_time(model_dir, 'd  ecode end')
         assembled = assembler.assemble(decoded)
         log_time(model_dir, 'assemble end')
         predicted_seq = int_label_to_string(np.argmax(assembled, axis=0))
@@ -86,7 +86,4 @@ def eval_assemble(model_dir, data_dir, out_dir):
 
 if __name__ == "__main__":
     run(sys.argv[1],
-        sys.argv[2],
-        sys.argv[3],
-        sys.argv[4],
-        sys.argv[5])
+        sys.argv[2])
