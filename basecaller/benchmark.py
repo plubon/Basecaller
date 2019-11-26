@@ -54,7 +54,7 @@ def eval_assemble(model_dir, data_dir, out_dir):
         logits_list = []
         log_time(model_dir, 'setup end')
         signal, indices = reader.read_for_eval(data_dir)
-        lengths = np.repeat(300, indices.shape[0])
+        lengths = np.repeat(300, len(indices))
         i = i + 1
         batch_index = 0
         log_time(model_dir, 'file reading end')
