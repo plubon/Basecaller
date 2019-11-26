@@ -1,7 +1,5 @@
 import tensorflow as tf
 import os
-from train import train
-from test import test
 import sys
 import time
 from datetime import datetime
@@ -10,7 +8,6 @@ import numpy as np
 from reader import ChironFileReader
 from assembler import AssemblerFactory
 from utils import int_label_to_string
-from calculate_metrics import calculate
 
 eval_batch_size = 1000
 
@@ -54,6 +51,7 @@ def eval_assemble(model_dir, data_dir, out_dir):
         logits_list = []
         log_time(model_dir, 'setup end')
         signal, indices = reader.read_for_eval(data_dir)
+        signal = np.expand_dims(np.stack(signal).astype(np.float32), -1)
         lengths = np.repeat(300, len(indices))
         i = i + 1
         batch_index = 0
