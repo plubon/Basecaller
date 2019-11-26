@@ -70,11 +70,11 @@ def eval_assemble(model_dir, data_dir, out_dir):
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
         tf.saved_model.loader.load(sess, ["serve"], os.path.join(model_dir, 'saved_model'))
         i = 1
-        size = data_extractor.get_size()
+        ds_size = data_extractor.get_size()
         while data_extractor.has_next_file():
+            print(f"{i}/{ds_size} : {filename} ")
             logits_list = []
             signal, lengths, indices, filename = data_extractor.extract_next_file()
-            print(f"{i}/{size} : {filename} ")
             i = i + 1
             if len(signal) == 0:
                 continue
