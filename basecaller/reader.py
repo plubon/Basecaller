@@ -173,12 +173,14 @@ class ChironFileReader:
             dataset = dataset[0].strip()
             dataset = dataset.split(' ')
             dataset = [int(x) for x in dataset]
+            mean = np.mean(np.unique(dataset))
+            std = np.std(np.unique(dataset))
             segments = []
             indices = []
             signal_index = 40
             while signal_index + 300 < len(dataset) - 40:
                 signal = dataset[signal_index:signal_index + 300]
-                normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
+                normalized_signal = (signal - mean) / std
                 segments.append(normalized_signal)
                 indices.append(signal_index)
                 signal_index = signal_index + 30
