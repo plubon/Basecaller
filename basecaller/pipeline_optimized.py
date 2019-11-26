@@ -11,7 +11,7 @@ from data import EvalDataExtractor
 from assembler import AssemblerFactory
 from utils import int_label_to_string
 from calculate_metrics import calculate
-eval_batch_size = 250
+eval_batch_size = 4000
 
 
 def log_time(path, name, time):

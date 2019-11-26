@@ -9,7 +9,7 @@ from reader import ChironFileReader
 from assembler import AssemblerFactory
 from utils import int_label_to_string
 
-eval_batch_size = 1000
+eval_batch_size = 4000
 
 def log_time(path, name):
     now = datetime.fromtimestamp(time.time()).isoformat()
