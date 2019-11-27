@@ -43,6 +43,21 @@ def wavenet_gate(input, dilation, filters):
     return tf.keras.layers.Multiply()([tanh, sigma])
 
 
+def wavenet_weird_block(input, dilation):
+    tanh = tf.keras.layers.Conv1D(256,
+                                  3,
+                                  dilation_rate=dilation,
+                                  padding='same',
+                                  activation='tanh')(input)
+    sigma = tf.keras.layers.Conv1D(input,
+                                   256,
+                                   dilation_rate=dilation,
+                                   padding='same',
+                                   activation='sigmoid')(input)
+    gate = tf.keras.layers.Multiply()([tanh, sigma])
+    return tf.keras.layers.Add()([input, gate])
+
+
 def wavenet_block(input, dilation, params=None):
     model = wavenet_gate(input, dilation, 256)
     res = tf.keras.layers.Conv1D(256, 1, padding='same')(model)

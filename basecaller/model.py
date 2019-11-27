@@ -9,6 +9,8 @@ class ModelFactory:
     def get(name, signal, config=None):
         if config is None:
             config = {}
+        if name.lower() == 'weird_wavenet':
+            return WeirdWavenetModel(signal, config)
         if name.lower() == 'deep_cnn_lstm_identity':
             return DeepCnnLstmIdentityModel(signal, config)
         if name.lower() == 'cnn_lstm':
@@ -74,6 +76,22 @@ class WavenetDenseModel:
         model = tf.keras.layers.Dense(5)(features)
         self.logits = model
 
+
+class WeirdWavenetModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        max_dilation = 128
+        model = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(signal)
+        for i in range(12):
+            model = blocks.pre_activation_residual_block(signal)
+        i = 1
+        while i <= max_dilation:
+            model, _ = blocks.wavenet_weird_block(model, i)
+            model, _ = blocks.wavenet_weird_block(model, i)
+            i = i * 2
+        self.logits = tf.keras.layers.Dense(5)(model)
 
 class WavenetIdentityModel:
 
