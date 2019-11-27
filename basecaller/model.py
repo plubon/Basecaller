@@ -9,6 +9,8 @@ class ModelFactory:
     def get(name, signal, config=None):
         if config is None:
             config = {}
+        if name.lower() == 'deep_cnn_lstm_identity':
+            return DeepCnnLstmIdentityModel(signal, config)
         if name.lower() == 'cnn_lstm':
             return CnnLstmModel(signal, config)
         if name.lower() == 'residual':
@@ -151,6 +153,26 @@ class CnnLstmDenseModel:
                 tf.keras.layers.LSTM(growth_rate, return_sequences=True), merge_mode='concat')(features)
             features = tf.concat([features, cb], axis=-1)
         model = tf.keras.layers.Dense(5)(features)
+        self.logits = model
+
+
+class DeepCnnLstmIdentityModel:
+    def __init__(self, signal, config):
+        hidden_num = 128
+        self.input = signal
+        self.config = config
+        model = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(signal)
+        for i in range(12):
+            model = blocks.pre_activation_residual_block(model)
+        for _ in range(5):
+            lstm = tf.keras.layers.Bidirectional(
+                tf.keras.layers.LSTM(128, return_sequences=True), merge_mode='concat')(model)
+            model = tf.keras.layers.Add()([lstm, model])
+        weight_bi = tf.Variable(tf.truncated_normal([2, hidden_num], stddev=np.sqrt(2.0 / (2*hidden_num))))
+        bias_bi = tf.Variable(tf.zeros([hidden_num]))
+        model = tf.reshape(model, [tf.shape(model)[0], 300, 2, hidden_num])
+        model = tf.nn.bias_add(tf.reduce_sum(tf.multiply(model, weight_bi), axis=2), bias_bi)
+        model = tf.keras.layers.Dense(5)(model)
         self.logits = model
 
 

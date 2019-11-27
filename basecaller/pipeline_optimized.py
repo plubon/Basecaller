@@ -59,8 +59,6 @@ def eval_assemble(model_dir, data_dir, out_dir):
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     data_extractor = EvalDataExtractor(data_dir)
-    data_extractor.filter('coli')
-    data_extractor.set_limit(200)
     logits_input = tf.placeholder(tf.float32, shape=(None, 300, 5), name='d1')
     len_input = tf.placeholder(tf.int32, shape=(None,), name='d2')
     decoded = tf.nn.ctc_beam_search_decoder(tf.transpose(logits_input, perm=[1, 0, 2], name='d4'),
