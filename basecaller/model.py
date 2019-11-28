@@ -262,7 +262,7 @@ class DeepDenseNetLstmModel:
         self.input = signal
         self.params = params
         hidden_num = 128
-        model = blocks.dense_net(self.input, blocks=5, depth=40, growth_rate=12)
+        model = blocks.dense_net(self.input, blocks=5, depth=30, growth_rate=12)
         model = tf.keras.layers.Conv1D(filters=256, padding='same', kernel_size=1)(model)
         for _ in range(5):
             lstm = tf.keras.layers.Bidirectional(
