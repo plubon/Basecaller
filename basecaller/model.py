@@ -11,6 +11,8 @@ class ModelFactory:
             config = {}
         if name.lower() == 'weird_wavenet':
             return WeirdWavenetModel(signal, config)
+        if name.lower() == 'deep_dense_wave_net':
+            return DeepDenseWaveNetModel(signal, config)
         if name.lower() == 'deep_cnn_lstm_identity':
             return DeepCnnLstmIdentityModel(signal, config)
         if name.lower() == 'cnn_lstm':
@@ -251,6 +253,22 @@ class DenseWaveNetModel:
         skip_sum = tf.keras.layers.Add()(skip_connections)
         self.logits = tf.keras.layers.Dense(5)(skip_sum)
 
+class DeepDenseWaveNetModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        model = blocks.dense_net(self.input, blocks=5,depth=50, growth_rate=16)
+        model = tf.keras.layers.Conv1D(filters=256, padding='same', kernel_size=1)(model)
+        max_dilation = 256
+        i = 1
+        skip_connections = []
+        while i <= max_dilation:
+            model, skip = blocks.wavenet_bidirectional_block(model, i)
+            skip_connections.append(skip)
+            i = i * 2
+        skip_sum = tf.keras.layers.Add()(skip_connections)
+        self.logits = tf.keras.layers.Dense(5)(skip_sum)
 
 class DenseNetModel:
 
