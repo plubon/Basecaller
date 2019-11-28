@@ -51,6 +51,8 @@ class ModelFactory:
             return CnnTcnDenseModel(signal, config)
         if name.lower() == 'wavenet_dense':
             return WavenetDenseModel(signal, config)
+        if name.lower() == 'deep_dense_net_lstm':
+            return DeepDenseNetLstmModel(signal, config)
         else:
             raise ValueError(f'No model with name: {name}')
 
@@ -252,6 +254,26 @@ class DenseWaveNetModel:
             i = i * 2
         skip_sum = tf.keras.layers.Add()(skip_connections)
         self.logits = tf.keras.layers.Dense(5)(skip_sum)
+
+
+class DeepDenseNetLstmModel:
+
+    def __init__(self, signal, params):
+        self.input = signal
+        self.params = params
+        hidden_num = 128
+        model = blocks.dense_net(self.input, blocks=5, depth=50, growth_rate=16)
+        model = tf.keras.layers.Conv1D(filters=256, padding='same', kernel_size=1)(model)
+        for _ in range(5):
+            lstm = tf.keras.layers.Bidirectional(
+                tf.keras.layers.LSTM(128, return_sequences=True), merge_mode='concat')(model)
+            model = tf.keras.layers.Add()([lstm, model])
+        weight_bi = tf.Variable(tf.truncated_normal([2, hidden_num], stddev=np.sqrt(2.0 / (2 * hidden_num))))
+        bias_bi = tf.Variable(tf.zeros([hidden_num]))
+        model = tf.reshape(model, [tf.shape(model)[0], 300, 2, hidden_num])
+        model = tf.nn.bias_add(tf.reduce_sum(tf.multiply(model, weight_bi), axis=2), bias_bi)
+        model = tf.keras.layers.Dense(5)(model)
+        self.logits = model
 
 class DeepDenseWaveNetModel:
 
