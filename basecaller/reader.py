@@ -268,11 +268,13 @@ class OverlapChironFileReader:
                     j = j + 1
                 signal_end = event_position[-skip]
                 examples = []
+                mean = np.mean(np.unique(dataset))
+                std = np.std(np.unique(dataset))
                 while current_signal_start + 300 < signal_end:
                     current_seq = sequence[i:j]
                     if all([x in alphabet_dict.keys() for x in current_seq]) and len(current_seq)>2:
                         signal = dataset[current_signal_start:current_signal_start+300]
-                        normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
+                        normalized_signal = (signal - mean) / std
                         breaks = event_position[i + 1:j - 1] - event_position[i]
                         example = TrainingExample(self.parser.get_id(), path, i, normalized_signal,
                                                   signal, current_seq, breaks)
