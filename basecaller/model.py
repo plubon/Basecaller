@@ -180,7 +180,7 @@ class DeepCnnLstmIdentityModel:
         self.input = signal
         self.config = config
         model = tf.keras.layers.Conv1D(filters=256, kernel_size=1, strides=1, use_bias=False, padding='same')(signal)
-        for i in range(12):
+        for i in range(10):
             model = blocks.pre_activation_residual_block(model)
         for _ in range(5):
             lstm = tf.keras.layers.Bidirectional(
