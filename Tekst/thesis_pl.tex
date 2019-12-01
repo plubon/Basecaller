@@ -362,7 +362,7 @@ Literatura porównująca basecallery pokazuje, że średnia dokładność otrzym
 		DeepNano     & 78\%                     & 96\%                        & 99\%                                                                                   \\
 		basecRAWller & 74\%                     & 85\%                        & 106\%                                                                                 
 	\end{tabular}
-	\caption{\label{}Porównanie jakości dostępnych Basecallerów.}
+	\caption{\label{}Porównanie jakości dostępnych Basecallerów. Wyniki pochodzą z basecallingu danych z sekwencjowania K. pneumoniae\cite{wick}}
 \end{table}
 
 \chapter*{Opis rozwiązania}
@@ -405,7 +405,7 @@ Sygnał elektryczny o całkowitej długości 246 892 693 został dopasowany do s
 
 Problem basecallingu polega na translacji pewnej sekwencji wejśćiowej na sekwencję wejściową w innej domenie o zmiennej ale mniejszej długości. Ma on wiele podobieństw do problemów takich jak rozponawanie mowy, rozpoznawanie pisma pisanego, segmentacja obrazu czy tłumaczenie maszynowe, do których z sukcesami zastosowano sieci neuronowe i uczenie głębokie. Modele i techniki użyte do tych zastosowań mogą być skuteczne w dziedzinie basecallingu.
 
-Z racji na dużą długość odczytów sygnał odpowiadający całemu odczytowi musi zotać podzielony na mniejsze fragmenty, które mogą zostać przetworzone przez sieć. Każdy z tych segmentów powinien być wystarczająco długi, aby odpowiadać kilku 5-merom nukleotydów. Z sygnału powinny zostać wyekstrachowane pewne cechy lokalne względem kroku czasowego. Sieć pownnia zawierać również moduł, który znajdzie zależności pomiędzy tymi cechami, aby dokonać segmentacji i dopasować sygnał do baz. Moduł ten powinien wykorzystywać cechy dla wszystkich kroków czasowych, wchodzących w skład 5-meru do którego należy obecny krok czasowy. Na podstawie wyniku obliczeń tego modułu zostanie obliczone prawdopodobieńśtwo, że próbka sygnału z kroku czasowego odpowiada jednej z baz lub granicy pomiędzy nimi. Z racji tego, że długość sekwencji wyjściowej jest zmienna należy wykorzystać dekodowanie CTC\cite{ctc}. Wyniki obliczone dla każdego krótkiego fragmentu muszą zostać złożone w konsensus reprezentujący sekwencję dla całego odczytu.
+Z racji na dużą długość odczytów sygnał odpowiadający całemu odczytowi musi zostać podzielony na mniejsze fragmenty, które mogą zostać przetworzone przez sieć. Każdy z tych segmentów powinien być wystarczająco długi, aby odpowiadać kilku 5-merom nukleotydów. Z sygnału powinny zostać wyekstrachowane pewne cechy lokalne względem kroku czasowego. Sieć pownnia zawierać również moduł, który znajdzie zależności pomiędzy tymi cechami, aby dokonać segmentacji i dopasować sygnał do baz. Moduł ten powinien wykorzystywać cechy dla wszystkich kroków czasowych, wchodzących w skład 5-meru do którego należy obecny krok czasowy. Na podstawie wyniku obliczeń tego modułu zostanie obliczone prawdopodobieńśtwo, że próbka sygnału z kroku czasowego odpowiada jednej z baz lub granicy pomiędzy nimi. Z racji tego, że długość sekwencji wyjściowej jest zmienna należy wykorzystać dekodowanie CTC\cite{ctc}. Wyniki obliczone dla każdego krótkiego fragmentu muszą zostać złożone w konsensus reprezentujący sekwencję DNA dla całego odczytu.
 
 \begin{figure}[h!]
 	\centering
@@ -416,7 +416,7 @@ Z racji na dużą długość odczytów sygnał odpowiadający całemu odczytowi 
 
 \section*{Reprezentacja i przygotowanie danych wejściowych}
 
-Sygnał jest normalizowany poprzez odjęcie średniej dla odczytu i podzielenie przez odchyelenie standardowe. Sygnał jest dzielony na fragmenty po 300 próbek. Zgodnie z przedstawionymi wcześniej kwantylami długości fragmentów sygnału odpowiadającym 5-merom podsekwencje o takiej długości w ponad 99.9\% przypadków odpowiadają conajmniej kilku 5-merom. Zastosowanie takiej długości umożliwia również uczenie sieci w batchach o wielkości ponad 100 przykładów co przyspiesza proces uczenia. 
+Sygnał jest normalizowany poprzez odjęcie średniej dla odczytu i podzielenie przez odchyelenie standardowe. Sygnał pochodzący z jednego odczytu. jest dzielony na fragmenty po 300 próbek. Zgodnie z przedstawionymi wcześniej kwantylami długości fragmentów sygnału odpowiadającym 5-merom podsekwencje o takiej długości w ponad 99.9\% przypadków odpowiadają conajmniej kilku 5-merom. Zastosowanie takiej długości umożliwia również uczenie sieci w batchach o wielkości ponad 100 przykładów co przyspiesza proces uczenia. 
 
 \section{Wykorzystane koncepty z dziedziny uczenia głębokiego}
 
@@ -462,6 +462,7 @@ W architekturze DenseNet, będącej rozwnięciem idei wykorzystanych w ResNet, k
 	\centering
 	\includegraphics[scale=0.7]{densenet}
 	\caption{Schemat połączeń w sieci DenseNet składającej się z 3 bloków.}
+	\label{fig:denseNet}
 \end{figure}
 
 \subsection*{Sieci rekurencyjne, LSTM}
@@ -514,6 +515,7 @@ Wavenet to głęboka sieć neuronowa wykorzystana oryginalnie do syntezy mowy\ci
 	\centering
 	\includegraphics[scale=0.7]{wavenet_block}
 	\caption{Blok sieci Waveneta. Sieć składa się z pewnej liczby takich bloków połączonych w serii.}
+	\label{fig:wavenet_block}
 \end{figure}
 
 Sieci Wavenet udało się wygenerować mowę bardzo podobną do ludzkiej\cite{wavenet}, znalazła ona również zastosowanie w problemach rozpoznawania mowy, redukcji hałasu i generowania muzyki\cite{wavenetReview}.
@@ -543,21 +545,55 @@ gdzie $p(x|z)$ to prawdopobieństwo prawdziwej sekwencji dla danej macierzy praw
 
 Na dane wejściowe nakładana jest warstwa konwolucyjna zmienająca ich kształt tak, aby ostatni wymiar miał rozmiar 256. Jest to potrzebne, aby mogłe one zostać wykorzystane w połączeniach rezydualnych. Następnie w sieci znajduje się 5 bloków rezydualnych z mapowaniem identycznośćiowym z warstwami konwolucyjnymi obliczającymi 256 cech. Po nich następuje 3 warstwowa sieć LSTM obliczająca 128 cech. Jest ona aplikowana do cech obliczonych przez poprzednie warstwy w obu kierunkach - od początku od końca i od końca do początku. Zatem każda z warstw oblicza również po 256 cech. Również w tej częsci sieci zostały dodane połączenia rezydualne omijające warstwę. Są one sumowane z cechami obliczonymi przez warstwę, które omijają. Zatem sygnał wejściowy może płynąć przez całą sieć bez żadnych modyfikacji poza zmianą kształtu w pierwszej warstwie. Ostatnią warstwą w sieci jest warstwa gęsto połączona która dla każdego kroku czasowego oblicza prawdopodobieństwo że odpowiada on któremuś z nukleotydów lub granicy pomiędzy nimi. Wynik tej warstwy trafia do dekodera CTC.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{resnetLstm}
+	\caption{Architektura modelu ResNet + LSTM z połączeniami rezydualnymi}
+\end{figure}
+
 \subsection{ResNet + Konwolucje czasowe}
 
 Podobnie jak w poprzedniej sieci do esktrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki wykorzystujące warstwy konwolucyjne rozszerzone i przyczynowe. W każdym bloku znajdują się 4 warstwy. Najpierw aplikowane są dwie z nich - jedna w oryginalnym kierunku a druga w odwróconym. Efekt zastosowania warstwy w odwróconym kierunku jest uzyskany poprzez odwróceniu danych wejściowych wobec wymiaru odpowiadającemu czasowi, zastosowanie warstwy i odwróceniu otrzymanego wyniku. Oba te wyniki są konkatenowane, a następnie stosuje się do nich \textit{Batch normalization} i funkcję aktywacyjną ReLu Dwie kolejne warstwy wykonują tą samą operację. Każda z warstw oblicza po 128 cech. Wszystkie warstwy wewnątrz danego bloku mają tą samą wartośc rozszerzenia(dilation), lecz w każdym kolejnym bloku jest ona podwajana. W sumie w sieci znajduje się 7 takich bloków, czyli ostatni ma wartość rozszerzenia równą 64. Jądro ma wielkość 3, zatem pole receptywne konwolucji w ostatniej warstwie sięga 128 kroków czasowych w obu kierunkach. Warstwa gęsto połączona jest aplikowana do sumy wyników obliczeń każdego z bloków.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{tcn_block}
+	\caption{Budowa bloku wykorzystującego konwolucje czasowe}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{resnetTcn}
+	\caption{Architektura modelu ResNet + Konwolucje czasowe}
+\end{figure}
+
 \subsection{ResNet + WaveNet}
 
-Ten model jest rozszerzeniem poprzedniego o idee wykorzystane w WaveNet\cite{wavenet}. Do esktrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki zawierające 2 warstwy konwolucyjne rozszerzone i przyczynowe. Do wyniku z nich jednej z nich aplikowana jest funkcja sigmoidalna a do drugiej tangens hyperboliczny, a następnie obliczany jest iloczyn. W ten sposób sieć może nauczyć się zapamiętywać lub usuwać z pamięci pewne cechy. Warstwy konwolucyjne są aplikowane w obu kierunkach i obliczają 256 cech. Jądro w tych warstwach ma rozmiar 2,a rozszerzenia przyjmują wartośći od 1 do 128 zatem pole receptywne ma tą samą wielkośc co w poprzednim modelu. Tak samo jak w poprzednim modelu dane wyjśćiowego każdego z bloków są sumowane i przekazywane do warstwy gęsto połączonej.
+Ten model jest rozszerzeniem poprzedniego o idee wykorzystane w WaveNet\cite{wavenet}. Do esktrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki zawierające 2 warstwy konwolucyjne rozszerzone i przyczynowe. Do wyniku z nich jednej z nich aplikowana jest funkcja sigmoidalna a do drugiej tangens hyperboliczny, a następnie obliczany jest iloczyn. W ten sposób sieć może nauczyć się zapamiętywać lub usuwać z pamięci pewne cechy. Budowa bloku wykorzystanego w tej sieci jest podobna do tego przedstawionego na rysunku \ref{fig:wavenet_block}, z tą różnicą że warstwy konwolucyjne są aplikowane do danych oryginalnych i takich z odwróconym wymiarem czasu. Wyniki te są następnie konkatenowane. Jądro w tych warstwach ma rozmiar 2,a rozszerzenia przyjmują wartośći od 1 do 128 zatem pole receptywne ma tą samą wielkośc co w poprzednim modelu. Tak samo jak w poprzednim modelu dane wyjściowego każdego z bloków są sumowane i przekazywane do warstwy gęsto połączonej i następnie do dekodera CTC.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{resnetWavenet}
+	\caption{Architektura modelu ResNet + WaveNet}
+\end{figure}
 
 \subsection{DenseNet + WaveNet}
 
-W tym modelu do ekstrakcji cech lokalnych wykorzystano model wzorowany na sieci DenseNet\cite{denseNet}. Składa się on z 30 warstw konwolucyjnych z \textit{batch normalization} i funkcją aktywacyjną ReLU. Każda z warstw oblicza 12 cech i konkatenuje je z danymi wejściowymi, które otrzymała. Po 30 warstwach zostaje zatem obliczone 360 cech. Po nich następuje warstwa która zmiejsza liczbę cech do 256 poprzez obliczenie kombinacji cech otrzymanych na wejściu. Dalsza część sieci jest analogiczna do poprzedniego modelu. 
+W tym modelu do ekstrakcji cech lokalnych wykorzystano model wzorowany na sieci DenseNet\cite{denseNet}. Architektura tej została przedstawiona na rysunku \ref{fig:denseNet}. Składa się on z 30 warstw konwolucyjnych z \textit{batch normalization} i funkcją aktywacyjną ReLU. Każda z warstw oblicza 12 cech i konkatenuje je z danymi wejściowymi, które otrzymała. Po 30 warstwach zostaje zatem obliczone 360 cech. Po nich następuje warstwa która zmiejsza liczbę cech do 256 poprzez obliczenie kombinacji cech otrzymanych na wejściu. Dalsza część sieci jest analogiczna do poprzedniego modelu
+. 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{denseWaveNet}
+	\caption{Architektura modelu DenseNet + WaveNet}
+\end{figure}
+
+\section*{Proces uczenia}
+
+Do uczenia sieci wykorzystano algorytm optymizacyjny Adam\cite{adam}, z \textit{learning rate} równym 0.001. Optymalizowano funkcję straty CTC\cite{ctc}. Sieć była uczona przez maksymalnie 10 epok - proces uczenia był przerywany jeśli po 2 kolejnych epok wartość funkcji straty nie zmniejszała się. Do uczenia wykorzystano procesor graficzny GEFORCE GTX 1080.
 
 \section*{Składanie odczytów}
 
-Predykcja dokonywana jest na fragmentach o długości 300 próbek sygnału. Każdy taki fragment pokrywa się z następnym w 90\% to znaczy fragmenty zaczynaja się od próbki sygnału o indeksach 0, 30, 60, 90 itd. Uzyskuje się w ten sposób dziesięciokrotne pokrycie krótkimi odczytami. Z racji że kolejność krótkich odczytów w konsensusie jest znana utworzenie go jest łatwe. Uzyskuje się go przez znaleznie najdłuższych zachodzących na siebie fragmentów sąsiadujących odczytów. W ten sposób zliczane są wystąpienia nukleotydów na każdej pozycji i wybierane te, które pojawiają się najczęściej.
+Podczas dokonywania predykcji długi odczyt sygnału dzielony jest na częsciowo pokrwyające się ze sobą fragmenty od długości 300 próbek. Każdy taki fragment pokrywa się z następnym w 90\%, to znaczy fragmenty zaczynaja się od próbki sygnału o indeksach 0, 30, 60, 90 itd. Uzyskuje się w ten sposób dziesięciokrotne pokrycie krótkimi odczytami. Z racji że kolejność krótkich odczytów w konsensusie jest znana utworzenie go jest łatwe. Uzyskuje się go przez znaleznie najdłuższych zachodzących na siebie fragmentów sąsiadujących odczytów. W ten sposób zliczane są wystąpienia nukleotydów na każdej pozycji i wybierane te, które pojawiają się najczęściej.
 
 \begin{figure}[h!]
 	\centering
@@ -565,15 +601,26 @@ Predykcja dokonywana jest na fragmentach o długości 300 próbek sygnału. Każ
 	\caption{Wizualizacj składanie krótkich odczytów w długi.}
 \end{figure}
 
-\chapter*{Analiza wyników}
-
 \section*{Szczegóły techniczne implementacji}
+
+Modele sieci neuronowych zostały zaimplementowane w języku Python, przy użyciu biblioteki TensorFlow\cite{tensorflow} wersja r1.15. Aplikacja obługuje odczyty w formacie fast5, będącym modyfikacją formatu HDF5 opracowną przez Oxford Nanopore Technologies do przechowywania danych z sekwencjonowania MinIONem. Obsługiwane są również odczyty w formacie tekstowym wykorzystanym w jednym z użytych zbiorów danycj\cite{chironData}. Sekwencje będące wynikiem basecallingu zapisywane są w formacie FASTA. Jest to format tekstowy służący do reprezentowania sekwencji nukleotydów lub białek, szeroko stosowany w bioinformatyce.
+
+\chapter*{Ewaluacja modeli i analiza wyników}
+
+\section{Zbiory danych}
+
+Do oceny jakośći modeli wykorzystano zbiory danych zawierające po 2000 odczytów. Pochodziły one z sekwencjonowania próbek \textit{e. coli} i \textit{lambda phage}\cite{chironData}.
+
+\section{Wykorzystane metryki}
+
+Aby ocenić wynik basecallingu na krótkich fragmentach sygnału (300 próbek) obliczono liczbę insercji, substytucji i delecji potrzbnych do przetransformowania wyniku dekodowania CTC do sekwencji DNA, która faktycznie odpowiada fragmentowi sygnału dla którego dokonano basecallingu. Obliczona wartość jest dzielona przez liczbę baz w oczekiwanej sekwencji w celu znormalizowania miary. Otrzymuje się w ten sposób znormalizowany dystans edycji pomiędzy wynikiem basecallingu a fragmentem prawdziwej sekwencji DNA. Miara ta ocenia jakość krótkich fragmentów DNA będących wynikiem bezpośrednio otrzymywanym z modelu.
+
+Z fragmentów DNA otrzymywanych na wyjściu dekodera tworzony jest konensus odpowiadający sekwencji DNA pewnego odczytu. Sekwencje te są mapowane na odpowiedni genom referencyjny przy użyciu programu minimap2\cite{minimap}. Otrzymane w ten sposób pliki BAM zostały przeanalizowane programem japsa\footnote{https://github.com/mdcao/japsa}, który oblicza liczbę delecji, substytucji i insercji pomiędzy pomiędzy sekwencją wejśćiową i fragmentem genomu referencyjnego na, który została zmapowana. Procent delecji, insercji i substytucji obliczony jest przez iloraz liczby tych operacji i długośći fragmentu genomu refernecyjnego, na który została zmapowana sekwencja. Stopień identycznośći pomiędzy sekwencjami jest zdefiniowany jako $1-procent_delecji-procent_substytucji$, a procent błędów jako $procent_insercji + procent_delecji + procent_substytucji$. Obliczona została również średnia liczba baz w każdym odczycie.
+
+Aby sprawdzić jakość konensusu powstałego z otrzymanych odczytów wykorzystano assembler Rebaler\footnote{https://github.com/rrwick/Rebaler}. Zbudowano przy jego pomocy kontigi z odczytów z sekwencjonowania \textit{lambda phage}. Kontigi zostały podzielone na fragmenty zawierające 10 tysięcy par zasad i zmapowane na genom referencyjny przy pomocy minimap2. Następnie obliczono średni stopień identyczności pomiędzy zmapowanymi sekwencjami i genomem referencyjnym. Obliczono względną długość otrzymanego konsensusu względem genomu referencyjnego. Taka procedura sprawdzenia jakośći konsensusu pojawia sie w publikacjach porównujących jakośc basecallerów\cite{wick}\cite{chiron}.
 
 \section*{Ewaluacja testowanych architektur sieci}
 
-\section*{Porównanie najlepszego z przygotowanych rozwiązań z istniejącymi rozwiązaniami}
-
-\section*{Testy wydajności}
 
 \chapter{Wnioski}
 % -------------------- 6. Bibliografia -----------------------
@@ -628,6 +675,9 @@ Predykcja dokonywana jest na fragmentach o długości 300 próbek sygnału. Każ
 \bibitem{wavenet}Aaron van den Oord, Sander Dieleman, Heiga Zen, Karen Simonyan, Oriol Vinyals, Alex Graves, Nal Kalchbrenner, Andrew Senior, Koray Kavukcuoglu WaveNet: A Generative Model for Raw Audio
 \bibitem{wavenetReview} Boilard, Jonathan \& Gournay, Philippe \& Lefebvre, R.. (2019). A Literature Review of WaveNet: Theory, Application and Optimization. 
 \bibitem{ctc}Alex Graves, Santiago Fernandez, Faustino Gomez, Jurgen Schmidhuber, Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks
+\bibitem{adam}Kingma, D.P., \& Ba, J. (2014). Adam: A Method for Stochastic Optimization. CoRR, abs/1412.6980.
+\bibitem{tensorflow}Martín Abadi, Ashish Agarwal, Paul Barham, Eugene Brevdo,Zhifeng Chen, Craig Citro, Greg S. Corrado, Andy Davis,Jeffrey Dean, Matthieu Devin, Sanjay Ghemawat, Ian Goodfellow,Andrew Harp, Geoffrey Irving, Michael Isard, Rafal Jozefowicz, Yangqing Jia, Lukasz Kaiser, Manjunath Kudlur, Josh Levenberg, Dan Mané, Mike Schuster, Rajat Monga, Sherry Moore, Derek Murray, Chris Olah, Jonathon Shlens, Benoit Steiner, Ilya Sutskever, Kunal Talwar, Paul Tucker, Vincent Vanhoucke, Vijay Vasudevan, Fernanda Viégas, Oriol Vinyals, Pete Warden, Martin Wattenberg, Martin Wicke, Yuan Yu, and Xiaoqiang Zheng. TensorFlow: Large-scale machine learning on heterogeneous systems, 2015. Software available from tensorflow.org.
+\bibitem{minimap} Li, H. (2018). Minimap2: pairwise alignment for nucleotide sequences. Bioinformatics, 34:3094-3100. doi:10.1093/bioinformatics/bty191
 \end{thebibliography}
 
 \thispagestyle{empty}

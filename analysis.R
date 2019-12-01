@@ -1,0 +1,18 @@
+library('dplyr')
+library('stringr')
+library('ggplot2')
+files <- list.files('/home/piotr/Uczelnia/PracaMagisterska/Dane/train')
+setwd('/home/piotr/Uczelnia/PracaMagisterska/Dane/train')
+files <- data.frame(filename=files, stringsAsFactors = FALSE)
+label_files <- files %>% filter(str_detect(filename, 'label'))
+df_list <- list()
+data_list <- lapply(label_files$filename,function(x)
+{
+  read.csv(x, header = FALSE, sep=' ')
+})
+data_list <- bind_rows(data_list, .id='file_no')
+data_list$len <- data_list$V2 - data_list$V1
+data_list %>% group_by(V3) %>% summarize(Mean = mean(len), Std=sd(len))
+read_means <- data_list %>% group_by(file_no) %>% summarise(Mean=mean(len), Std=sd(len), Max=max(len)) %>% arrange(desc(Mean))
+qs <- seq(0.9,1,0.01)
+q_values <- quantile(data_list$len, qs)
