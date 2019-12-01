@@ -330,13 +330,13 @@ Wynikiem sekwencjonowania jest fragment całego genomu. nazywanym odczytem(\text
 
 \section*{Oxford Nanopore MinION}
 
-Oxford Nanopore MinION to technologia sekwencjonowania dostępna publicznie od maja 2015 r. produkująca długie odczyty, nawet do 2 milionów par zasad. Wykorzystuje ona pory przez, które przepływa pojedyncza nić DNA. Wewnątrz nich mierzony jest sygnał elektryczny, które zmieniy się w zależności od tego, które nukleotydy znadują się wewnątrz poru. Na podstawie tego sygnału jest możliwe rozponanie sewkwencji DNA, nawet w trakcie procesu sekwencjonowania. Urządznie MinION jest bardzo przenośne (ma rozmiar zszywacza) i jego koszt jest znacznie mniejszy niż konkurencyjnych urządzeń. 
+Oxford Nanopore MinION to technologia sekwencjonowania dostępna publicznie od maja 2015 r. produkująca długie odczyty, nawet do 2 milionów par zasad. Wykorzystuje ona pory przez, które przepływają pojedyńcze nici DNA. Pory osadzone są w rezystentnej membranie polimerowej, przez którą przepływa prąd elektryczny. Nukleotyd znajdujący się w porze wpływa na jego opór elektryczny, tym samym powodując zmianę napięcia. Sygnał elektryczny jest mierzony i to on jest rezultatem pracy urządzenia. Analizując go jest możliwe uzyskanie sekwencji DNA nici, która przepłyneła przez por. Proces ten nazywany jest basecallingiem. Na sygnał elektryczny wpływają pojedyńcze molekuły znajdujące się wewnątrz poru co wprowadza wiele szumu. Dodatkowo w najwęższym punkcie poru znajduje się jednocześnie 4-5 nukleotydów i wszystkie z nich wpływają na opór elektryczny poru i tym samym mierzony sygnał. Zatem basecalling jest złożonym problemem, który ma kluczowe znaczenie dla jakośći sekwencjonowania nanoporowego.
 
-Proces rozpoznawania baz na podstawie sygnału elektrycznego wewnątrz poru nazywany jest basecallingiem. Jakość oprogramowania użytego do basecallingu (nazywanego basecallerem) ma znaczny wpływ na celność odczytów pochodzących z MinIONa.
+Urządzenie MinION jest bardzo przenośne (ma rozmiar zszywacza) i jego koszt jest znacznie mniejszy niż konkurencyjnych urządzeń. Było ono wykorzystywane nawet w terenie, na przykład podczas badania ognisk choroby w odległych rejonach\cite{ebola}. Niski koszt urządzenia pozwola na zastosowaniego na szerszą skalę niż innych technologii sekwencjonowania.
 
 \section*{Istniejące rozwiązania}
 
-Oxford Nanopore Technologies (producent MinIONa) oferuje kilka basecallerów. Są to oficjalny basecaller Albacore, Guppy wykorzystujący procesory graficzne i Scrappie opisany przez producenta jako "demonstracja technologii". W przeszłości ONT oferowało również NanoNet oparty o sieci neuronowe, a także Metrichor działający w chmurze obliczeniowej.
+Oxford Nanopore Technologies (producent MinIONa) oferuje kilka basecallerów. Są to oficjalny basecaller Albacore, Guppy wykorzystujący procesory graficzne i Scrappie określany przez producenta jako "demonstracja technologii". Aktualne wersje Albacore i Guppy wykorzystują sieci neuronowe. W przeszłości ONT oferowało również NanoNet będący pierwszym basecallerem opartym o sieci neuronowe, a także Metrichor działający w chmurze obliczeniowej oparty o łańcuchy Markowa. 
 
 Opublikowano również następujące basecallery z otwartym kodem źródłowym pochodzące od społecznośći badawczej.
 
@@ -345,37 +345,100 @@ DeepNano\cite{deepNano} wykonuje proces basecallingu w dwóch krokach. W pierwsz
 BasecRAWller\cite{basecrawler} wykorzystuje dwie rekurencyjne sieci neuronowe. Pierwsza z nich przewiduje dla każdego kroku czasowego w sygnale wejściowym prawdopodobieństwo tego, że jest on granicą pomiędzy segmentom sygnału odpowiadjącego kolejnym nukleotydom. Druga mapuje w ten sposób powstałe segmenty na odpowiadające nim bazy.
 
 Chiron\cite{chiron} tłumaczy sygnał elektryczny bezpośrednio na sekwencję DNA. Wykorzystuje on model oparty o sieci konwolucyjne, sieci rekurencyjne i dekodowanie CTC.
+
+Jakość basecallingu można ocenić wykorzystując celność pojedyńczego odczytu lub celność konsensusu utworzonego z wielu odczytów pochodzących z tego samego rejonu genomu. Konsesus powstaje poprzez nałożenie na siebie wielu odczytów z pasującymi do siebie fragmentami. Obie te metryki oblicza się poprzez mapowanie uzyskanej sekwencji do znanej sekwencji referencyjnej. Nie muszą być one skorelowane - odczyty o dużej liczbie losowych błędów mogą stworzyć konsensus o bardzo dużej celnośći, ponieważ losowe błędy zostaną wyelimowane poprzez nałożenie na siebie odczytów. Natomiast systematyczne błędy zostaną powielone w konsensusie.
+
+Literatura porównująca basecallery pokazuje, że średnia dokładność otrzymanych odczytów jest w przedziale 80-90\%, a celność konsensus otrzymanego z wielu odczytów wacha się pomiędzy 99.37\% a 99.94\%\cite{wick}. Zatem w genomie bakteri e. coli o długości około 4.6 miliona baz wystąpiłoby conajmniej 4.6 tysiąca insercji, delecji i substytucji. Taka liczba substytucji znacznie utrudnia użycie sekwencjonowania nanopore w zastosowaniach gdzie nawet zamiana pojedyńczej bazy w genomie, nazywana w skrócie SNP(single nucleotide polymorphism), ma kluczowe znaczenie\cite{snp}. Zatem stworzenie basecallera o lepszej precyzji zwiększyłoby zakres zastosowań technologii.
+
+
+\begin{table}
+	\centering
+	\begin{tabular}{llll}
+		Basecaller   & Mediana celności odczytu & Mediana celności konsensusu & \begin{tabular}[c]{@{}l@{}}Średnia długość odczytu \\ względem referencji\end{tabular} \\
+		Albacore     & 88\%                     & 99.37\%                     & 99.8\%                                                                                 \\
+		Guppy        & 88\%                     & 99.37\%                     & 99.8\%                                                                                 \\
+		Scrappie     & 86\%                     & 99.42\%                     & 95\%                                                                                   \\
+		Chiron       & 86\%                     & 99.4\%                      & 98\%                                                                                   \\
+		DeepNano     & 78\%                     & 96\%                        & 99\%                                                                                   \\
+		basecRAWller & 74\%                     & 85\%                        & 106\%                                                                                 
+	\end{tabular}
+	\caption{\label{}Porównanie jakości dostępnych Basecallerów.}
+\end{table}
+
 \chapter*{Opis rozwiązania}
 
 \section*{Przygotowanie zbiorów danych danych}
 
 W celu nauczenia i testowania sieci neuronowej przygotowane zostały 2 zbiory danych w postaci par \textit{wektor synału, odpowiadające mu nukleotydy}.
-Pierwszy zbiór powstał z danych z sekwencjonowania genomu ludzkiego z lini komórkowej NA12878. Wykorzystano wyłącznie DNA pochodzące z chromosomu mitochondrialnego, na które składa się 5000 odczytów.
+Pierwszy zbiór powstał z danych z sekwencjonowania genomu ludzkiego z lini komórkowej NA12878. Wykorzystano DNA pochodzące z chromosomu mitochondrialnego, na które składa się 5000 odczytów.
 Dane pochodzące z sekwencjonowania metodą Nanopore pochodzą z repozytorium udostępnionego przez Whole Human Genome Sequencing Project\cite{nanoporeHuman},a genom referencyjny sekwencjonwany metodą Illumina pochodzi z The International Genome Sample Resource\cite{refGenome}. Aby uzyskać dane treningowe nie będące obciążone błędem innego \textit{basecallera} wykorzystano pakiet \textit{nanoraw}\cite{nanoraw}. Dokonuje on uliniowienia sygnału pochodzącego z sekwencjonowania technologią nanopore i genomu referencyjnego. W efekcie otrzymano podział sygnału na fragmenty, z których każdy odpowiada jednem z nukleotydów.
 
 W celu poprawienia generalności rozwiązania do uczenia sieci wykorzystano również zbiór danych z sewkwencjonowania gatunków \textit{Escherichia virus Lambda} i \textit{Escherichia coli} składający się z 4000 odczytów \cite{chironData}. Uliniowienie z genomami referencyjnymi zostało wykonane przez autorów zbioru, w sposób analogiczny do opisanego powyżej.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{squiggle}
+	\caption{Wizualizacja dopasowania baz do znormalizowanego sygnału}
+\end{figure}
+
 \section*{Eksploracyjna analiza danych}
+
+Sygnał elektryczny o całkowitej długości 246 892 693 został dopasowany do sekwencji składających się w sumie z 29 193 641 par zasad. Zatem długość segmentu odpowiadjącego jednej bazie wynosi 8.457071. Długość takich segmentów ma kluczowe znaczenie w budowie modelu, ponieważ na poziom sygnału w danym kroku czasowym ma wpływ 4 do 5 baz obecnie znajdujących się w porze. Zatem, aby wykonać poprawną predykcję model potrzebuje informacji o bazach w odległośći 2 od tej, dla której dokonywana jest predykcja. Średnia długość fragmentu sygnału odpowiadającego 5-merowi wyniosła 33.81744, z odchyleniem standardowym równym 21.70463. Tak duże odchylenie standardowe wynika z obecności małej liczby 5-merów o sygnale bardzo dużej długości - 99\% fragmentów syngału odpowiadających 5-merowi miało długość mniejszą niż 79, 99.95\% mniejszą niż 209, a 99.9\% niż 620. Najdłuższy taki fragment sygnału miał długość 10197. Podczas sekwenjonowania nić dna przepływa przez por z prędkośćią 250-450 baz na sekundę a sygnwał jest próbkowany 4000 razy na sekundę. Zatem na jeden 5-mer powinno przypadać do 80 próbek sygnału. Większa ich liczba może świadczyć o zablokowaniu się nici w porze lub innej anomalii w procesie sekwencjonowania. Ponad 99\% 5-merów w danych treningowych spełnia ten warunek.
+
+\begin{table}[]
+	\centering
+	\begin{tabular}{ll}
+		10\%    & 21  \\
+		30\%    & 26  \\
+		50\%    & 31  \\
+		70\%    & 37  \\
+		90\%    & 49  \\
+		99\%    & 79  \\
+		99.5\%  & 94  \\
+		99.9\%  & 155 \\
+		99.99\% & 620
+	\end{tabular}
+	\caption{\label{}Wybrane kwantyle długośći syngałów odpowiadających 5-merow nukleotydów.}
+\end{table}
+
+\section*{Ogólna architektura rozwiązania}
+
+Problem basecallingu polega na translacji pewnej sekwencji wejśćiowej na sekwencję wejściową w innej domenie o zmiennej ale mniejszej długości. Ma on wiele podobieństw do problemów takich jak rozponawanie mowy, rozpoznawanie pisma pisanego, segmentacja obrazu czy tłumaczenie maszynowe, do których z sukcesami zastosowano sieci neuronowe i uczenie głębokie. Modele i techniki użyte do tych zastosowań mogą być skuteczne w dziedzinie basecallingu.
+
+Z racji na dużą długość odczytów sygnał odpowiadający całemu odczytowi musi zotać podzielony na mniejsze fragmenty, które mogą zostać przetworzone przez sieć. Każdy z tych segmentów powinien być wystarczająco długi, aby odpowiadać kilku 5-merom nukleotydów. Z sygnału powinny zostać wyekstrachowane pewne cechy lokalne względem kroku czasowego. Sieć pownnia zawierać również moduł, który znajdzie zależności pomiędzy tymi cechami, aby dokonać segmentacji i dopasować sygnał do baz. Moduł ten powinien wykorzystywać cechy dla wszystkich kroków czasowych, wchodzących w skład 5-meru do którego należy obecny krok czasowy. Na podstawie wyniku obliczeń tego modułu zostanie obliczone prawdopodobieńśtwo, że próbka sygnału z kroku czasowego odpowiada jednej z baz lub granicy pomiędzy nimi. Z racji tego, że długość sekwencji wyjściowej jest zmienna należy wykorzystać dekodowanie CTC\cite{ctc}. Wyniki obliczone dla każdego krótkiego fragmentu muszą zostać złożone w konsensus reprezentujący sekwencję dla całego odczytu.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[]{architecture}
+	\caption{Schemat wysokopoziomowej architektury rozwiązania.}
+\end{figure}
+
 
 \section*{Reprezentacja i przygotowanie danych wejściowych}
 
-\section{ReLU}
+Sygnał jest normalizowany poprzez odjęcie średniej dla odczytu i podzielenie przez odchyelenie standardowe. Sygnał jest dzielony na fragmenty po 300 próbek. Zgodnie z przedstawionymi wcześniej kwantylami długości fragmentów sygnału odpowiadającym 5-merom podsekwencje o takiej długości w ponad 99.9\% przypadków odpowiadają conajmniej kilku 5-merom. Zastosowanie takiej długości umożliwia również uczenie sieci w batchach o wielkości ponad 100 przykładów co przyspiesza proces uczenia. 
+
+\section{Wykorzystane koncepty z dziedziny uczenia głębokiego}
+
+W kolejnych sekcjach opisano techniki uczenia głębokiego i architektury sieci, które wykorzystano w testowanych modelach lub były one inspiracją dla nich.
+
+\subsection{ReLU}
 
 Funkcje aktywacji są stosowane w sieciach neuronowych w celu dodania nieliniowości do modelu. Są one stosowane do wyniku obliczeń warstw wewnątrz sieci. \textit{Recitified linear unit} czyli ReLU jest funkcją aktywacji daną wzorem
 \[Relu(x) = max(0,x)\]
 
-\section{\textit{Batch Normalization}}
+\subsection{\textit{Batch Normalization}}
 
 \textit{Batch normalization} to metoda przyspieszająca uczenie sieci neuronowych, polegająca na normalizacji danych wejśćiowych do warstw ukrytych. Dzięki temu rozkład wartości aktywacji tych warstw pozostaje taki sam podczas całego procesu uczenia sieci. Wynik zastosowania \textit{Batch normalization } dla danych wejściowy $h$ jest danym wzorem:
 \[BN(h, \lambda, \beta)=\beta+\lambda\frac{h-\hat{E}}{\sqrt{\hat{Var}(h)+\epsilon}}\]
 gdzie $\lambda$ i $\beta$ są wagami nauczonymi przez sieć a $\epsilon$ to parametr regularyzujący.
 
-\section*{Sieci konwolucyjne, ResNet}
+\subsection*{Sieci konwolucyjne, ResNet}
 
 Sieci konwolucyjne(splotowe) to klasa głębokich sieci neuronowych wykorzystujących operację konwolucji. Charakteryzują się one mniejszą ilością parametrów i lepszą umiejętnością uczenia się lokalnych cech danych wejśćiowych niż sieci w pełni połączone\cite{cnn} i dzięki temu znajdują zastosowanie w ekstrakcji cech w problemach, w których dane wejśćiowe są zależne od położenia lub czasu, takich jak rozpoznawanie obrazu \cite{vgg}, wideo\cite{cnnVideo} lub dźwięku\cite{cnnAudio}.
 
 W przypadku sieci konwolucyjnych składających się z wielu warstw występuje problem zanikającego gradientu, co znacznie spowalnia lub uniemożliwa uczenia takich sieci\cite{difficulty}.
-Architekturą, która próbuje rozwiązać tą trudność jest \textit{resNet}, osiągający jedne z najlepszych wyników w dziedzinie klasyfikacji obrazu. Sieci tego typu składają się z bloków zawierających połączenia omijające część warstw. Na wyjściu z każdego bloku znajduje się suma danych wejściowych i danych przetworzonych przez warstwy wenątrz bloku. Dzięki temu. sygnał nie zanika przed osiągnięciem dalszej części sieci. Umożliwiło to trenowanie sieci o większej liczbie warstw bez utraty celności predykcji.\cite{resnet}.
+Architekturą, która próbuje rozwiązać tą trudność jest \textit{resNet}, osiągający jedne z najlepszych wyników w dziedzinie klasyfikacji obrazu. Sieci tego typu składają się z bloków zawierających połączenia omijające część warstw. Na wyjściu z każdego bloku znajduje się suma danych wejściowych i danych przetworzonych przez warstwy wenątrz bloku. Dzięki temu sygnał nie zanika przed osiągnięciem dalszej części sieci. Umożliwiło to trenowanie sieci o większej liczbie warstw bez utraty celności predykcji.\cite{resnet}.
 
 \begin{figure}[h!]
 	\centering
@@ -391,9 +454,9 @@ Ulepszona wersja tej architektury zawierająca mapowania identycznościowe zosta
 	\caption{Konstrukcja bloku użytego w sieci resNet w wersji a) orygninalnej i b) z mapowaniem identycznościowym}
 \end{figure}
 
-\section{DenseNet}
+\subsection*{DenseNet}
 
-W architekturze DenseNet, będącej rozwnięciem idei wykorzystanych w ResNet, każda z warstw przekazuje do dalszej części sieci skontatenowane wyniki obliczeń wykonanych przez siebie i każdą z poprzednich warstw. Na wyjściu z sieci znajdują sie cechy obliczone, przez każdą z warstw w sieci - wynikami kolejnych warstw są cechy danych wejśćiowych coraz wyższego rzędu. Dzięki temu wszystkie warstwy w sieci podlegają nadzorowi, podobnie jak w sieciach DSN(Deeply-Supervised Nets)\cite{DSN}. Wykorzystanie cech obliczonych w począktwych warstwach w dalszej części sieci, umożliwia zastosowanie modeli o mniejszej liczbie parametrów. Klasyfikacja jest dokonywana na podstawie cech niskiego i wysokiego rzędu. Dzięki temu sieci typu DenseNet osiągają lepszą precyzję klasyfikacji, niż sieci typu ResNet, mimo zastosowania mniej złożonego modelu\cite{denseNet}. 
+W architekturze DenseNet, będącej rozwnięciem idei wykorzystanych w ResNet, każda z warstw przekazuje do dalszej części sieci skontatenowane wyniki obliczeń wykonanych przez siebie i każdą z poprzednich warstw. Na wyjściu z sieci znajdują sie cechy obliczone, przez każdą z warstw w sieci - wynikami kolejnych warstw są cechy danych wejściowych coraz wyższego rzędu. Dzięki temu wszystkie warstwy w sieci podlegają nadzorowi, podobnie jak w sieciach DSN(Deeply-Supervised Nets)\cite{DSN}. Wykorzystanie cech obliczonych w początkowych warstwach w dalszej części sieci, umożliwia zastosowanie modeli o mniejszej liczbie parametrów. Klasyfikacja jest dokonywana na podstawie cech niskiego i wysokiego rzędu. Dzięki temu sieci typu DenseNet osiągają lepszą precyzję klasyfikacji wielu problemach niż sieci typu ResNet, mimo zastosowania mniej złożonego modelu\cite{denseNet}. 
 
 \begin{figure}[h!]
 	\centering
@@ -401,7 +464,35 @@ W architekturze DenseNet, będącej rozwnięciem idei wykorzystanych w ResNet, k
 	\caption{Schemat połączeń w sieci DenseNet składającej się z 3 bloków.}
 \end{figure}
 
-\section*{Sieci w pełni konwolucyjne}
+\subsection*{Sieci rekurencyjne, LSTM}
+
+Sieci rekurencyjne umożliwiają przetwarzanie danych zależnych od czasu, wykorzystująe do obliczenia wyniku dla pewnego kroku czasowego informacji obecnych w poprzednich krokach. Składają się one z komórek, jednej dla kroku czasowego, z których każda przyjmuje na wejściu stan obliczony przez poprzednią komórkę i dane wejśćiowe dla kroku czasowego, zwraca wynik i oblicza stan, który jest przekazywany do następnej komórkki. Ponieważ wagi są dzielone pomiędzone krokami czasowymi sieci rekurencyjne można interpretować jako wykonanie obliczeń w pętli przez sięć składającą się z jednej takiej komórki. Dzięki temu że stan jest przekazywany pomiędzy kolejnymi krokami sieci rekurencyjne mają mechanizm pamięci i mogą znajdować zależności pomiędzy danymi oddalonymi od siebie o wiele kroków czasowych. \cite{rnn}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics{rnn}
+	\caption{Sieć rekurencyjna w postaci rozwiniętej i w postaci pętli}
+\end{figure}
+
+W praktyce sieciom rekurencyjnym nie udawało się nauczyć się zależnośći pomiędzy danymi oddalonymi od siebie o więcej niż kilka kroków czasowych \cite{rnnDifficulty}. Rozwiązaniem tego problemu okazały się sieci LSTM(Long short-term memory) wykorzystujące specjalną konstrukcję komórki \cite{lstm}. Składa się ona z czterech warstw i przekazuje do kolejnej komórki jako stan dwie zmienne $h_t$ i $C_t$ opowiadające pamięci krótko i długotrwałej.  
+
+Komórka LSTM dla kroku czasowego $t$ wykonuje następujące operacje:
+\begin{itemize}
+	\item Na podstawie stanu $h_{t-1}$ i danych wejściowych $x_t$ obliczany jest wektor $f_t$ o wartościach z przedziału od 0 do 1, który reprezentuje, które wartości ze stanu $C_{t-1}$ powinny zostać zapomniane. 
+	\item Wektor $g_t$ powstaje na podstawie $h_{t-1}$ i $x_t$. Reprezentuje on zmienne dodane do pamięci długotrwałej.
+	\item Stan $C_t$ jest obliczony przez pomnożenie wektora $C_{t-1}$ przez $f_t$ a następnie dodanie $g_t$
+	\item Na podstawie wektorów stanu $C_t$ i $h_{t-1}$ i danych wejściowych $x_t$ zostaje obliczony wektor $h_t$ będący jednocześnie wynikiem dla kroku czasowego $t$ i jednym z dwóch stanów przekazanych do następnej komórki
+\end{itemize}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.7]{lstm}
+	\caption{Konstrukcja komórki sieci LSTM}
+\end{figure}
+
+Sieci LSTM są wykorzystywane w problemach takich jak rozpozanwanie mowy\cite{lstmSpeech}, analiza wideo\cite{lstmVideo}, rozpoznawanie pisma \cite{lstmHandwriting} i tłumaczenie maszynowe\cite{lstmTranslation}.
+
+\subsection*{Sieci w pełni konwolucyjne}
 
 Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z warstw konwolucyjnych, które mogą być zastosowane w problemach w których rozmiar danych wyjściowych, jest zależny od rozmiaru danych wejściowych, takich jak segmentacja obrazu\cite{segmentation} czy modelowanie sekwencji np. dzwięku i tekstu \cite{sequenceModelling}. Wykorzystują one fakt, że każdy neuron w sieci przetwarza tylko dane wejściowe znajdującym się w w jego otoczeniu, którego rozmiar zależy od rozmiaru filtrów w poprzedzających go warstwach. Zatem w sieci składające sie wyłącznie z warstw konwolucyjnych, liczba neuronów w ostatniej warstwie jest zależna od rozmiaru danych wejśćiowych i każdy z tych neuronów odpowiada, pewnemu elementowi z danych wejśćiowych, np. krokowi czasowemu lub pikselowi w obrazie\cite{fcn}.
 
@@ -415,7 +506,7 @@ Czasowe sieci konwolucyjne(\textit{temporal convolutional networks}) to sieci w 
 
 Czasowe sieci konwolucyjne znalazły zastosowanie w problemach, w których dane wejśćiowe są zależne od czasu np. tłumaczenie maszynowe\cite{fcnTranslation} i synteza dźwięku. Innym typem sieci znajdujących zastosowanie w tej klasie problemów są sieci LSTM\cite{lstm}, lecz zademonstrowano, że sieci w pełni konwolucyjne są w stanie osiągać lepsze wyniki w wielu problemach, mimo mniejszego zużycia pamięci i krótszego czasu potrzebnego do wykonania obliczeń \cite{sequenceModelling}.
 
-\section*{WaveNet}
+\subsection*{WaveNet}
 
 Wavenet to głęboka sieć neuronowa wykorzystana oryginalnie do syntezy mowy\cite{wavenet}. Wykorzystano w niej konwolucje rozszerzone i przyczynowe tak jak w czasowych sieciach konwolucyjnych. Do wyniku obliczeń każdej z warstw konwolucyjnych stosuje sie funkcję sigmoidalną i tangens hiperboliczny. Do dalszej części sieci przekazywany iloczyn wyników zastosowania tych funkcji. Podobna operacja jest wykonywana w sieciach LSTM \cite{lstm}, i tak ja tam ma za zadanie znormalizowanie cech i wybranie, które z nich mają przekazane do dalszej części sieci. Dodatkowo wykorzystano połączenia rezydualne podobne do tych w sieci ResNet\cite{resnet}, a klasyfikacja jest dokonywana na podstawie sumy cech obliczonej przez każdą z warstw.
 
@@ -427,7 +518,7 @@ Wavenet to głęboka sieć neuronowa wykorzystana oryginalnie do syntezy mowy\ci
 
 Sieci Wavenet udało się wygenerować mowę bardzo podobną do ludzkiej\cite{wavenet}, znalazła ona również zastosowanie w problemach rozpoznawania mowy, redukcji hałasu i generowania muzyki\cite{wavenetReview}.
 
-\section*{Dekodowanie CTC}
+\subsection*{Dekodowanie CTC}
 
 Zarówno sieci konwolucyjne jak i sieci LSTM mogą przyjmować dane wejściowe różnych rozmiarów, ale rozmiar danych wyjściowych jest funkcją rozmiaru danych wejściowych. W celu zbudowania modelu, który dla danych o określonym rozmiarze może zwracać sekwencje różnych długości stosuje sie dekodowanie CTC(\textit{Connectionist Temporal Classification})\cite{ctc}. Dekoder CTC przyjmuje na wejśćiu macierz o rozmiarze \textit{(rozmiar alfabetu wyjśćiowego + 1, długość sekwencji wejśćiowej)}. Element macierzy na pozycji  \textit{(n, t)} opisuje prawdopodbieńśtwo, że krok czasowy \textit{t} danych wejśćiowych odpowiada \textit{n}-temu elementowi alfabetu wyjśćiowego. Ostatni wiersz macierzy odpowiada prawdopobieństwu wystąpienia dodatkowego symbolu - znaku pustego odpowiadającemu granicom pomiędzy kolejnymi znakami w ciągu wyjściowym. 
 
@@ -443,16 +534,38 @@ Prawdopodobieństwo sekwencji wyjściowej to suma prawdopodobieństw wszystkich 
 
 Funkcja straty dla dekodowania CTC zdefiniowana jest jako
 \[-\ln{(p(x|z))}\]
-gdzie $p(x|z)$ to prawdopobieńśtwo prawdziwej sekwencji dla danej macierzy prawdopodobieństw dla kroków czasowych.
+gdzie $p(x|z)$ to prawdopobieństwo prawdziwej sekwencji dla danej macierzy prawdopodobieństw dla kroków czasowych.
 
 
 \section*{Architektury przetestowanych sieci neuronowych}
 
+\subsection{ResNet + LSTM z połączeniami rezydualnymi}
+
+Na dane wejściowe nakładana jest warstwa konwolucyjna zmienająca ich kształt tak, aby ostatni wymiar miał rozmiar 256. Jest to potrzebne, aby mogłe one zostać wykorzystane w połączeniach rezydualnych. Następnie w sieci znajduje się 5 bloków rezydualnych z mapowaniem identycznośćiowym z warstwami konwolucyjnymi obliczającymi 256 cech. Po nich następuje 3 warstwowa sieć LSTM obliczająca 128 cech. Jest ona aplikowana do cech obliczonych przez poprzednie warstwy w obu kierunkach - od początku od końca i od końca do początku. Zatem każda z warstw oblicza również po 256 cech. Również w tej częsci sieci zostały dodane połączenia rezydualne omijające warstwę. Są one sumowane z cechami obliczonymi przez warstwę, które omijają. Zatem sygnał wejściowy może płynąć przez całą sieć bez żadnych modyfikacji poza zmianą kształtu w pierwszej warstwie. Ostatnią warstwą w sieci jest warstwa gęsto połączona która dla każdego kroku czasowego oblicza prawdopodobieństwo że odpowiada on któremuś z nukleotydów lub granicy pomiędzy nimi. Wynik tej warstwy trafia do dekodera CTC.
+
+\subsection{ResNet + Konwolucje czasowe}
+
+Podobnie jak w poprzedniej sieci do esktrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki wykorzystujące warstwy konwolucyjne rozszerzone i przyczynowe. W każdym bloku znajdują się 4 warstwy. Najpierw aplikowane są dwie z nich - jedna w oryginalnym kierunku a druga w odwróconym. Efekt zastosowania warstwy w odwróconym kierunku jest uzyskany poprzez odwróceniu danych wejściowych wobec wymiaru odpowiadającemu czasowi, zastosowanie warstwy i odwróceniu otrzymanego wyniku. Oba te wyniki są konkatenowane, a następnie stosuje się do nich \textit{Batch normalization} i funkcję aktywacyjną ReLu Dwie kolejne warstwy wykonują tą samą operację. Każda z warstw oblicza po 128 cech. Wszystkie warstwy wewnątrz danego bloku mają tą samą wartośc rozszerzenia(dilation), lecz w każdym kolejnym bloku jest ona podwajana. W sumie w sieci znajduje się 7 takich bloków, czyli ostatni ma wartość rozszerzenia równą 64. Jądro ma wielkość 3, zatem pole receptywne konwolucji w ostatniej warstwie sięga 128 kroków czasowych w obu kierunkach. Warstwa gęsto połączona jest aplikowana do sumy wyników obliczeń każdego z bloków.
+
+\subsection{ResNet + WaveNet}
+
+Ten model jest rozszerzeniem poprzedniego o idee wykorzystane w WaveNet\cite{wavenet}. Do esktrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki zawierające 2 warstwy konwolucyjne rozszerzone i przyczynowe. Do wyniku z nich jednej z nich aplikowana jest funkcja sigmoidalna a do drugiej tangens hyperboliczny, a następnie obliczany jest iloczyn. W ten sposób sieć może nauczyć się zapamiętywać lub usuwać z pamięci pewne cechy. Warstwy konwolucyjne są aplikowane w obu kierunkach i obliczają 256 cech. Jądro w tych warstwach ma rozmiar 2,a rozszerzenia przyjmują wartośći od 1 do 128 zatem pole receptywne ma tą samą wielkośc co w poprzednim modelu. Tak samo jak w poprzednim modelu dane wyjśćiowego każdego z bloków są sumowane i przekazywane do warstwy gęsto połączonej.
+
+\subsection{DenseNet + WaveNet}
+
+W tym modelu do ekstrakcji cech lokalnych wykorzystano model wzorowany na sieci DenseNet\cite{denseNet}. Składa się on z 30 warstw konwolucyjnych z \textit{batch normalization} i funkcją aktywacyjną ReLU. Każda z warstw oblicza 12 cech i konkatenuje je z danymi wejściowymi, które otrzymała. Po 30 warstwach zostaje zatem obliczone 360 cech. Po nich następuje warstwa która zmiejsza liczbę cech do 256 poprzez obliczenie kombinacji cech otrzymanych na wejściu. Dalsza część sieci jest analogiczna do poprzedniego modelu. 
+
 \section*{Składanie odczytów}
 
-\chapter*{Analiza wyników}
+Predykcja dokonywana jest na fragmentach o długości 300 próbek sygnału. Każdy taki fragment pokrywa się z następnym w 90\% to znaczy fragmenty zaczynaja się od próbki sygnału o indeksach 0, 30, 60, 90 itd. Uzyskuje się w ten sposób dziesięciokrotne pokrycie krótkimi odczytami. Z racji że kolejność krótkich odczytów w konsensusie jest znana utworzenie go jest łatwe. Uzyskuje się go przez znaleznie najdłuższych zachodzących na siebie fragmentów sąsiadujących odczytów. W ten sposób zliczane są wystąpienia nukleotydów na każdej pozycji i wybierane te, które pojawiają się najczęściej.
 
-\section*{Zbiory danych}
+\begin{figure}[h!]
+	\centering
+	\includegraphics{assembly}
+	\caption{Wizualizacj składanie krótkich odczytów w długi.}
+\end{figure}
+
+\chapter*{Analiza wyników}
 
 \section*{Szczegóły techniczne implementacji}
 
@@ -482,9 +595,12 @@ gdzie $p(x|z)$ to prawdopobieńśtwo prawdziwej sekwencji dla danej macierzy pra
 \bibitem{sequencingTechnologies} James M.Heather, Benjamin Chain The sequence of sequencers: The history of sequencing DNA
 \bibitem{refGenome} Susan Fairley, Ernesto Lowy-Gallego, Emily Perry, Paul Flicek, The International Genome Sample Resource (IGSR) collection of open human genomic variation resources, Nucleic Acids Research.
 \bibitem{nanoporeHuman} Miten Jain, Sergey Koren, Karen H Miga, Josh Quick, Arthur C Rand, Thomas A Sasani, John R Tyson, Andrew D Beggs, Alexander T Dilthey, Ian T Fiddes, Sunir Malla, Hannah Marriott, Tom Nieto, Justin O'Grady, Hugh E Olsen, Brent S Pedersen, Arang Rhie, Hollian Richardson, Aaron R Quinlan, Terrance P Snutch, Louise Tee, Benedict Paten, Adam M Phillippy, Jared T Simpson, Nicholas J Loman \& Matthew Loose. Nanopore sequencing and assembly of a human genome with ultra-long reads. Nature Biotechnology
+\bibitem{ebola} Hoenen T, Groseth A, Rosenke K, et al. Nanopore Sequencing as a Rapidly Deployable Ebola Outbreak Tool. Emerg Infect Dis. 2016;22(2):331–334. doi:10.3201/eid2202.151796
 \bibitem{deepNano}Boza, V., Brejova, B. \& Vinar, T. Deepnano: Deep recurrent neural networks for base calling in minion nanopore reads.PloS one12, e0178751 (2017).
 \bibitem{basecrawler}Stoiber, M. \& Brown, J. Basecrawller: Streaming nanopore basecalling directly from raw signal.bioRxiv133058 (2017).
 \bibitem{chiron} Haotian Teng, Minh Duc Cao, Michael B Hall, Tania Duarte, Sheng Wang, Lachlan J M Coin, Chiron: translating nanopore raw signal directly into nucleotide sequence using deep learning, GigaScience, Volume 7, Issue 5, May 2018, giy037, https://doi.org/10.1093/gigascience/giy037
+\bibitem{wick}Wick, R.R., Judd, L.M. \& Holt, K.E. Performance of neural network basecalling tools for Oxford Nanopore sequencing. Genome Biol 20, 129 (2019) doi:10.1186/s13059-019-1727-y
+\bibitem{snp}Pightling AW, Pettengill JB, Luo Y, Baugher JD, Rand H, Strain E. Interpreting whole-genome sequence analyses of foodborne bacteria for regulatory applications and outbreak investigations. Front Microbiol. 2018; 9:1–13. https://doi.org/10.3389/fmicb.2018.01482.
 \bibitem{nanoraw}Stoiber, M.H. et al. De novo Identification of DNA Modifications Enabled by Genome-Guided Nanopore Signal Processing. bioRxiv (2016).
 \bibitem{chironData} Teng H; Cao MD; Hall MB; Duarte T; Wang S; Coin LJM (2018): Supporting data for "Chiron: Translating nanopore raw signal directly into nucleotide sequence using deep learning" GigaScience Database.
 \bibitem{resnet} K. He, X. Zhang, S. Ren and J. Sun, “Deep Residual Learning for Image Recognition,” in CVPR, 2016.
@@ -500,6 +616,12 @@ gdzie $p(x|z)$ to prawdopobieńśtwo prawdziwej sekwencji dla danej macierzy pra
 \bibitem{fcn}Fully Convolutional Networks for Semantic Segmentation Jonathan Long, Evan Shelhamer, Trevor Darrell
 \bibitem{DSN}Deeply-Supervised Nets Chen-Yu Lee, Saining Xie, Patrick Gallagher, Zhengyou Zhang, Zhuowen Tu
 \bibitem{denseNet}Densely Connected Convolutional Networks Gao Huang, Zhuang Liu, Laurens van der Maaten, Kilian Q. Weinberger
+\bibitem{rnn} A., Servan-Schreiber, D., and McClelland, J. L. Finite-state automata and simple recurrent networks Neural Computation, pp , 1:372-381.
+\bibitem{rnnDifficulty} Y. Bengio, P. Simard, P. Frasconi Learning long-term dependencies with gradient descent is difficult, IEEE Transactions on Neural Networks (Volume: 5 ,Issue: 2 , March 1994)
+\bibitem{lstmSpeech} Alex Graves, Navdeep Jaitly Towards End-to-End Speech Recognition with Recurrent Neural Networks
+\bibitem{lstmVideo} Subhashini Venugopalan, Marcus Rohrbach, Jeff Donahue, Raymond Mooney, Trevor Darrell, Kate Saenko,  Sequence to Sequence -- Video to Text
+\bibitem{lstmHandwriting} Alex Graves, Jurgen Schmidhuber Offline Handwriting Recognition with Multidimensional Recurrent Neural Networks
+\bibitem{lstmTranslation} Yonghui Wu, Mike Schuster, Zhifeng Chen, Quoc V. Le, Mohammad Norouzi, Wolfgang Macherey, Maxim Krikun, Yuan Cao, Qin Gao, Klaus Macherey, Jeff Klingner, Apurva Shah, Melvin Johnson, Xiaobing Liu, Łukasz Kaiser, Stephan Gouws, Yoshikiyo Kato, Taku Kudo, Hideto Kazawa, Keith Stevens, George Kurian, Nishant Patil, Wei Wang, Cliff Young, Jason Smith, Jason Riesa, Alex Rudnick, Oriol Vinyals, Greg Corrado, Macduff Hughes, Jeffrey Dean Google's Neural Machine Translation System: Bridging the Gap between Human and Machine Translation
 \bibitem{fcnTranslation}Pervasive Attention: 2D Convolutional Neural Networks for Sequence-to-Sequence Prediction Maha Elbayad, Laurent Besacier, Jakob Verbeek
 \bibitem{lstm} Sepp Hochreiter; Jürgen Schmidhuber Long short-term memory. Neural Computation
 \bibitem{tcn} Nal Kalchbrenner  Lasse Espeholt  Karen Simonyan  Aaron van den Oord  Alex Graves  Koray Kavukcuoglu Neural Machine Translation in Linear Time
