@@ -181,10 +181,10 @@
 
 % --------------------- Ustawienia użytkownika ------------------
 
-\newcommand{\tytul}{Tytuł pracy dyplomowej w języku polskim}
-\renewcommand{\title}{English title}
-\newcommand{\type}{inżyniers} % magisters, licencjac
-\newcommand{\supervisor}{dr inż. Promotor X}
+\newcommand{\tytul}{Zastosowanie sieci neuronowych do identyfikacji nukleotydów z danych pochodzących z sekwencjonowania technologią Nanopore}
+\renewcommand{\title}{Application of neural networks to identify nucleotides from data derived from Nanopore sequencing}
+\newcommand{\type}{magisters} % magisters, licencjac
+\newcommand{\supervisor}{dr hab. Dariusz Plewczyński}
 
 
 
@@ -330,7 +330,7 @@ Wynikiem sekwencjonowania jest fragment całego genomu. nazywanym odczytem(\text
 
 \section{Oxford Nanopore MinION}
 
-Oxford Nanopore MinION to technologia sekwencjonowania dostępna publicznie od maja 2015 r. produkująca długie odczyty, nawet do 2 milionów par zasad. Wykorzystuje ona pory przez, które przepływają pojedyncze nici DNA. Pory osadzone są w rezystentnej membranie polimerowej, przez którą przepływa prąd elektryczny. Nukleotyd znajdujący się w porze wpływa na jego opór elektryczny, tym samym powodując zmianę napięcia. Sygnał elektryczny jest mierzony i to on jest rezultatem pracy urządzenia. Analizując go jest możliwe uzyskanie sekwencji DNA nici, która przepłynęła przez por. Proces ten nazywany jest basecallingiem. Na sygnał elektryczny wpływają pojedyncze molekuły znajdujące się wewnątrz poru co wprowadza wiele szumu. Dodatkowo w najwęższym punkcie poru znajduje się jednocześnie 4-5 nukleotydów i wszystkie z nich wpływają na opór elektryczny poru i tym samym na mierzony sygnał. Zatem basecalling jest złożonym problemem, który ma kluczowe znaczenie dla jakości sekwencjonowania nanoporowego.
+Oxford Nanopore MinION to technologia sekwencjonowania dostępna publicznie od maja 2015 r. produkująca długie odczyty, nawet do 2 milionów par zasad. Wykorzystuje ona pory przez, które przepływają pojedyncze nici DNA. Pory osadzone są w rezystentnej membranie polimerowej, przez którą przepływa prąd elektryczny. Nukleotyd znajdujący się w porze wpływa na jego opór elektryczny, tym samym powodując zmianę napięcia. Sygnał elektryczny jest mierzony i to on jest rezultatem pracy urządzenia. Analizując go jest możliwe uzyskanie sekwencji DNA nici, która przepłynęła przez por \cite{nanoporeHuman}. Proces ten nazywany jest basecallingiem. Na sygnał elektryczny wpływają pojedyncze molekuły znajdujące się wewnątrz poru co wprowadza wiele szumu. Dodatkowo w najwęższym punkcie poru znajduje się jednocześnie 4-5 nukleotydów i wszystkie z nich wpływają na opór elektryczny poru i tym samym na mierzony sygnał. Zatem basecalling jest złożonym problemem, który ma kluczowe znaczenie dla jakości sekwencjonowania nanoporowego.
 
 Urządzenie MinION jest bardzo przenośne (ma rozmiar zszywacza) i jego koszt jest znacznie mniejszy niż konkurencyjnych urządzeń. Było ono wykorzystywane nawet w terenie, na przykład podczas badania ognisk choroby w odległych rejonach\cite{ebola}. Niski koszt urządzenia pozwala na zastosowanie go na szerszą skalę niż innych technologii sekwencjonowania.
 
@@ -726,7 +726,7 @@ W tabeli \ref{table:consensus} zaprezentowano jakośc konsensusów otrzymanych z
 \bibitem{sequencing} Jay Shendure Shankar Balasubramanian, George M. Church, Walter Gilbert, Jane Rogers, Jeffery A. Schloss, Robert h. Waterston DNA sequencing at 40: past, present and future
 \bibitem{sequencingTechnologies} James M.Heather, Benjamin Chain The sequence of sequencers: The history of sequencing DNA
 \bibitem{refGenome} Susan Fairley, Ernesto Lowy-Gallego, Emily Perry, Paul Flicek, The International Genome Sample Resource (IGSR) collection of open human genomic variation resources, Nucleic Acids Research.
-\bibitem{nanoporeHuman} Miten Jain, Sergey Koren, Karen H Miga, Josh Quick, Arthur C Rand, Thomas A Sasani, John R Tyson, Andrew D Beggs, Alexander T Dilthey, Ian T Fiddes, Sunir Malla, Hannah Marriott, Tom Nieto, Justin O'Grady, Hugh E Olsen, Brent S Pedersen, Arang Rhie, Hollian Richardson, Aaron R Quinlan, Terrance P Snutch, Louise Tee, Benedict Paten, Adam M Phillippy, Jared T Simpson, Nicholas J Loman \& Matthew Loose. Nanopore sequencing and assembly of a human genome with ultra-long reads. Nature Biotechnology
+\bibitem{nanoporeHuman} Miten J. et al., Nanopore sequencing and assembly of a human genome with ultra-long reads, Nature Biotechnology 36, pp. 338–345 (2018) 
 \bibitem{ebola} Hoenen T, Groseth A, Rosenke K, et al. Nanopore Sequencing as a Rapidly Deployable Ebola Outbreak Tool. Emerg Infect Dis. 2016;22(2):331–334. doi:10.3201/eid2202.151796
 \bibitem{deepNano}Boza, V., Brejova, B. \& Vinar, T. Deepnano: Deep recurrent neural networks for base calling in minion nanopore reads.PloS one12, e0178751 (2017).
 \bibitem{basecrawler}Stoiber, M. \& Brown, J. Basecrawller: Streaming nanopore basecalling directly from raw signal.bioRxiv133058 (2017).
