@@ -296,17 +296,17 @@ samodzielnie, co poświadczam własnoręcznym podpisem.
 \null\thispagestyle{empty}\newpage
 \pagestyle{fancy}
 \pagenumbering{arabic}
-\setcounter{page}{11} % JEŻELI Z POWODU DUŻEJ ILOŚCI STRON W SPISIE TREŚCI SIĘ NIE ZGADZA, TRZEBA ZMODYFIKOWAĆ RĘCZNIE
+\setcounter{page}{12} % JEŻELI Z POWODU DUŻEJ ILOŚCI STRON W SPISIE TREŚCI SIĘ NIE ZGADZA, TRZEBA ZMODYFIKOWAĆ RĘCZNIE
 
-\chapter*{Wstęp}
+\chapter{Wstęp}
 \markboth{}{Wstęp}
-\addcontentsline{toc}{chapter}{Wstęp}
+%\addcontentsline{toc}{chapter}{Wstęp}
 
-\chapter*{Opis problemu}
+\chapter{Opis problemu}
 
-\section*{DNA}
+\section{DNA}
 
-DNA to molekuła składająca się z dwóch zwiniętych siebie nici tworzących podwójną helisę. DNA jest nośnikiem informacji genetycznej, przenoszącej instrukcje dotyczące rozwoju, funkcjonowania i reprodukcji wszystkich znanych organizmów żyjących i niektórych wirusów. Podstawowym składnikiem budującym DNA są nukleotydy. Każdy z nich zawiera jedną z czterech z zasad: adeninę, cytozynę, guaninę lub tyminę, często oznaczane pierwszą literą nazwy (odpowiednio A, C, G lub T). Sekwencja tych baz w DNA definiuje kod genetyczny. Kompletny kod genetyczny organizmu jest nazywany genomem. Długość genomu znacznie różni się pomiędzy gatunkami.
+DNA to molekuła składająca się z dwóch zwiniętych wokół siebie nici tworzących podwójną helisę. DNA jest nośnikiem informacji genetycznej, przenoszącej instrukcje dotyczące rozwoju, funkcjonowania i reprodukcji wszystkich znanych organizmów żyjących i niektórych wirusów. Podstawowym składnikiem budującym DNA są nukleotydy. Każdy z nich zawiera jedną z czterech z zasad: adeninę, cytozynę, guaninę lub tyminę, często oznaczanych pierwszą literą nazwy (odpowiednio A, C, G lub T). Sekwencja tych baz w DNA definiuje kod genetyczny. Kompletny kod genetyczny organizmu jest nazywany genomem. Długości genomów znacznie różnią się pomiędzy gatunkami.
 
 
 \begin{table}
@@ -322,21 +322,21 @@ DNA to molekuła składająca się z dwóch zwiniętych siebie nici tworzących 
 \caption{\label{}Liczba par zasad w genomach wybranych organizmów.}
 \end{table}
 
-\section*{Sekwencjonowanie DNA}
+\section{Sekwencjonowanie DNA}
 
 Sekwencjonowanie DNA to proces rozpoznawania sekwencji DNA danego organizmu. Wczesne metody sekwencjonowania (np. metoda Sangera opracowana w 1977 r. \cite{sequencingTechnologies}) były zbyt kosztowne do powszechnych zastosowań, lecz metody drugiej i trzeciej generacji umożliwiły zbadanie DNA organizmów na szerszą skalę i wykorzystanie tej wiedzy w celach takich jak badanie odporności na nowotwory\cite{cancerImmunity} i przyczyn zachorowań na nie\cite{cancerNonCoding}, badanie historii adaptacji w procesie ewolucji człowieka \cite{adaptation}, medycyna spersonalizowana do kodu genetycznego człowieka \cite{personalizedMedicine}, badania prenatalne \cite{prenatal} i diagnostyka chorób o podłożu genetycznym\cite{diagnosis}.
 
-Wynikiem sekwencjonowania jest fragment całego genomu. nazywanym odczytem(\textit{read}). Długość odczytów jest zależna od użytej technologii - sekwencjonowanie technologią produkuje odczyty o długości do 600 par zasad przy celności do 99.9\%, a przy użyciu technologii PacBio odczyty osiągają długość nawet do 100 tysięcy par zasad przy celności 87\%. Odczyty są dopasowywane i łączone tak aby otrzymać cały genom(po angielsku ten proces jest nazywany \textit{genome assembly}).  Pomimo większej ilości błędów w długich odczytach są one potrzebne do dopasowania regionów repetytywnych, czyli podsekwencji genomu występujących w nim wielokrotnie. Dla tego do składania genomu wykorzystuje się zarówno odczyty długie i krótkie.
+Wynikiem sekwencjonowania jest fragment całego genomu. nazywanym odczytem(\textit{read}). Długość odczytów jest zależna od użytej technologii - sekwencjonowanie technologią Illumina produkuje odczyty o długości do 600 par zasad przy celności do 99.9\%, natomiast przy użyciu technologii PacBio odczyty osiągają długość nawet do 100 tysięcy par zasad przy celności 87\%. Odczyty są dopasowywane i nakładane na siebie tak aby otrzymać cały genom(po angielsku ten proces jest nazywany \textit{genome assembly}).  Pomimo większej ilości błędów w długich odczytach są one potrzebne do dopasowania regionów repetytywnych, czyli podsekwencji genomu występujących w nim wielokrotnie. Dla tego do składania genomu wykorzystuje się zarówno odczyty długie jak i krótkie.
 
-\section*{Oxford Nanopore MinION}
+\section{Oxford Nanopore MinION}
 
-Oxford Nanopore MinION to technologia sekwencjonowania dostępna publicznie od maja 2015 r. produkująca długie odczyty, nawet do 2 milionów par zasad. Wykorzystuje ona pory przez, które przepływają pojedyncze nici DNA. Pory osadzone są w rezystentnej membranie polimerowej, przez którą przepływa prąd elektryczny. Nukleotyd znajdujący się w porze wpływa na jego opór elektryczny, tym samym powodując zmianę napięcia. Sygnał elektryczny jest mierzony i to on jest rezultatem pracy urządzenia. Analizując go jest możliwe uzyskanie sekwencji DNA nici, która przepłynęła przez por. Proces ten nazywany jest basecallingiem. Na sygnał elektryczny wpływają pojedyncze molekuły znajdujące się wewnątrz poru co wprowadza wiele szumu. Dodatkowo w najwęższym punkcie poru znajduje się jednocześnie 4-5 nukleotydów i wszystkie z nich wpływają na opór elektryczny poru i tym samym mierzony sygnał. Zatem basecalling jest złożonym problemem, który ma kluczowe znaczenie dla jakości sekwencjonowania nanoporowego.
+Oxford Nanopore MinION to technologia sekwencjonowania dostępna publicznie od maja 2015 r. produkująca długie odczyty, nawet do 2 milionów par zasad. Wykorzystuje ona pory przez, które przepływają pojedyncze nici DNA. Pory osadzone są w rezystentnej membranie polimerowej, przez którą przepływa prąd elektryczny. Nukleotyd znajdujący się w porze wpływa na jego opór elektryczny, tym samym powodując zmianę napięcia. Sygnał elektryczny jest mierzony i to on jest rezultatem pracy urządzenia. Analizując go jest możliwe uzyskanie sekwencji DNA nici, która przepłynęła przez por. Proces ten nazywany jest basecallingiem. Na sygnał elektryczny wpływają pojedyncze molekuły znajdujące się wewnątrz poru co wprowadza wiele szumu. Dodatkowo w najwęższym punkcie poru znajduje się jednocześnie 4-5 nukleotydów i wszystkie z nich wpływają na opór elektryczny poru i tym samym na mierzony sygnał. Zatem basecalling jest złożonym problemem, który ma kluczowe znaczenie dla jakości sekwencjonowania nanoporowego.
 
-Urządzenie MinION jest bardzo przenośne (ma rozmiar zszywacza) i jego koszt jest znacznie mniejszy niż konkurencyjnych urządzeń. Było ono wykorzystywane nawet w terenie, na przykład podczas badania ognisk choroby w odległych rejonach\cite{ebola}. Niski koszt urządzenia pozaola na zastosowanie go na szerszą skalę niż innych technologii sekwencjonowania.
+Urządzenie MinION jest bardzo przenośne (ma rozmiar zszywacza) i jego koszt jest znacznie mniejszy niż konkurencyjnych urządzeń. Było ono wykorzystywane nawet w terenie, na przykład podczas badania ognisk choroby w odległych rejonach\cite{ebola}. Niski koszt urządzenia pozwala na zastosowanie go na szerszą skalę niż innych technologii sekwencjonowania.
 
-\section*{Istniejące rozwiązania}
+\section{Istniejące rozwiązania}
 
-Oxford Nanopore Technologies (producent MinIONa) oferuje kilka basecallerów. Są to oficjalny basecaller Albacore, Guppy wykorzystujący procesory graficzne i Scrappie określany przez producenta jako "demonstracja technologii". Aktualne wersje Albacore i Guppy wykorzystują sieci neuronowe. W przeszłości ONT oferowało również NanoNet będący pierwszym basecallerem opartym o sieci neuronowe, a także Metrichor działający w chmurze obliczeniowej oparty o łańcuchy Markowa. 
+Oxford Nanopore Technologies (producent MinIONa) oferuje kilka basecallerów. Są to oficjalny basecaller Albacore, Guppy wykorzystujący procesory graficzne i Scrappie określany przez producenta jako "demonstracja technologii". Aktualne wersje Albacore i Guppy wykorzystują sieci neuronowe. W przeszłości ONT oferowało również NanoNet będący pierwszym basecallerem dokonującym oredykcji przy użyciu sieci neuronowych, a także Metrichor działający w chmurze obliczeniowej oparty o łańcuchy Markowa. 
 
 Opublikowano również następujące basecallery z otwartym kodem źródłowym pochodzące od społeczności akademickiej.
 
@@ -346,9 +346,9 @@ BasecRAWller\cite{basecrawler} wykorzystuje dwie rekurencyjne sieci neuronowe. P
 
 Chiron\cite{chiron} tłumaczy sygnał elektryczny bezpośrednio na sekwencję DNA. Wykorzystuje on model oparty o sieci konwolucyjne, sieci rekurencyjne i dekodowanie CTC.
 
-Jakość basecallingu można ocenić wykorzystując celność pojedynczego odczytu lub celność konsensusu utworzonego z wielu odczytów pochodzących z tego samego rejonu genomu. Konsensus powstaje poprzez nałożenie na siebie wielu odczytów z pasującymi do siebie fragmentami. Obie te metryki oblicza się poprzez mapowanie uzyskanej sekwencji do znanej sekwencji referencyjnej. Nie muszą być one skorelowane - odczyty o dużej liczbie losowych błędów mogą stworzyć konsensus o bardzo dużej celności, ponieważ losowe błędy zostaną wyeliminowane poprzez nałożenie na siebie odczytów. Natomiast systematyczne błędy zostaną powielone w konsensusie.
+Jakość basecallingu można ocenić wykorzystując celność pojedynczego odczytu lub celność konsensusu utworzonego z wielu odczytów pochodzących z tego samego rejonu genomu. Konsensus powstaje poprzez nałożenie na siebie wielu odczytów z pasującymi do siebie fragmentami. Obie te metryki oblicza się poprzez mapowanie uzyskanej sekwencji na znaną sekwencji referencyjnej. Miary te nie muszą być one skorelowane - odczyty o dużej liczbie losowych błędów mogą stworzyć konsensus o bardzo dużej celności, ponieważ losowe błędy zostaną wyeliminowane poprzez nałożenie na siebie odczytów. Natomiast systematyczne błędy zostaną powielone w konsensusie\cite{wick}.
 
-Literatura porównująca basecallery pokazuje, że średnia dokładność otrzymanych odczytów jest w przedziale 80-90\%, a celność konsensus otrzymanego z wielu odczytów wacha się pomiędzy 99.37\% a 99.94\%\cite{wick}. Zatem w genomie bakterii e. coli o długości około 4.6 miliona baz wystąpiłoby co najmniej 4.6 tysiąca insercji, delecji i substytucji. Taka liczba substytucji znacznie utrudnia użycie sekwencjonowania nanopore w zastosowaniach gdzie nawet zamiana pojedynczej bazy w genomie, nazywana w skrócie SNP(single nucleotide polymorphism), ma kluczowe znaczenie\cite{snp}. Zatem stworzenie basecallera o lepszej precyzji zwiększyłoby zakres zastosowań technologii.
+Literatura porównująca basecallery pokazuje, że średnia dokładność otrzymanych odczytów jest w przedziale 80-90\%, a celność konsensus otrzymanego z wielu odczytów waha się pomiędzy 99.37\% a 99.94\%\cite{wick}. Zatem w genomie bakterii e. coli o długości około 4.6 miliona baz sekwencjonowanego technologią nanopore wystąpiłoby co najmniej 4.6 tysiąca insercji, delecji i substytucji. Taka liczba substytucji znacznie utrudnia użycie sekwencjonowania nanopore w zastosowaniach gdzie nawet zamiana pojedynczej bazy w genomie, nazywana w skrócie SNP(single nucleotide polymorphism), ma kluczowe znaczenie\cite{snp}. Zatem stworzenie basecallera o lepszej precyzji zwiększyłoby zakres zastosowań technologii.
 
 
 \begin{table}
@@ -362,16 +362,16 @@ Literatura porównująca basecallery pokazuje, że średnia dokładność otrzym
 		DeepNano     & 78\%                     & 96\%                        & 99\%                                                                                   \\
 		basecRAWller & 74\%                     & 85\%                        & 106\%                                                                                 
 	\end{tabular}
-	\caption{\label{}Porównanie jakości dostępnych Basecallerów. Wyniki pochodzą z basecallingu danych z sekwencjowania \textit{K. pneumoniae}\cite{wick}}
+	\caption{\label{}Porównanie jakości dostępnych Basecallerów. Wyniki pochodzą z basecallingu danych z sekwencjonowania \textit{K. pneumoniae}\cite{wick}}
 \end{table}
 
-\chapter*{Opis rozwiązania}
+\chapter{Opis rozwiązania}
 
-\section*{Przygotowanie zbiorów danych danych}
+\section{Przygotowanie zbiorów danych danych}
 
-W celu nauczenia i testowania sieci neuronowej przygotowane zostały 2 zbiory danych w postaci par \textit{wektor sygnału, odpowiadające mu nukleotydy}.
+W celu nauczenia sieci neuronowej przygotowane zostały 2 zbiory danych w postaci par \textit{wektor sygnału, odpowiadające mu nukleotydy}.
 Pierwszy zbiór powstał z danych z sekwencjonowania genomu ludzkiego z linii komórkowej NA12878. Wykorzystano DNA pochodzące z chromosomu mitochondrialnego, na które składa się 5000 odczytów.
-Dane pochodzące z sekwencjonowania metodą Nanopore pochodzą z repozytorium udostępnionego przez Whole Human Genome Sequencing Project\cite{nanoporeHuman},a genom referencyjny sekwencjonowany metodą Illumina pochodzi z The International Genome Sample Resource\cite{refGenome}. Aby uzyskać dane treningowe nie będące obciążone błędem innego \textit{basecallera} wykorzystano pakiet \textit{nanoraw}\cite{nanoraw}. Dokonuje on uliniowienia sygnału pochodzącego z sekwencjonowania technologią nanopore i genomu referencyjnego. W efekcie otrzymano podział sygnału na fragmenty, z których każdy odpowiada jednemu z nukleotydów.
+Dane pochodzące z sekwencjonowania metodą Nanopore pochodzą z repozytorium udostępnionego przez Whole Human Genome Sequencing Project\cite{nanoporeHuman}, a genom referencyjny sekwencjonowany metodą Illumina pochodzi z The International Genome Sample Resource\cite{refGenome}. Aby uzyskać dane treningowe nie będące obciążone błędem innego \textit{basecallera} wykorzystano pakiet \textit{nanoraw}\cite{nanoraw}. Dokonuje on uliniowienia sygnału pochodzącego z sekwencjonowania technologią nanopore i genomu referencyjnego. W efekcie otrzymano podział sygnału na fragmenty, z których każdy odpowiada jednemu z nukleotydów.
 
 W celu poprawienia generalności rozwiązania do uczenia sieci wykorzystano również zbiór danych z sewkwencjonowania gatunków \textit{Escherichia virus Lambda} i \textit{Escherichia coli} składający się z 4000 odczytów \cite{chironData}. Uliniowienie z genomami referencyjnymi zostało wykonane przez autorów zbioru, w sposób analogiczny do opisanego powyżej.
 
@@ -383,7 +383,7 @@ W celu poprawienia generalności rozwiązania do uczenia sieci wykorzystano rów
 
 \section*{Eksploracyjna analiza danych}
 
-Sygnał elektryczny o całkowitej długości 246 892 693 został dopasowany do sekwencji składających się w sumie z 29 193 641 par zasad. Zatem długość segmentu odpowiadającego jednej bazie wynosi 8.457071. Długość takich segmentów ma kluczowe znaczenie w budowie modelu, ponieważ na poziom sygnału w danym kroku czasowym ma wpływ 4 do 5 baz obecnie znajdujących się w porze. Zatem, aby wykonać poprawną predykcję model potrzebuje informacji o bazach w odległości 2 od tej, dla której dokonywana jest predykcja. Średnia długość fragmentu sygnału odpowiadającego 5-merowi wyniosła 33.81744, z odchyleniem standardowym równym 21.70463. Tak duże odchylenie standardowe wynika z obecności małej liczby 5-merów o sygnale bardzo dużej długości - 99\% fragmentów sygnału odpowiadających 5-merowi miało długość mniejszą niż 79, 99.95\% mniejszą niż 209, a 99.9\% niż 620. Najdłuższy taki fragment sygnału miał długość 10197. Podczas sekwencjonowania nić dna przepływa przez por z prędkością 250-450 baz na sekundę a sygnał jest próbkowany 4000 razy na sekundę. Zatem na jeden 5-mer powinno przypadać do 80 próbek sygnału. Większa ich liczba może świadczyć o zablokowaniu się nici w porze lub innej anomalii w procesie sekwencjonowania. Ponad 99\% 5-merów w danych treningowych spełnia ten warunek.
+Sygnał elektryczny o całkowitej długości 246 892 693 próbek został dopasowany do sekwencji składających się w sumie z 29 193 641 par zasad. Zatem długość segmentu odpowiadającego jednej bazie wynosi 8.457071. Długość takich segmentów ma kluczowe znaczenie w budowie modelu, ponieważ na poziom sygnału w danym kroku czasowym ma wpływ od 4 do 5 baz obecnie znajdujących się w porze. Zatem, aby wykonać poprawną predykcję model potrzebuje informacji o bazach w odległości 2 baz od tej, dla której dokonywana jest predykcja. Średnia długość fragmentu sygnału odpowiadającego 5-merowi wyniosła 33.81744, z odchyleniem standardowym równym 21.70463. Tak duże odchylenie standardowe wynika z obecności małej liczby 5-merów o sygnale bardzo dużej długości - 99\% fragmentów sygnału odpowiadających 5-merowi miało długość mniejszą niż 79, 99.95\% mniejszą niż 209, a 99.9\% niż 620. Najdłuższy taki fragment sygnału miał długość 10197. Podczas sekwencjonowania nić dna przepływa przez por z prędkością 250-450 baz na sekundę a sygnał jest próbkowany 4000 razy na sekundę. Zatem na jeden 5-mer powinno przypadać do 80 próbek sygnału. Większa ich liczba może świadczyć o zablokowaniu się nici w porze lub innej anomalii w procesie sekwencjonowania. Ponad 99\% 5-merów w danych treningowych spełnia ten warunek. Długie fragmenty sygnału odpowiadające jednej bazie zostały odrzucone i nie były wykorzystywane w procesie uczenia sieci.
 
 \begin{table}[]
 	\centering
@@ -401,48 +401,48 @@ Sygnał elektryczny o całkowitej długości 246 892 693 został dopasowany do s
 	\caption{\label{}Wybrane kwantyle długośći syngałów odpowiadających 5-merow nukleotydów.}
 \end{table}
 
-\section*{Ogólna architektura rozwiązania}
+\section{Ogólna architektura rozwiązania}
 
-Problem basecallingu polega na translacji pewnej sekwencji wejściowej na sekwencję wejściową w innej domenie o zmiennej ale mniejszej długości. Ma on wiele podobieństw do problemów takich jak rozpoznawanie mowy, rozpoznawanie pisma pisanego, segmentacja obrazu czy tłumaczenie maszynowe, do których z sukcesami zastosowano sieci neuronowe i uczenie głębokie. Modele i techniki użyte do tych zastosowań mogą być skuteczne w dziedzinie basecallingu.
+Problem basecallingu polega na translacji pewnej sekwencji wejściowej na sekwencję wyjściową o zmiennej ale mniejszej długości. Sekwencje wejściowe pochodzą z innej domeny niż sekwencje wyjściowe. Problem ten posiada wiele podobieństw do problemów takich jak rozpoznawanie mowy, rozpoznawanie pisma pisanego, segmentacja obrazu czy tłumaczenie maszynowe, do których z sukcesami zastosowano sieci neuronowe i uczenie głębokie. Modele i techniki użyte do tych zastosowań mogą być skuteczne w dziedzinie basecallingu.
 
 Z racji na dużą długość odczytów sygnał odpowiadający całemu odczytowi musi zostać podzielony na mniejsze fragmenty, które mogą zostać przetworzone przez sieć. Każdy z tych segmentów powinien być wystarczająco długi, aby odpowiadać kilku 5-merom nukleotydów. Z sygnału powinny zostać wyekstrahowane pewne cechy lokalne względem kroku czasowego. Sieć powinna zawierać również moduł, który znajdzie zależności pomiędzy tymi cechami, aby dokonać segmentacji i dopasować sygnał do baz. Moduł ten powinien wykorzystywać cechy dla wszystkich kroków czasowych, wchodzących w skład 5-meru do którego należy obecny krok czasowy. Na podstawie wyniku obliczeń tego modułu zostanie obliczone prawdopodobieństwo, że próbka sygnału z kroku czasowego odpowiada jednej z baz lub granicy pomiędzy nimi. Z racji tego, że długość sekwencji wyjściowej jest zmienna należy wykorzystać dekodowanie CTC\cite{ctc}. Wyniki obliczone dla każdego krótkiego fragmentu muszą zostać złożone w konsensus reprezentujący sekwencję DNA dla całego odczytu.
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[]{architecture}
+	\includegraphics[scale=0.5]{architecture}
 	\caption{Schemat wysokopoziomowej architektury rozwiązania.}
 \end{figure}
 
 
-\section*{Reprezentacja i przygotowanie danych wejściowych}
+\section{Reprezentacja i przygotowanie danych wejściowych}
 
 Sygnał jest normalizowany poprzez odjęcie średniej dla odczytu i podzielenie przez odchylenie standardowe. Sygnał pochodzący z jednego odczytu. jest dzielony na fragmenty po 300 próbek. Zgodnie z przedstawionymi wcześniej kwantylami długości fragmentów sygnału odpowiadającym 5-merom podsekwencje o takiej długości w ponad 99.9\% przypadków odpowiadają co najmniej kilku 5-merom. Zastosowanie takiej długości umożliwia również uczenie sieci w batchach o wielkości ponad 100 przykładów co przyspiesza proces uczenia. 
 
 \section{Wykorzystane koncepty z dziedziny uczenia głębokiego}
 
-W kolejnych sekcjach opisano techniki uczenia głębokiego i architektury sieci, które wykorzystano w testowanych modelach lub były one inspiracją dla nich.
+W kolejnych sekcjach opisano techniki uczenia głębokiego i architektury sieci, które wykorzystano w testowanych modelach.
 
 \subsection{ReLU}
 
-Funkcje aktywacji są stosowane w sieciach neuronowych w celu dodania nieliniowości do modelu. Są one stosowane do wyniku obliczeń warstw wewnątrz sieci. \textit{Recitified linear unit} czyli ReLU jest funkcją aktywacji daną wzorem
+Funkcje aktywacji są stosowane w sieciach neuronowych w celu dodania nieliniowości do modelu. Są one stosowane do wyniku obliczeń warstw wewnątrz sieci.We wszystkich modelach wykorzystano funkcję aktywacjj \textit{Recitified linear unit} lub w skrócie ReLU daną wzorem
 \[Relu(x) = max(0,x)\]
 
 \subsection{\textit{Batch Normalization}}
 
 \textit{Batch normalization} to metoda przyspieszająca uczenie sieci neuronowych, polegająca na normalizacji danych wejściowych do warstw ukrytych. Dzięki temu rozkład wartości aktywacji tych warstw pozostaje taki sam podczas całego procesu uczenia sieci. Wynik zastosowania \textit{Batch normalization } dla danych wejściowy $h$ jest danym wzorem:
 \[BN(h, \lambda, \beta)=\beta+\lambda\frac{h-\hat{E}}{\sqrt{\hat{Var}(h)+\epsilon}}\]
-gdzie $\lambda$ i $\beta$ są wagami nauczonymi przez sieć a $\epsilon$ to parametr regularyzujący.
+gdzie $\lambda$ i $\beta$ są wagami nauczonymi się przez sieć a $\epsilon$ to parametr regularyzujący.
 
-\subsection*{Sieci konwolucyjne, ResNet}
+\subsection{Sieci konwolucyjne, ResNet}
 
-Sieci konwolucyjne(splotowe) to klasa głębokich sieci neuronowych wykorzystujących operację konwolucji. Charakteryzują się one mniejszą ilością parametrów i lepszą umiejętnością uczenia się lokalnych cech danych wejściowych niż sieci w pełni połączone\cite{cnn} i dzięki temu znajdują zastosowanie w ekstrakcji cech w problemach, w których dane wejściowe są zależne od położenia lub czasu, takich jak rozpoznawanie obrazu \cite{vgg}, wideo\cite{cnnVideo} lub dźwięku\cite{cnnAudio}.
+Sieci konwolucyjne(splotowe) to klasa głębokich sieci neuronowych wykorzystujących operację konwolucji. Charakteryzują się one mniejszą ilością parametrów i lepszą umiejętnością uczenia się lokalnych cech danych wejściowych niż sieci w pełni połączone\cite{cnn} i dzięki temu znajdują zastosowanie w ekstrakcji cech w problemach, w których dane wejściowe są zależne od położenia lub czasu, takich jak rozpoznawanie obrazu \cite{vgg}, wideo\cite{cnnVideo} lub dźwięku\cite{cnnAudio}. 
 
 W przypadku sieci konwolucyjnych składających się z wielu warstw występuje problem zanikającego gradientu, co znacznie spowalnia lub uniemożliwia uczenia takich sieci\cite{difficulty}.
 Architekturą, która próbuje rozwiązać tą trudność jest \textit{resNet}, osiągający jedne z najlepszych wyników w dziedzinie klasyfikacji obrazu. Sieci tego typu składają się z bloków zawierających połączenia omijające część warstw. Na wyjściu z każdego bloku znajduje się suma danych wejściowych i danych przetworzonych przez warstwy wewnątrz bloku. Dzięki temu sygnał nie zanika przed osiągnięciem dalszej części sieci. Umożliwiło to trenowanie sieci o większej liczbie warstw bez utraty celności predykcji.\cite{resnet}.
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.7]{resnet}
+	\includegraphics[scale=0.5]{resnet}
 	\caption{Schemat połączeń w sieci ResNet składającej się z 3 bloków.}
 \end{figure}
 
@@ -450,28 +450,29 @@ Ulepszona wersja tej architektury zawierająca mapowania identycznościowe zosta
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics{resnetBlock}
+	\includegraphics[scale=0.7]{resnetBlock}
 	\caption{Konstrukcja bloku użytego w sieci resNet w wersji a) oryginalnej i b) z mapowaniem identycznościowym}
+	\label{fig:resnetBlock}
 \end{figure}
 
-\subsection*{DenseNet}
+\subsection{DenseNet}
 
-W architekturze DenseNet, będącej rozwinięciem idei wykorzystanych w ResNet, każda z warstw przekazuje do dalszej części sieci skonkatenowane wyniki obliczeń wykonanych przez siebie i każdą z poprzednich warstw. Na wyjściu z sieci znajdują sie cechy obliczone, przez każdą z warstw w sieci - wynikami kolejnych warstw są cechy danych wejściowych coraz wyższego rzędu. Dzięki temu wszystkie warstwy w sieci podlegają nadzorowi, podobnie jak w sieciach DSN(Deeply-Supervised Nets)\cite{DSN}. Wykorzystanie cech obliczonych w początkowych warstwach w dalszej części sieci, umożliwia zastosowanie modeli o mniejszej liczbie parametrów. Klasyfikacja jest dokonywana na podstawie cech niskiego i wysokiego rzędu. Dzięki temu sieci typu DenseNet osiągają lepszą precyzję klasyfikacji wielu problemach niż sieci typu ResNet, mimo zastosowania mniej złożonego modelu\cite{denseNet}. 
+W architekturze DenseNet, będącej rozwinięciem idei wykorzystanych w ResNet, każda z warstw przekazuje do dalszej części sieci skonkatenowane wyniki obliczeń wykonanych przez siebie i każdą z poprzednich warstw. Na wyjściu z sieci znajdują się cechy obliczone, przez każdą z warstw w sieci - wynikami kolejnych warstw są cechy danych wejściowych coraz wyższego rzędu. Dzięki temu wszystkie warstwy w sieci podlegają nadzorowi, podobnie jak w sieciach DSN(Deeply-Supervised Nets)\cite{DSN}. Wykorzystanie cech obliczonych w początkowych warstwach w dalszej części sieci, umożliwia zastosowanie modeli o mniejszej liczbie parametrów. Klasyfikacja jest dokonywana na podstawie cech niskiego i wysokiego rzędu. Dzięki temu sieci typu DenseNet osiągają lepszą precyzję klasyfikacji wielu problemach niż sieci typu ResNet, mimo zastosowania mniej złożonego modelu\cite{denseNet}. 
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.7]{densenet}
+	\includegraphics[scale=0.6]{densenet}
 	\caption{Schemat połączeń w sieci DenseNet składającej się z 3 bloków.}
 	\label{fig:denseNet}
 \end{figure}
 
-\subsection*{Sieci rekurencyjne, LSTM}
+\subsection{Sieci rekurencyjne, LSTM}
 
-Sieci rekurencyjne umożliwiają przetwarzanie danych zależnych od czasu, wykorzystująe do obliczenia wyniku dla pewnego kroku czasowego informacji obecnych w poprzednich krokach. Składają się one z komórek, jednej dla kroku czasowego, z których każda przyjmuje na wejściu stan obliczony przez poprzednią komórkę i dane wejściowe dla kroku czasowego, zwraca wynik i oblicza stan, który jest przekazywany do następnej komórki. Ponieważ wagi są dzielone pomiędzone krokami czasowymi sieci rekurencyjne można interpretować jako wykonanie obliczeń w pętli przez sieć składającą się z jednej takiej komórki. Dzięki temu że stan jest przekazywany pomiędzy kolejnymi krokami sieci rekurencyjne mają mechanizm pamięci i mogą znajdować zależności pomiędzy danymi oddalonymi od siebie o wiele kroków czasowych. \cite{rnn}
+Sieci rekurencyjne umożliwiają przetwarzanie danych zależnych od czasu, wykorzystując do obliczenia wyniku dla pewnego kroku czasowego informacji obecnej w poprzednich krokach. Składają się one z komórek, jednej dla kroku czasowego, z których każda przyjmuje na wejściu stan obliczony przez poprzednią komórkę i dane wejściowe dla kroku czasowego,  a zwraca wynik i oblicza stan, który jest przekazywany do następnej komórki. Ponieważ wagi są dzielone pomiędzy krokami czasowymi sieci rekurencyjne można interpretować jako wykonanie obliczeń w pętli przez sieć składającą się z jednej takiej komórki. Dzięki temu że stan jest przekazywany pomiędzy kolejnymi krokami sieci rekurencyjne mają mechanizm pamięci i mogą znajdować zależności pomiędzy danymi oddalonymi od siebie o wiele kroków czasowych. \cite{rnn}
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics{rnn}
+	\includegraphics[scale=0.5]{rnn}
 	\caption{Sieć rekurencyjna w postaci rozwiniętej i w postaci pętli}
 \end{figure}
 
@@ -480,51 +481,51 @@ W praktyce sieciom rekurencyjnym nie udawało się nauczyć się zależności po
 Komórka LSTM dla kroku czasowego $t$ wykonuje następujące operacje:
 \begin{itemize}
 	\item Na podstawie stanu $h_{t-1}$ i danych wejściowych $x_t$ obliczany jest wektor $f_t$ o wartościach z przedziału od 0 do 1, który reprezentuje, które wartości ze stanu $C_{t-1}$ powinny zostać zapomniane. 
-	\item Wektor $g_t$ powstaje na podstawie $h_{t-1}$ i $x_t$. Reprezentuje on zmienne dodane do pamięci długotrwałej.
+	\item Wektor $g_t$ powstaje na podstawie $h_{t-1}$ i $x_t$. Reprezentuje on zmienne, które powinny zostać dodane do pamięci długotrwałej.
 	\item Stan $C_t$ jest obliczony przez pomnożenie wektora $C_{t-1}$ przez $f_t$ a następnie dodanie $g_t$
-	\item Na podstawie wektorów stanu $C_t$ i $h_{t-1}$ i danych wejściowych $x_t$ zostaje obliczony wektor $h_t$ będący jednocześnie wynikiem dla kroku czasowego $t$ i jednym z dwóch stanów przekazanych do następnej komórki
+	\item Na podstawie wektorów stanu $C_t$ i $h_{t-1}$ i danych wejściowych $x_t$ zostaje obliczony wektor $h_t$ będący jednocześnie wynikiem dla kroku czasowego $t$ i jednym z dwóch stanów~przekazanych do następnej komórki
 \end{itemize}
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.7]{lstm}
+	\includegraphics[scale=0.6]{lstm}
 	\caption{Konstrukcja komórki sieci LSTM}
 \end{figure}
 
 Sieci LSTM są wykorzystywane w problemach takich jak rozpoznawanie mowy\cite{lstmSpeech}, analiza wideo\cite{lstmVideo}, rozpoznawanie pisma \cite{lstmHandwriting} i tłumaczenie maszynowe\cite{lstmTranslation}.
 
-\subsection*{Sieci w pełni konwolucyjne}
+\subsection{Sieci w pełni konwolucyjne}
 
-Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z warstw konwolucyjnych, które mogą być zastosowane w problemach w których rozmiar danych wyjściowych, jest zależny od rozmiaru danych wejściowych, takich jak segmentacja obrazu\cite{segmentation} czy modelowanie sekwencji np. dzwięku i tekstu \cite{sequenceModelling}. Wykorzystują one fakt, że każdy neuron w sieci przetwarza tylko dane wejściowe znajdującym się w w jego otoczeniu, którego rozmiar zależy od rozmiaru filtrów w poprzedzających go warstwach. Zatem w sieci składające się wyłącznie z warstw konwolucyjnych, liczba neuronów w ostatniej warstwie jest zależna od rozmiaru danych wejśćiowych i każdy z tych neuronów odpowiada, pewnemu elementowi z danych wejściowych, np. krokowi czasowemu lub pikselowi w obrazie\cite{fcn}.
+Sieci w pełni konwolucyjne to rodzaj sieci składających się wyłącznie z warstw konwolucyjnych, które mogą być zastosowane w problemach w których rozmiar danych wyjściowych jest zależny od rozmiaru danych wejściowych takich jak segmentacja obrazu\cite{segmentation} czy modelowanie sekwencji np. dzwięku i tekstu \cite{sequenceModelling}. Wykorzystują one fakt, że każdy neuron w sieci przetwarza tylko dane wejściowe znajdującym się w w jego otoczeniu, którego rozmiar zależy od rozmiaru filtrów w poprzedzających go warstwach. Zatem w sieci składające się wyłącznie z warstw konwolucyjnych, liczba neuronów w ostatniej warstwie jest zależna od rozmiaru danych wejśćiowych i każdy z tych neuronów odpowiada, pewnemu elementowi z danych wejściowych, np. krokowi czasowemu lub pikselowi w obrazie\cite{fcn}.
 
-Czasowe sieci konwolucyjne(\textit{temporal convolutional networks}) to sieci w pełni konwolucyjne dostosowane do problemów, w których dane wejściowe zależą od czasu. Stosuje się w nich konwolucje przyczynowe(causal convolutions), czyli takie, w których predykcja dla kroku czasowego \textit{t} zależy tylko od danych wejściowych dla kroku czasowego \textit{t} i wcześniejszych. Aby zwiększyć pole recepcyjne wykorzystano konwolucje rozszerzone (\textit{dilated convolutions}). Polega ona na wykorzystaniu wartości oddalonych o \textit{d} kroków czasowych przy obliczaniu wartości filtra, gdzie \textit{d} jest parametrem. Paramter ten jest zwiększany wykładniczo w kolejnych warstwach, co pozwala na wykorzystanie w predykcji danych dla oddalonych kroków czasowych.
+Czasowe sieci konwolucyjne(\textit{temporal convolutional networks} lub TCN) to sieci w pełni konwolucyjne dostosowane do problemów, w których dane wejściowe zależą od czasu. Stosuje się w nich konwolucje przyczynowe(causal convolutions), czyli takie, w których predykcja dla kroku czasowego \textit{t} zależy tylko od danych wejściowych dla kroku czasowego \textit{t} i wcześniejszych. Aby zwiększyć pole recepcyjne wykorzystano konwolucje rozszerzone (\textit{dilated convolutions}). Polega ona na wykorzystaniu wartości oddalonych o \textit{d} kroków czasowych przy obliczaniu wartości filtra, gdzie \textit{d} jest parametrem. Paramter ten jest zwiększany wykładniczo w kolejnych warstwach, co pozwala na wykorzystanie w predykcji danych nawet z kilkuset kroków czasowych wstecz.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.5]{tcn}
-	\caption{Schemat przedstawiający połaczenia w sieci używającej konwolucji czasowych i przyczynowych.}
+	\caption{Schemat przedstawiający połączenia w sieci używającej konwolucji czasowych i przyczynowych.}
 \end{figure}
 
-Czasowe sieci konwolucyjne znalazły zastosowanie w problemach, w których dane wejśćiowe są zależne od czasu np. tłumaczenie maszynowe\cite{fcnTranslation} i synteza dźwięku. Innym typem sieci znajdujących zastosowanie w tej klasie problemów są sieci LSTM\cite{lstm}, lecz zademonstrowano, że sieci w pełni konwolucyjne są w stanie osiągać lepsze wyniki w wielu problemach, mimo mniejszego zużycia pamięci i krótszego czasu potrzebnego do wykonania obliczeń \cite{sequenceModelling}.
+Czasowe sieci konwolucyjne znalazły zastosowanie w problemach, w których dane wejściowe są zależne od czasu np. tłumaczenie maszynowe\cite{fcnTranslation} i synteza dźwięku. Innym typem sieci znajdujących zastosowanie w tej klasie problemów są sieci LSTM\cite{lstm}, lecz zademonstrowano, że sieci w pełni konwolucyjne są w stanie osiągać lepsze wyniki w wielu problemach, mimo mniejszego zużycia pamięci i krótszego czasu potrzebnego do wykonania obliczeń \cite{sequenceModelling}.
 
-\subsection*{WaveNet}
+\subsection{WaveNet}
 
 Wavenet to głęboka sieć neuronowa wykorzystana oryginalnie do syntezy mowy\cite{wavenet}. Wykorzystano w niej konwolucje rozszerzone i przyczynowe tak jak w czasowych sieciach konwolucyjnych. Do wyniku obliczeń każdej z warstw konwolucyjnych stosuje się funkcję sigmoidalną i tangens hiperboliczny. Do dalszej części sieci przekazywany iloczyn wyników zastosowania tych funkcji. Podobna operacja jest wykonywana w sieciach LSTM \cite{lstm}, i tak ja tam ma za zadanie znormalizowanie cech i wybranie, które z nich mają przekazane do dalszej części sieci. Dodatkowo wykorzystano połączenia rezydualne podobne do tych w sieci ResNet\cite{resnet}, a klasyfikacja jest dokonywana na podstawie sumy cech obliczonej przez każdą z warstw.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.7]{wavenet_block}
-	\caption{Blok sieci Waveneta. Sieć składa się z pewnej liczby takich bloków połączonych w serii.}
+	\caption{Blok sieci Wavenet. Sieć składa się z pewnej liczby takich bloków połączonych w serii.}
 	\label{fig:wavenet_block}
 \end{figure}
 
 Sieci Wavenet udało się wygenerować mowę bardzo podobną do ludzkiej\cite{wavenet}, znalazła ona również zastosowanie w problemach rozpoznawania mowy, redukcji hałasu i generowania muzyki\cite{wavenetReview}.
 
-\subsection*{Dekodowanie CTC}
+\subsection{Dekodowanie CTC}
 
-Zarówno sieci konwolucyjne jak i sieci LSTM mogą przyjmować dane wejściowe różnych rozmiarów, ale rozmiar danych wyjściowych jest funkcją rozmiaru danych wejściowych. W celu zbudowania modelu, który dla danych o określonym rozmiarze może zwracać sekwencje różnych długości stosuje sie dekodowanie CTC(\textit{Connectionist Temporal Classification})\cite{ctc}. Dekoder CTC przyjmuje na wejściu macierz o rozmiarze \textit{(rozmiar alfabetu wyjściowego + 1, długość sekwencji wejściowej)}. Element macierzy na pozycji  \textit{(n, t)} opisuje prawdopodobieństwo, że krok czasowy \textit{t} danych wejśćiowych odpowiada \textit{n}-temu elementowi alfabetu wyjśćiowego. Ostatni wiersz macierzy odpowiada prawdopodobieństwu wystąpienia dodatkowego symbolu - znaku pustego odpowiadającemu granicom pomiędzy kolejnymi znakami w ciągu wyjściowym. 
+Zarówno sieci konwolucyjne jak i sieci LSTM mogą przyjmować dane wejściowe różnych rozmiarów, ale rozmiar danych wyjściowych jest funkcją rozmiaru danych wejściowych. W celu zbudowania modelu, który dla danych o określonym rozmiarze może zwracać sekwencje różnych długości stosuje się dekodowanie CTC(\textit{Connectionist Temporal Classification})\cite{ctc}. Dekoder CTC przyjmuje na wejściu macierz o rozmiarze \textit{(rozmiar alfabetu wyjściowego + 1, długość sekwencji wejściowej)}. Element macierzy na pozycji  \textit{(n, t)} opisuje prawdopodobieństwo, że krok czasowy \textit{t} danych wejściowych odpowiada \textit{n}-temu elementowi alfabetu wyjściowego. Ostatni wiersz macierzy odpowiada prawdopodobieństwu wystąpienia dodatkowego symbolu - znaku pustego odpowiadającemu granicom pomiędzy kolejnymi znakami w ciągu wyjściowym. 
 
-Sekwencje są kodowane w tej macierzy przez ścieżki, które powstają poprzez wybranie jednego znaku dla każdego kroku czasowego. Ścieżka zostaje zamieniona na sekwencję wyjściową poprzez połączenie w nieprzerwanych podciągów składających się z jednego znaku w pojedynczy symbol(AAAAAA -> A), a następnie usunięcie znaków pustych. Zatem sekwencje wyjściowe mogą być krótsze niż sekwencje wejściowe i mogą zawierać te same znaki na sąsiadujących pozycjach, w przypadku gdy w ścieżce znajduje się pomiędzy nimi znak pusty. Prawdopodobieństwo ścieżki jest zdefiniowane przez iloczyn prawdopodobieństw wybranych znaków dla każdego kroku czasowego.
+Sekwencje są kodowane w tej macierzy przez ścieżki, które powstają poprzez wybranie jednego znaku dla każdego kroku czasowego. Ścieżka zostaje zamieniona na sekwencję wyjściową poprzez połączenie występujących w niej nieprzerwanych podciągów składających się z jednego znaku w pojedynczy symbol(AAAAAA -> A), a następnie usunięcie znaków pustych. Zatem sekwencje wyjściowe mogą być krótsze niż sekwencje wejściowe i mogą zawierać te same znaki na sąsiadujących pozycjach, w przypadku gdy w ścieżce znajduje się pomiędzy nimi znak pusty. Prawdopodobieństwo ścieżki jest zdefiniowane przez iloczyn prawdopodobieństw znaków wybranych dla każdego kroku czasowego.
 
 \begin{figure}[h!]
 	\centering
@@ -536,14 +537,16 @@ Prawdopodobieństwo sekwencji wyjściowej to suma prawdopodobieństw wszystkich 
 
 Funkcja straty dla dekodowania CTC zdefiniowana jest jako
 \[-\ln{(p(x|z))}\]
-gdzie $p(x|z)$ to prawdopodobieństwo prawdziwej sekwencji dla danej macierzy prawdopodobieństw dla kroków czasowych.
+gdzie $p(x|z)$ to prawdopodobieństwo prawdziwej sekwencji dla danej macierzy prawdopodobieństw dla kroków czasowych. Jest ona różniczkowalna przy pomocy sieci neuronowych i algorytmu spadku gradientu.
 
 
-\section*{Architektury przetestowanych sieci neuronowych}
+\section{Architektury przetestowanych sieci neuronowych}
+
+W trakcie tworzenia pracy przetestowano poniższe architektury sieci neuronowych.
 
 \subsection{ResNet + LSTM z połączeniami rezydualnymi}
 
-Na dane wejściowe nakładana jest warstwa konwolucyjna zmieniająca ich kształt tak, aby ostatni wymiar miał rozmiar 256. Jest to potrzebne, aby mogły one zostać wykorzystane w połączeniach rezydualnych. Następnie w sieci znajduje się 5 bloków rezydualnych z mapowaniem identycznośćiowym z warstwami konwolucyjnymi obliczającymi 256 cech. Po nich następuje 3 warstwowa sieć LSTM obliczająca 128 cech. Jest ona aplikowana do cech obliczonych przez poprzednie warstwy w obu kierunkach - od początku od końca i od końca do początku. Zatem każda z warstw oblicza również po 256 cech. Również w tej części sieci zostały dodane połączenia rezydualne omijające warstwę. Są one sumowane z cechami obliczonymi przez warstwę, które omijają. Zatem sygnał wejściowy może płynąć przez całą sieć bez żadnych modyfikacji poza zmianą kształtu w pierwszej warstwie. Ostatnią warstwą w sieci jest warstwa gęsto połączona która dla każdego kroku czasowego oblicza prawdopodobieństwo że odpowiada on któremuś z nukleotydów lub granicy pomiędzy nimi. Wynik tej warstwy trafia do dekodera CTC.
+Na dane wejściowe nakładana jest warstwa konwolucyjna zmieniająca ich kształt tak, aby ostatni wymiar miał rozmiar 256. Jest to potrzebne, aby mogły one zostać wykorzystane w połączeniach rezydualnych. Następnie w sieci znajduje się 5 bloków rezydualnych z mapowaniem identycznościowym z warstwami konwolucyjnymi obliczającymi 256 cech. Konstrukcja takiego bloku została przedstawiona na rysunku \ref{fig:resnetBlock}. Po nich następuje 3 warstwowa sieć LSTM obliczająca 128 cech. Jest ona aplikowana do cech obliczonych przez poprzednie warstwy w obu kierunkach względem wymiaru czasu - od początku od końca i od końca do początku. Zatem każda z warstw oblicza również po 256 cech. Również w tej części sieci zostały dodane połączenia rezydualne omijające warstwę. Są one sumowane z cechami obliczonymi przez warstwę, które omijają. Zatem sygnał wejściowy może płynąć przez całą sieć bez żadnych modyfikacji poza zmianą kształtu w pierwszej warstwie. Ostatnią warstwą w sieci jest warstwa gęsto połączona która dla każdego kroku czasowego oblicza prawdopodobieństwo że odpowiada on któremuś z nukleotydów lub granicy pomiędzy nimi. Wynik tej warstwy trafia do dekodera CTC, który zwraca sekwencję DNA.
 
 \begin{figure}[h!]
 	\centering
@@ -553,7 +556,7 @@ Na dane wejściowe nakładana jest warstwa konwolucyjna zmieniająca ich kształ
 
 \subsection{ResNet + Konwolucje czasowe}
 
-Podobnie jak w poprzedniej sieci do ekstrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki wykorzystujące warstwy konwolucyjne rozszerzone i przyczynowe. W każdym bloku znajdują się 4 warstwy. Najpierw aplikowane są dwie z nich - jedna w oryginalnym kierunku a druga w odwróconym. Efekt zastosowania warstwy w odwróconym kierunku jest uzyskany poprzez odwróceniu danych wejściowych wobec wymiaru odpowiadającemu czasowi, zastosowanie warstwy i odwróceniu otrzymanego wyniku. Oba te wyniki są konkatenowane, a następnie stosuje się do nich \textit{Batch normalization} i funkcję aktywacyjną ReLu Dwie kolejne warstwy wykonują tą samą operację. Każda z warstw oblicza po 128 cech. Wszystkie warstwy wewnątrz danego bloku mają tą samą wartość rozszerzenia(dilation), lecz w każdym kolejnym bloku jest ona podwajana. W sumie w sieci znajduje się 7 takich bloków, czyli ostatni ma wartość rozszerzenia równą 64. Jądro ma wielkość 3, zatem pole receptywne konwolucji w ostatniej warstwie sięga 128 kroków czasowych w obu kierunkach. Warstwa gęsto połączona jest aplikowana do sumy wyników obliczeń każdego z bloków.
+Podobnie jak w poprzedniej sieci do ekstrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki wykorzystujące warstwy konwolucyjne rozszerzone i przyczynowe. W każdym bloku znajdują się 4 warstwy. Najpierw aplikowane są dwie z nich - jedna w oryginalnym kierunku a druga w odwróconym. Efekt zastosowania warstwy w odwróconym kierunku jest uzyskany poprzez odwróceniu danych wejściowych względem wymiaru odpowiadającemu czasowi, zastosowanie warstwy i odwróceniu otrzymanego wyniku. Oba te wyniki są konkatenowane, a następnie stosuje się do nich \textit{Batch normalization} i funkcję aktywacyjną ReLu Dwie kolejne warstwy wykonują tą samą operację. Każda z warstw oblicza po 128 cech. Wszystkie warstwy wewnątrz danego bloku mają tą samą wartość rozszerzenia(dilation), lecz w każdym kolejnym bloku jest ona podwajana. W sumie w sieci znajduje się 7 takich bloków, czyli ostatni ma wartość rozszerzenia równą 64. Jądro ma wielkość 3, zatem pole receptywne konwolucji w ostatniej warstwie sięga 128 kroków czasowych w obu kierunkach. Warstwa gęsto połączona jest aplikowana do sumy wyników obliczeń każdego z bloków.
 
 \begin{figure}[h!]
 	\centering
@@ -569,7 +572,7 @@ Podobnie jak w poprzedniej sieci do ekstrakcji cech lokalnych wykorzystano 5 blo
 
 \subsection{ResNet + WaveNet}
 
-Ten model jest rozszerzeniem poprzedniego o idee wykorzystane w WaveNet\cite{wavenet}. Do ekstrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki zawierające 2 warstwy konwolucyjne rozszerzone i przyczynowe. Do wyniku z nich jednej z nich aplikowana jest funkcja sigmoidalna a do drugiej tangens hiperboliczny, a następnie obliczany jest iloczyn. W ten sposób sieć może nauczyć się zapamiętywać lub usuwać z pamięci pewne cechy. Budowa bloku wykorzystanego w tej sieci jest podobna do tego przedstawionego na rysunku \ref{fig:wavenet_block}, z tą różnicą że warstwy konwolucyjne są aplikowane do danych oryginalnych i takich z odwróconym wymiarem czasu. Wyniki te są następnie konkatenowane. Jądro w tych warstwach ma rozmiar 2,a rozszerzenia przyjmują wartości od 1 do 128 zatem pole receptywne ma tą samą wielkość co w poprzednim modelu. Tak samo jak w poprzednim modelu dane wyjściowego każdego z bloków są sumowane i przekazywane do warstwy gęsto połączonej i następnie do dekodera CTC.
+Ten model jest rozszerzeniem poprzedniego o idee wykorzystane w WaveNet\cite{wavenet}. Do ekstrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki zawierające 2 warstwy konwolucyjne rozszerzone i przyczynowe. Do wyniku z nich jednej z nich aplikowana jest funkcja sigmoidalna a do drugiej tangens hiperboliczny, a następnie obliczany jest iloczyn. W ten sposób sieć może nauczyć się zapamiętywać lub usuwać z pamięci pewne cechy. Budowa bloku wykorzystanego w tej sieci jest podobna do tego przedstawionego na rysunku \ref{fig:wavenet_block}, z tą różnicą że warstwy konwolucyjne są aplikowane do danych oryginalnych i takich z odwróconym wymiarem czasu. Wyniki te są następnie konkatenowane. Jądro w tych warstwach ma rozmiar 2, a rozszerzenia przyjmują wartości od 1 do 128 zatem pole receptywne ma tą samą wielkość co w poprzednim modelu. Tak samo jak w poprzednim modelu dane wyjściowego każdego z bloków są sumowane i przekazywane do warstwy gęsto połączonej i następnie do dekodera CTC.
 
 \begin{figure}[h!]
 	\centering
@@ -587,13 +590,13 @@ W tym modelu do ekstrakcji cech lokalnych wykorzystano model wzorowany na sieci 
 	\caption{Architektura modelu DenseNet + WaveNet}
 \end{figure}
 
-\section*{Proces uczenia}
+\section{Proces uczenia}
 
 Do uczenia sieci wykorzystano algorytm optymalizacyjny Adam\cite{adam}, z \textit{learning rate} równym 0.001. Optymalizowano funkcję straty CTC\cite{ctc}. Sieć była uczona przez maksymalnie 10 epok - proces uczenia był przerywany jeśli po 2 kolejnych epok wartość funkcji straty nie zmniejszała się. Do uczenia wykorzystano procesor graficzny GEFORCE GTX 1080.
 
-\section*{Składanie odczytów}
+\section{Składanie odczytów}
 
-Podczas dokonywania predykcji długi odczyt sygnału dzielony jest na częściowo pokrywające się ze sobą fragmenty od długości 300 próbek. Każdy taki fragment pokrywa się z następnym w 90\%, to znaczy fragmenty zaczynają się od próbki sygnału o indeksach 0, 30, 60, 90 itd. Uzyskuje się w ten sposób dziesięciokrotne pokrycie krótkimi odczytami. Z racji że kolejność krótkich odczytów w konsensusie jest znana utworzenie go jest łatwe. Uzyskuje się go przez znalezienie najdłuższych zachodzących na siebie fragmentów sąsiadujących odczytów. W ten sposób zliczane są wystąpienia nukleotydów na każdej pozycji i wybierane te, które pojawiają się najczęściej.
+Podczas dokonywania predykcji długi odczyt sygnału dzielony jest na częściowo pokrywające się ze sobą fragmenty od długości 300 próbek. Każdy taki fragment pokrywa się z następnym w 90\%, to znaczy fragmenty zaczynają się od próbek sygnału o indeksach 0, 30, 60, 90 itd. Uzyskuje się w ten sposób dziesięciokrotne pokrycie krótkimi odczytami. Z racji że kolejność krótkich odczytów w konsensusie jest znana utworzenie go jest łatwe. Uzyskuje się go przez znalezienie najdłuższych zachodzących na siebie fragmentów sąsiadujących odczytów i nałożenie ich na siebie. W ten sposób zliczane są wystąpienia nukleotydów na każdej pozycji i wybierane są te, które pojawiają się najczęściej.
 
 \begin{figure}[h!]
 	\centering
@@ -601,11 +604,11 @@ Podczas dokonywania predykcji długi odczyt sygnału dzielony jest na częściow
 	\caption{Wizualizacja składanie krótkich odczytów w długi.}
 \end{figure}
 
-\section*{Szczegóły techniczne implementacji}
+\section{Szczegóły techniczne implementacji}
 
-Modele sieci neuronowych zostały zaimplementowane w języku Python, przy użyciu biblioteki TensorFlow\cite{tensorflow} wersja r1.15. Aplikacja obługuje odczyty w formacie fast5, będącym modyfikacją formatu HDF5 opracowaną przez Oxford Nanopore Technologies do przechowywania danych z sekwencjonowania MinIONem. Obsługiwane są również odczyty w formacie tekstowym wykorzystanym w jednym z użytych zbiorów danych\cite{chironData}. Sekwencje będące wynikiem basecallingu zapisywane są w formacie FASTA. Jest to format tekstowy służący do reprezentowania sekwencji nukleotydów lub białek, szeroko stosowany w bioinformatyce.
+Modele sieci neuronowych zostały zaimplementowane w języku Python, przy użyciu biblioteki TensorFlow\cite{tensorflow} wersja r1.15. Aplikacja obsługuje dane wejściowe w formacie fast5, będącym modyfikacją formatu HDF5 opracowaną przez Oxford Nanopore Technologies do przechowywania danych z sekwencjonowania MinIONem. Obsługiwane są również odczyty w formacie tekstowym wykorzystanym w jednym z użytych zbiorów danych\cite{chironData}. Sekwencje będące wynikiem basecallingu zapisywane są w formacie FASTA. Jest to format tekstowy służący do reprezentowania sekwencji nukleotydów lub białek, szeroko stosowany w bioinformatyce.
 
-\chapter*{Ewaluacja modeli i analiza wyników}
+\chapter{Ewaluacja modeli i analiza wyników}
 
 \section{Zbiory danych}
 
@@ -613,28 +616,28 @@ Do oceny jakości modeli wykorzystano zbiory danych zawierające po 2000 odczyt�
 
 \section{Wykorzystane metryki}
 
-Aby ocenić wynik basecallingu na krótkich fragmentach sygnału (300 próbek) obliczono liczbę insercji, substytucji i delecji potrzebnych do przetransformowania wyniku dekodowania CTC do sekwencji DNA, która faktycznie odpowiada fragmentowi sygnału dla którego dokonano basecallingu. Obliczona wartość jest dzielona przez liczbę baz w oczekiwanej sekwencji w celu znormalizowania miary. Otrzymuje się w ten sposób znormalizowany dystans edycji pomiędzy wynikiem basecallingu a fragmentem prawdziwej sekwencji DNA. Miara ta ocenia jakość krótkich fragmentów DNA będących wynikiem bezpośrednio otrzymywanym z modelu.
+Aby ocenić wynik basecallingu na krótkich fragmentach sygnału (300 próbek) obliczono liczbę insercji, substytucji i delecji potrzebnych do przetransformowania wyniku dekodowania CTC do sekwencji DNA, która faktycznie odpowiada fragmentowi sygnału dla którego dokonano basecallingu. Obliczona wartość jest dzielona przez liczbę baz w oczekiwanej sekwencji w celu znormalizowania miary. Otrzymuje się w ten sposób znormalizowany dystans edycji pomiędzy wynikiem basecallingu a fragmentem prawdziwej sekwencji DNA. Miara ta ocenia jakość krótkich fragmentów DNA będących wynikiem bezpośrednio otrzymywanym z sieci neuronowej, przed krokiem składania odczytu.
 
-Z fragmentów DNA otrzymywanych na wyjściu dekodera tworzony jest konsensus odpowiadający sekwencji DNA pewnego odczytu. Sekwencje te są mapowane na odpowiedni genom referencyjny przy użyciu programu minimap2\cite{minimap}. Otrzymane w ten sposób pliki BAM zostały przeanalizowane programem japsa\footnote{https://github.com/mdcao/japsa}, który oblicza liczbę delecji, substytucji i insercji pomiędzy pomiędzy sekwencją wejściowa i fragmentem genomu referencyjnego na, który została zmapowana. Procent delecji, insercji i substytucji obliczony jest przez iloraz liczby tych operacji i długości fragmentu genomu referencyjnego, na który została zmapowana sekwencja. Stopień identyczności pomiędzy sekwencjami jest zdefiniowany jako $1-procent_delecji-procent_substytucji$, a procent błędów jako $procent_insercji + procent_delecji + procent_substytucji$.
+Z fragmentów DNA otrzymywanych na wyjściu dekodera tworzony jest konsensus odpowiadający sekwencji DNA pewnego odczytu. Sekwencje te są mapowane na odpowiedni genom referencyjny przy użyciu programu minimap2\cite{minimap}. Otrzymane w ten sposób pliki BAM zostały przeanalizowane programem japsa\footnote{https://github.com/mdcao/japsa}, który oblicza liczbę delecji, substytucji i insercji pomiędzy pomiędzy sekwencją wejściowa i fragmentem genomu referencyjnego na, który została zmapowana. Procent delecji, insercji i substytucji obliczony jest przez iloraz liczby tych operacji i długości fragmentu genomu referencyjnego, na który została zmapowana sekwencja. Stopień identyczności pomiędzy sekwencjami jest zdefiniowany jako $1-procentDelecji-procentSubstytucji$, a procent błędów jako $procentInsercji + procentDelecji + procentSubstytucji$.
 
-Aby sprawdzić jakość konsensusu powstałego z otrzymanych odczytów wykorzystano assembler Rebaler\footnote{https://github.com/rrwick/Rebaler}. Zbudowano przy jego pomocy kontigi z odczytów z sekwencjonowania \textit{lambda phage}. Kontigi zostały podzielone na fragmenty zawierające 10 tysięcy par zasad i zmapowane na genom referencyjny przy pomocy minimap2. Następnie obliczono średni stopień identyczności pomiędzy zmapowanymi sekwencjami i genomem referencyjnym. Obliczono względną długość otrzymanego konsensusu względem genomu referencyjnego. Taka procedura sprawdzenia jakości konsensusu pojawia się w publikacjach porównujących basecallery\cite{wick}\cite{chiron}.
+Aby sprawdzić jakość konsensusu powstałego z otrzymanych odczytów wykorzystano assembler Rebaler\footnote{https://github.com/rrwick/Rebaler}. Zbudowano przy jego pomocy kontigi z odczytów z sekwencjonowania \textit{lambda phage}. Kontigi zostały podzielone na fragmenty zawierające 10 tysięcy par zasad i zmapowane na genom referencyjny przy pomocy minimap2. Następnie obliczono średni stopień identyczności pomiędzy zmapowanymi sekwencjami i genomem referencyjnym. Obliczono również względną długość otrzymanego konsensusu względem genomu referencyjnego. Taka procedura sprawdzenia jakości konsensusu pojawia się w publikacjach porównujących basecallery\cite{wick}\cite{chiron}.
 
-\section*{Ewaluacja testowanych architektur sieci}
+\section{Ewaluacja testowanych architektur sieci}
 
 \subsection{Proces uczenia}
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics{training_loss}
+	\includegraphics[scale=0.8]{training_loss}
 	\caption{Wartości funkcji straty podczas procesu uczenia poszczególnych modeli.}
 	\label{fig:training}
 \end{figure}
 
-Na wykresie \ref{fig:training} przedstawiono wartość funkcji straty osiągane przez modele w trakcie procesu uczenia. W przypadku wszystkich architektur strata spada szybko podczas pierwszej epoki, a potem zmienia się już tylko nieznacznie, Przez cały proces uczenia najmniejszą wartość funkcji straty notują modele oparte o sieci rekurencyjne. 
+Na wykresie \ref{fig:training} przedstawiono wartości funkcji straty osiągane przez modele w trakcie procesu uczenia. W przypadku wszystkich architektur strata spada szybko podczas pierwszej epoki, a potem zmienia się już tylko nieznacznie. Przez cały proces uczenia najmniejszą wartość funkcji straty notują modele oparte o sieci rekurencyjne. 
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics{val_distance}
+	\includegraphics[scale=0.8]{val_distance}
 	\caption{Znormalizowany dystans edycji liczony na zbiorze treningowym końcu każdej epoki.}
 	\label{fig:val_distance}
 \end{figure}
@@ -645,7 +648,7 @@ Podobnie podczas uczenia zachowuje się dystans edycji (wykres \ref{fig:val_dist
 
 Podczas basecallingu zbioru testowego obliczono znormalizowany dystans edycji pomiędzy wynikiem predykcji na fragmentach sygnału po 300 próbek, a sekwencjom DNA odpowiadających temu sygnałowi. Wyniki przedstawiono w tabeli \ref{table:edit_distance}. Wyniki te są bardzo podobne do tych uzyskanych na zbiorze treningowym - najlepsze osiągane są przez modele wykorzystujące sieci rekurencyjne.
 
-\begin{table}[]
+\begin{table}[h!]
 	\centering
 	\begin{tabular}{ll}
 		Model            & \begin{tabular}[c]{@{}l@{}}Znormalizowany \\ \\ Dystans Edycji\end{tabular} \\
@@ -660,7 +663,7 @@ Podczas basecallingu zbioru testowego obliczono znormalizowany dystans edycji po
 
 \subsection{Ocena jakości odczytów}
 
-Sekwencje otrzymane z basecallingu całych odczytów zostały zmapowane na genom referencyjny celu zbadania ich jakości. Wyniki zostały przedstawione w tabelach \ref{table:lambda} i \ref{table:ecoli}. Wszystkie modele produkowały trafniejsze odczyty dla dany \textit{e. coli}. Jakość odczytów jest powiązana z jakością predykcji dla krótkich fragmentów - modele, których wyniki dla krótkich fragmentów osiągały niższy znormalizowany dystans edycji produkowały odczyty o wyższym stopniu identyczności i niższym procencie błędów. Zatem ponownie modele wykorzystujące rekurencyjne sieci neuronowe osiągały lepsze wyniki niż oparte wyłącznie o sieci konwolucyjne.
+Sekwencje otrzymane z basecallingu całych odczytów zostały zmapowane na genom referencyjny w celu zbadania ich jakości. Wyniki zostały przedstawione w tabelach \ref{table:lambda} i \ref{table:ecoli}. Wszystkie modele produkowały trafniejsze odczyty dla danych \textit{e. coli}. Jakość odczytów jest powiązana z jakością predykcji dla krótkich fragmentów - modele, których wyniki dla krótkich fragmentów osiągały niższy znormalizowany dystans edycji produkowały odczyty o wyższym stopniu identyczności i niższym procencie błędów. Zatem ponownie modele wykorzystujące rekurencyjne sieci neuronowe osiągały lepsze wyniki niż oparte wyłącznie o sieci konwolucyjne.
 
 \begin{table}[]
 		\centering
@@ -675,7 +678,7 @@ Sekwencje otrzymane z basecallingu całych odczytów zostały zmapowane na genom
 	\label{table:lambda}
 \end{table}
 
-\begin{table}[]
+\begin{table}[h!]
 	\centering
 	\begin{tabular}{llllll}
 		& \begin{tabular}[c]{@{}l@{}}Procent\\ delecji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent\\ insercji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent \\ substytucji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Stopień\\ identyczności\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent \\ błędów\end{tabular} \\
@@ -692,7 +695,7 @@ Sekwencje otrzymane z basecallingu całych odczytów zostały zmapowane na genom
 
 W tabeli \ref{table:consensus} zaprezentowano jakośc konsensusów otrzymanych z odczytów. Wyniki dla każdego z modelu zawierają błędy, częstotliwość ich występowania jest powiązana z iloscią błędów w odczytach, z których powstały kontigi. Zatem wszystkie modele popełniają systematyczne błędy, które zostają odzwierciedlone w konsensusie.
 
-\begin{table}[]
+\begin{table}[h!]
 	\begin{tabular}{lll}
 		& \begin{tabular}[c]{@{}l@{}}Mediana stopnia\\ identycznośći\end{tabular} & \begin{tabular}[c]{@{}l@{}}Mediana długości\\ względem referencji\end{tabular} \\
 		ResNet+LSTM      & 99.67\%                                                                 & 99.69\%                                                                        \\
@@ -772,14 +775,12 @@ W tabeli \ref{table:consensus} zaprezentowano jakośc konsensusów otrzymanych z
 % ----- 8. Spis rysunków - jeśli nie ma, zakomentować --------
 \listoffigures
 \thispagestyle{empty}
-Jak nie występują, usunąć.
 
 
 % ------------ 9. Spis tabel - jak wyżej ------------------
 \renewcommand{\listtablename}{Spis tabel}
 \listoftables
 \thispagestyle{empty}
-Jak nie występują, usunąć.
 
 
 % 10. Spis załączników - jak nie ma załączników, to zakomentować lub usunąć
