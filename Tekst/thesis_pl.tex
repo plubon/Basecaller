@@ -224,11 +224,13 @@ podpis promotora & \hspace*{100pt} & podpis autora
 \tytul
 \end{center}
 
-Streszczam.
+Sekwencjonowanie DNA przy użyciu nanoporów przez które przepływa nić DNA charakteryzuje się niskim kosztem i znaczną długością otrzymanych odczytów. Kluczowy wpływ na jakość wyniku tego procesu ma krok basecallingu czyli translacji sygnału elektrycznego na sekwencję nukleotydów. Celem pracy jest zbudowanie narzędzia realizującego ten krok.
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elit, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+W pracy zaproponowano rozwiązanie oparte o uczenie głębokie. Przetestowano architektury w pełni konwolucyjne i takie wykorzystujące warstwy rekurencyjne. Udało się osiągnąć
+odczyty o stopniu identyczności 91.15\% i konsensus w 99.77\% zgodny z referencją. Dokonano analizy wyników w celu wykrycia cech fragmentów sygnału, w których pojawiają się błędy.\\
 
-\noindent \textbf{Słowa kluczowe:} slowo1, slowo2, ...
+
+\noindent \textbf{Słowa kluczowe:} sekwencjonowanie DNA, uczenie głębokie, modelowanie sekwencji, sekwencjonowanie nanopore, sieci neuronowe
 \end{abstract}
 }
 
@@ -241,11 +243,11 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elit, sed diam nonumyeirmod te
 \title
 \end{center}
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+DNA sequencing by translocation of DNA strand through a nanopore offers lower cost and produces long reads. The process of translation of electric signal to sequence of nucloetides, called basecalling, strongly influences the quality of the result of sequencing. In this work a tool for basecalling is presented.
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\\
+A deep learning based solution is presented. Several neural network architectures were tested, including fully convolutional ones and ones using recurrent layers. Best one produces reads with identity rate up to 91.15\% and assembly identity rate up to 99.77\%. Results are analyzed to discover features of segments of input electrical signal  that cause errors.  \\
 
-\noindent \textbf{Keywords:} keyword1, keyword2, ...
+\noindent \textbf{Keywords:} DNA sequencing, deep learning, sequence modelling, nanopore sequencing, neural networks
 \end{abstract}
 }
 
@@ -291,7 +293,7 @@ samodzielnie, co poświadczam własnoręcznym podpisem.
 
 \newpage % JEŻELI SPIS TREŚCI MA PARZYSTĄ LICZBĘ STRON, ZAKOMENTOWAĆ
 % ALBO JAK KTOŚ WOLI WTEDY DWIE STRONY ODSTĘPU, DODAĆ \null\newpage
-
+\null\newpage
 % -------------- 5. ZASADNICZA CZĘŚĆ PRACY --------------------
 \null\thispagestyle{empty}\newpage
 \pagestyle{fancy}
@@ -301,6 +303,14 @@ samodzielnie, co poświadczam własnoręcznym podpisem.
 \chapter{Wstęp}
 \markboth{}{Wstęp}
 %\addcontentsline{toc}{chapter}{Wstęp}
+Sekwencjonowanie DNA pozwala na poznanie genomu organizmu i wykorzystanie tej wiedzy np. w medycynie poprzez zbadanie wpływu kodu genetycznego na zachorowanie na nowotwory \cite{cancerNonCoding} czy choroby o podłożu genetycznym\cite{diagnosis}. Zastosowanie sekwencjonowania jest ograniczone przez jego koszt i długość fragmentów genomu będących jego wynikiem nazywanych odczytami. Oxford Nanopore MinION to technologia sekwencjonowania dostępna od 2015 r. ona pory przez, które przepływają pojedyncze nici DNA. Cechuje się ona niskim kosztem i dużą długością produkowanych odczytów. MinION mierzy sygnał elektryczny, którego poziom zmienia się w zależności od nukleotydów znajdujących się w porze  w danym momencie. Proces analizy mający na celu otrzymanie sekwencji DNA odpowiadającej nazywany jest basecallingiem i ma on kluczowy wpływ na liczbę błędów  w otrzymanej sekwencji. Jest on utrudniony poprzez obecność szumu w otrzymywanym sygnale. Poprawienie tego procesu umożliwiłoby użycie sekwencjonowania nanoporowego w zastosowaniach, w których niezbędne są sekwencje o bardzo dużej trafności\cite{snp}. Ważną miarą oceny jakości basecallera jest nie tylko liczba błędów w pojedynczych odczytach, ale też stopień identyczności utworzonego z nich konsensusu względem genomu referencyjnego.
+
+Istniejące basecallery wykorzystują uczenie głębokie w celu translacji sygnału na sekwencję DNA. Problem modelowania sekwencji pojawia się w wielu zastosowaniach sieci neuronowych np. tłumaczeniu maszynowym czy syntezie mowy. Architektury sieci wykorzystanych do tego celu mogą być wykorzystane w procesie basecallingu.
+
+Dzięki analizie błędów popełnianych przez basecaller można by wykryć przypadki, w których dokonanie poprawnej predykcji na podstawie sygnału dla tego modelu. Umożliwiłoby zaproponowanie metody, która pomoże w rozwiązaniu tych trudnych przypadków i umożliwi zbudowanie lepszego konsensusu.
+
+W pracy zaproponowano modele oparte o modele rekurencyjne i w pełni konwolucyjne. Przetestowano Zmierzono jakość produkowanych odczytów i otrzymanych z nich konsensusu. Otrzymano odczyty o stopniu identyczności 91.15\% i konsensus w 99.77\% zgodny z referencją. Przeprowadzono również analizę błędów w konsensusie i wykryto przypadek odpowiedzialny za 78\% występujących w nim błędów. Opisano jak sposób mierzenia sygnału przez urządzenia powoduje pojawianie się tego błędu.
+
 
 \chapter{Opis problemu}
 
@@ -510,7 +520,7 @@ Czasowe sieci konwolucyjne znalazły zastosowanie w problemach, w których dane 
 
 \subsection{WaveNet}
 
-Wavenet to głęboka sieć neuronowa wykorzystana oryginalnie do syntezy mowy\cite{wavenet}. Wykorzystano w niej konwolucje rozszerzone i przyczynowe tak jak w czasowych sieciach konwolucyjnych. Do wyniku obliczeń każdej z warstw konwolucyjnych stosuje się funkcję sigmoidalną i tangens hiperboliczny. Do dalszej części sieci przekazywany iloczyn wyników zastosowania tych funkcji. Podobna operacja jest wykonywana w sieciach LSTM \cite{lstm}, i tak ja tam ma za zadanie znormalizowanie cech i wybranie, które z nich mają przekazane do dalszej części sieci. Dodatkowo wykorzystano połączenia rezydualne podobne do tych w sieci ResNet\cite{resnet}, a klasyfikacja jest dokonywana na podstawie sumy cech obliczonej przez każdą z warstw.
+Wavenet to głęboka sieć neuronowa wykorzystana oryginalnie do syntezy mowy\cite{wavenet}. Wykorzystano w niej konwolucje rozszerzone i przyczynowe tak jak w czasowych sieciach konwolucyjnych. Do wyniku obliczeń każdej z warstw konwolucyjnych stosuje się funkcję sigmoidalną i tangens hiperboliczny. Do dalszej części sieci przekazywany iloczyn wyników zastosowania tych funkcji. Podobna operacja jest wykonywana w sieciach LSTM \cite{lstm}, i tak ja tam ma za zadanie znormalizowanie cech i wybranie, które z nich mają przekazane do dalszej części sieci. Nazywana ona jest Gated Linear Unit\cite{glu}. Dodatkowo wykorzystano połączenia rezydualne podobne do tych w sieci ResNet\cite{resnet}, a klasyfikacja jest dokonywana na podstawie sumy cech obliczonej przez każdą z warstw.
 
 \begin{figure}[h!]
 	\centering
@@ -740,12 +750,37 @@ Prawie 80\% błędów występujących w konsensusie było delecją w homopolimer
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.8]{homopolymer}
+	\includegraphics[scale=0.7]{homopolymer}
 	\caption{Znormalizowany sygnał dla homopolimeru składającego się z ośmiu cząsteczek adeniny }
 	\label{fig:homopolymer}
 \end{figure}
 
 \chapter{Podsumowanie}
+
+Celem pracy było stworzenia narzędzia umożliwiającego dokonania translacji sygnału pochodzącego z sekwencjonowania nici DNA urządzeniem ONT MinION na sekwencję nukleotydów znajdującej się w niej. Wykorzystano do tego głębokie sieci neuronowe i przetestowano następujące ich architektury:
+
+\begin{itemize}
+	\item sieć opartą o bloki ResNet i warstwy LSTM
+	\item głęboką sieć opartą o bloki ResNet i warstwy LSTM, wykorzystującą połączenia rezydualne
+	\item sieć w pełni konwolucyjną wykorzystującą bloki ResNet i konwolucje czasowe
+	\item sieć w pełni konwolucyjną oparta o bloki ResNet i konwolucje czasowe wykorzystujące Gated Linear Units
+	\item sieć w pełni konwolucyjną oparta o sieć DenseNet i konwolucje czasowe wykorzystujące Gated Linear Units
+\end{itemize}
+
+Wszystkie modele wykorzystują dekodowanie CTC do obliczenia sekwencji wyjściowej. Zaimplementowano również algorytm umożliwiający stworzenie z krótkich sekwencji obliczanych przez sieć konsensusu reprezentującego sekwencję odpowiadającą długiemu odczytowi.
+
+Zbadano jakość predykcji na wszystkich etapach obliczania wyniku:
+
+\begin{itemize}
+	\item obliczono znormalizowany dystans edycji dla krótkich sekwencji na wyjściu z sieci
+	\item zmapowano otrzymane odczyty na genom referencyjny i obliczono liczbę delecji, insercji i substytucji
+	\item zbudowano konsensus z odczytów i porównano otrzymane kontigi z  genomem referecyjnym
+\end{itemize}
+
+Według wszystkich miar najlepsze wyniki uzyskiwały modele wykorzystujące sieci rekurencyjne. Wykorzystanie modelu, który przekazuje stan obliczeń pomiędzy krokami poprawia jakość predykcji. Zastosowanie połączeń rezydualnych umożliwiło wytrenowanie głębszej sieci neuronowej, która osiągała lepsze wyniki, podobne do tych co istniejące rozwiązania.
+
+Przeprowadzono analizę błędów w konsensusie utworzonych z odczytów pochodzących z modelu produkującego najtrafniejsze odczyty. Wykryto rodzaj błędu odpowiadający za 80\% wszystkich pomyłek w otrzymanym konsensusie - delecje w homopolimerach. Opisano jak sposób działania urządzenia MinION wpływa na występowanie tego błędu i dlaczego rozpoznanie liczby baz w homopolimerze jest trudnym problemem dla sieci neuronowej. W celu poprawy predykcji można stworzyć osobny model do wykrywania i dokonania predykcji regionów sygnału odpowiadających homopolimerom.
+
 % -------------------- 6. Bibliografia -----------------------
 % Bibliografia leksykograficznie wg nazwisk autorów
 % Dla ambitnych - można skorzystać z BibTeX-a
@@ -796,6 +831,7 @@ Prawie 80\% błędów występujących w konsensusie było delecją w homopolimer
 \bibitem{lstm} Sepp Hochreiter; Jürgen Schmidhuber Long short-term memory. Neural Computation
 \bibitem{tcn} Nal Kalchbrenner  Lasse Espeholt  Karen Simonyan  Aaron van den Oord  Alex Graves  Koray Kavukcuoglu Neural Machine Translation in Linear Time
 \bibitem{wavenet}Aaron van den Oord, Sander Dieleman, Heiga Zen, Karen Simonyan, Oriol Vinyals, Alex Graves, Nal Kalchbrenner, Andrew Senior, Koray Kavukcuoglu WaveNet: A Generative Model for Raw Audio
+\bibitem{glu} Yann N. Dauphin, Angela Fan, Michael Auli, David Grangie Language Modeling with Gated Convolutional Network, arXiv:1612.08083v3
 \bibitem{wavenetReview} Boilard, Jonathan \& Gournay, Philippe \& Lefebvre, R.. (2019). A Literature Review of WaveNet: Theory, Application and Optimization. 
 \bibitem{ctc}Alex Graves, Santiago Fernandez, Faustino Gomez, Jurgen Schmidhuber, Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks
 \bibitem{adam}Kingma, D.P., \& Ba, J. (2014). Adam: A Method for Stochastic Optimization. CoRR, abs/1412.6980.
