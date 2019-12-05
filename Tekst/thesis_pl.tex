@@ -554,6 +554,10 @@ Na dane wejściowe nakładana jest warstwa konwolucyjna zmieniająca ich kształ
 	\caption{Architektura modelu ResNet + LSTM z połączeniami rezydualnymi}
 \end{figure}
 
+\subsection{Deep ResNet + LSTM z połączeniami rezydualnymi}
+
+Model, tak jak poprzedni, składa się z bloków ResNet i dwukierunkowych warstw LSTM. Zwiększono jednak głębokość sieci - zastosowano 10 bloków ResNet i 5 warstw LSTM. Dzięki zastosowaniu połączeń rezydualnych zwiększenie złożoności modelu powinno poprawić jakość predykcji.
+
 \subsection{ResNet + Konwolucje czasowe}
 
 Podobnie jak w poprzedniej sieci do ekstrakcji cech lokalnych wykorzystano 5 bloków ResNet. Po nich następują bloki wykorzystujące warstwy konwolucyjne rozszerzone i przyczynowe. W każdym bloku znajdują się 4 warstwy. Najpierw aplikowane są dwie z nich - jedna w oryginalnym kierunku a druga w odwróconym. Efekt zastosowania warstwy w odwróconym kierunku jest uzyskany poprzez odwróceniu danych wejściowych względem wymiaru odpowiadającemu czasowi, zastosowanie warstwy i odwróceniu otrzymanego wyniku. Oba te wyniki są konkatenowane, a następnie stosuje się do nich \textit{Batch normalization} i funkcję aktywacyjną ReLu Dwie kolejne warstwy wykonują tą samą operację. Każda z warstw oblicza po 128 cech. Wszystkie warstwy wewnątrz danego bloku mają tą samą wartość rozszerzenia(dilation), lecz w każdym kolejnym bloku jest ona podwajana. W sumie w sieci znajduje się 7 takich bloków, czyli ostatni ma wartość rozszerzenia równą 64. Jądro ma wielkość 3, zatem pole receptywne konwolucji w ostatniej warstwie sięga 128 kroków czasowych w obu kierunkach. Warstwa gęsto połączona jest aplikowana do sumy wyników obliczeń każdego z bloków.
@@ -653,6 +657,7 @@ Podczas basecallingu zbioru testowego obliczono znormalizowany dystans edycji po
 	\begin{tabular}{ll}
 		Model            & \begin{tabular}[c]{@{}l@{}}Znormalizowany \\ \\ Dystans Edycji\end{tabular} \\
 		ResNet+LSTM      & 0.1544                                                                      \\
+		Deep ResNet+LSTM & 0.1566                                                                      \\
 		ResNet+TCN       & 0.1853                                                                      \\
 		ResNet+WaveNet   & 0.2040                                                                      \\
 		DenseNet+WaveNet & 0.1879                                                                     
@@ -670,6 +675,7 @@ Sekwencje otrzymane z basecallingu całych odczytów zostały zmapowane na genom
 	\begin{tabular}{llllll}
 		& \begin{tabular}[c]{@{}l@{}}Procent\\ delecji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent\\ insercji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent \\ substytucji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Stopień\\ identyczności\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent \\ błędów\end{tabular} \\
 		ResNet+LSTM      & 6.30\%                                                    & 2.26\%                                                     & 4.44\%                                                         & 89.26\%                                                         & 13.00\%                                                   \\
+		Deep ResNet+LSTM      & 5.55\%                                                    & 2.59\%                                                     & 4.25\%                                                         & 90.19\%                                                         & 11.44\%                                                   \\
 		ResNet+TCN       & 7.02\%                                                    & 3.00\%                                                     & 6.41\%                                                         & 86.57\%                                                         & 16.43\%                                                   \\
 		ResNet+WaveNet   & 9.18\%                                                    & 1.82\%                                                     & 5.74\%                                                         & 85.09\%                                                         & 16.74\%                                                   \\
 		DenseNet+WaveNet & 7.40\%                                                    & 2.56\%                                                     & 5.78\%                                                         & 86.83\%                                                         & 15.74\%                                                  
@@ -683,6 +689,7 @@ Sekwencje otrzymane z basecallingu całych odczytów zostały zmapowane na genom
 	\begin{tabular}{llllll}
 		& \begin{tabular}[c]{@{}l@{}}Procent\\ delecji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent\\ insercji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent \\ substytucji\end{tabular} & \begin{tabular}[c]{@{}l@{}}Stopień\\ identyczności\end{tabular} & \begin{tabular}[c]{@{}l@{}}Procent \\ błędów\end{tabular} \\
 		ResNet+LSTM      & 5.42\%                                                    & 2.20\%                                                     & 4.20\%                                                         & 90.39\%                                                         & 11.82\%                                                   \\
+		Deep ResNet+LSTM      & 4.77\%                                                    & 2.51\%                                                     & 4.08\%                                                         & 91.15\%                                                         & 11.44\%                                                   \\
 		ResNet+TCN       & 6.11\%                                                    & 2.94\%                                                     & 5.94\%                                                         & 87.95\%                                                         & 13.99\%                                                   \\
 		ResNet+WaveNet   & 8.15\%                                                    & 1.85\%                                                     & 5.59\%                                                         & 86.26\%                                                         & 15.59\%                                                   \\
 		DenseNet+WaveNet & 6.57\%                                                    & 2.52\%                                                     & 5.67\%                                                         & 87.76\%                                                         & 13.76\%                                                  
@@ -699,6 +706,7 @@ W tabeli \ref{table:consensus} zaprezentowano jakośc konsensusów otrzymanych z
 	\begin{tabular}{lll}
 		& \begin{tabular}[c]{@{}l@{}}Mediana stopnia\\ identycznośći\end{tabular} & \begin{tabular}[c]{@{}l@{}}Mediana długości\\ względem referencji\end{tabular} \\
 		ResNet+LSTM      & 99.67\%                                                                 & 99.69\%                                                                        \\
+		Deep ResNet+LSTM      & 99.77\%                                                                 & 99.80\%                                                                        \\
 		ResNet+TCN       & 99.55\%                                                                 & 99.75\%                                                                        \\
 		ResNet+WaveNet   & 98.94\%                                                                 & 99.02\%                                                                        \\
 		DenseNet+WaveNet & 99.43\%                                                                 & 99.55\%                                                                       
@@ -707,7 +715,37 @@ W tabeli \ref{table:consensus} zaprezentowano jakośc konsensusów otrzymanych z
 	\label{table:consensus}
 \end{table}
 
-\chapter{Wnioski}
+\subsection{Porównanie wyników, wnioski}
+
+We wszystkich obliczonych metrykach lepsze wyniki osiągają architektury wykorzystujące warstwy rekurencyjne. Sieci wykorzystujące wyłącznie warstwy konwolucyjne produkują odczyty o większym dystansie edycji względem referencji i tym samym konsensus o mniejszym stopniu identyczności. Może to wynikać z faktu że w sieciach LSTM istnieje stan obliczeń przekazywany pomiędzy krokami czasowymi - dzięki temu predykcja dokonana w pewnym kroku czasowym wpływa na te dokonywane w innych krokach. 
+
+Typ popełnianych błędów w odczytach jest podobny w prawie wszystkich modelach - pojawia się więcej delecji i substytucji niż insercji. Jedynie model ResNet+WaveNet cechuje się innym profilem błędów - występuję tam względnie więcej delecji a mniej insercji. Konsensus stworzony z dwóch zestawów odczytów o innym typie błędów może mieć lepszą jakość niż taki stworzony tylko jednego z nich, jednak  konsensusu z odczytów z różnych modeli nie poprawiało jego jakości. Zwiększenie liczby warstw w modelu ResNet+LSTM poprawiło jakość predykcji i to model DeepResNet+LSTM produkował odczyty o najwyższym stopniu identyczności i najmniejszej liczbie błędów. 
+
+Jakość pojedynczych odczytów miała bezpośredni wpływ na utworzony z nich konsensus - mniejsza liczba błędów w odczytach przekładała się na mniejszą liczbę błędów w konsensusie. Najlepszy konsensus powstał z odczytów z modelu DeepResNet+LSTM, przeprowadzono dla niego analizę błędów.s
+
+Prawie 80\% błędów występujących w konsensusie było delecją w homopolimerze czyli ciągu przynajmniej 3 tych samych baz sąsiadujących ze sobą. Sygnał pochodzący z takich fragmentów DNA może być trudny do przetworzenia przez sieć neuronową. Przykładowy fragment sygnału odpowiadający homopolimerowi składającemu się z ośmiu cząsteczek adeniny przedstawiono na wykresie \ref{homopolymer}. We fragmentach odpowiadających homopolimerom poziom sygnału zmienia się w małym stopniu, podczas gdy w innych fragmentach zmianie bazy odpowiada skok sygnału. Może to wynikać z faktu, że w przypadku homopolimerów dłuższych niż 5 baz przez dłuższy czas w porze znajduje się 5-mer, a zatem nie zmienia się opór. Dlatego model ma problemy z rozpoznaniem, że przez por przesunął się kolejny nukleotyd. Rozwiązaniem tego problemu może być osobny model, który wykryje fragmenty sygnału potencjalnie odpowiadające homopolimerom i dokona predykcji w inny sposób. Umożliwiłoby to wyeliminowanie znacznej części błędów w konsensusie.
+
+\begin{table}[]
+	\begin{tabular}{ll}
+		Rodzaj błędu             & Procent wszystkich błędów \\
+		Delecja w homopolimerze  & 78.81\%                   \\
+		Insercja w homopolimerze & 0.84\%                    \\
+		Inna insercja            & 11.01\%                   \\
+		Inna delecja             & 4.23\%                    \\
+		Substytucja              & 5.11\%                   
+	\end{tabular}
+	\caption{Rodzaj błedów popełnionych w konsensusie otrzymanym z readów basecallowanych modelem Deep ResNet+LSTM}
+	\label{table:errors}
+\end{table}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.8]{homopolymer}
+	\caption{Znormalizowany sygnał dla homopolimeru składającego się z ośmiu cząsteczek adeniny }
+	\label{fig:homopolymer}
+\end{figure}
+
+\chapter{Podsumowanie}
 % -------------------- 6. Bibliografia -----------------------
 % Bibliografia leksykograficznie wg nazwisk autorów
 % Dla ambitnych - można skorzystać z BibTeX-a
