@@ -30,40 +30,22 @@ class H5FileReader:
 
     def read_for_eval(self, path):
         with h5py.File(path + '.fast5', 'r') as h5_file:
-            if 'Analyses/RawGenomeCorrected_000/BaseCalled_template/Events' not in h5_file:
-                return [], [], []
-            corrected_events = h5_file['Analyses/RawGenomeCorrected_000/BaseCalled_template/Events']
-            corrected_events_array = corrected_events[()]
             raw_signal = h5_file['Raw/Reads']
             signal_path = raw_signal.visit(self.find_signal)
             dataset = raw_signal[signal_path][()]
-            offset = corrected_events.attrs.get('read_start_rel_to_raw')
-            event_position = np.array([x[2] + offset for x in corrected_events_array])
-            event_length = np.array([x[3] for x in corrected_events_array])
-            sequence = np.array([x[4] for x in corrected_events_array])
+            mean = np.mean(np.unique(dataset))
+            std = np.std(np.unique(dataset))
             segments = []
-            labels = []
             indices = []
-            signal_index = event_position[0]
-            label_index = 0
-            end = event_position[-1] + event_length[-1]
-            while signal_index + 300 < end and signal_index+300 < len(dataset):
-                signal = dataset[signal_index:signal_index+300]
-                normalized_signal = (signal - np.mean(np.unique(dataset))) / np.std(np.unique(dataset))
-                label_end = label_index + 1
-                while label_end < len(event_position) and event_position[label_end] <= signal_index + 300:
-                    label_end = label_end + 1
-                label = sequence[label_index:label_end]
-                for idx, char in enumerate(label):
-                    if char not in alphabet_dict.keys():
-                        label[idx] = b'A'
+            signal_index = 40
+            while signal_index + 300 < len(dataset) - 40:
+                signal = dataset[signal_index:signal_index + 300]
+                normalized_signal = (signal - mean) / std
                 segments.append(normalized_signal)
-                labels.append([x.decode("utf-8") for x in label])
                 indices.append(signal_index)
                 signal_index = signal_index + 30
-                while event_position[label_index + 1] < signal_index:
-                    label_index = label_index + 1
-            return segments, labels, indices
+            return segments, indices
+
 
     def read(self, path):
         with h5py.File(path + '.fast5', 'r') as h5_file:
